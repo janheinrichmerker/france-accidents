@@ -6,7 +6,7 @@
 
 # 🚨 france-accidents
 
-Visualizing [accidents in France from 2005 to 2016](https://kaggle.com/ahmedlahlou/accidents-in-france-from-2005-to-2016).
+Visualizing [accidents in France from 2005 to 2016](https://kaggle.com/ahmedlahlou/accidents-in-france-from-2005-to-2016), originally released as [French Government open data](https://data.gouv.fr/en/datasets/bases-de-donnees-annuelles-des-accidents-corporels-de-la-circulation-routiere-annees-de-2005-a-2019/).
 
 _The project is developed as part of the [Information Retrieval and Visualization lecture](https://informatik.uni-halle.de/arbeitsgruppen/dbs/lehre/2757674_2757765/) lecture at [Martin Luther University Halle-Wittenberg](https://uni-halle.de)._
 
