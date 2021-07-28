@@ -17,6 +17,7 @@
     "coverage": "elm-coverage node_modules/.bin/elm-test"
   },
   "dependencies": {
+    "copy-webpack-plugin": "^9.0.1",
     "elm": "^0.19.1-5",
     "elm-coverage": "^0.3.0",
     "elm-format": "^0.8.5",
