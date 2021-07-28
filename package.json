@@ -7,11 +7,25 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "elm reactor",
-    "elm": "elm"
+    "build": "webpack build --mode production",
+    "watch": "webpack build --mode development --watch",
+    "start": "webpack serve --mode development",
+    "lint": "elm-format --validate ./ && elm-review",
+    "test": "elm-test",
+    "coverage": "elm-coverage node_modules/.bin/elm-test"
   },
   "dependencies": {
     "elm": "^0.19.1-5",
-    "elm-format": "^0.8.5"
+    "elm-coverage": "^0.3.0",
+    "elm-format": "^0.8.5",
+    "elm-hot-webpack-loader": "^1.1.8",
+    "elm-json": "^0.2.10",
+    "elm-review": "^2.5.3",
+    "elm-test": "^0.19.1-revision7",
+    "elm-webpack-loader": "^8.0.0",
+    "html-webpack-plugin": "^5.3.2",
+    "webpack": "^5.47.0",
+    "webpack-cli": "^4.7.2",
+    "webpack-dev-server": "^3.11.2"
   }
 }
