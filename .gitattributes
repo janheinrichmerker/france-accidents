@@ -1,3 +1,4 @@
+*.csv filter=lfs diff=lfs merge=lfs -text
 *.svg !text !filter !merge !diff
 *.labx !text !filter !merge !diff
 *.skb !text !filter !merge !diff
