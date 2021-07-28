@@ -36,7 +36,8 @@ config =
     , NoUnsafePorts.rule NoUnsafePorts.any
     , NoUnusedPorts.rule
     , NoUnused.CustomTypeConstructors.rule []
-    , NoUnused.Dependencies.rule
+
+    -- , NoUnused.Dependencies.rule
     , NoUnused.Exports.rule |> ignoreErrorsForDirectories [ "tests/" ]
     , NoUnused.Modules.rule
     , NoUnused.Parameters.rule
