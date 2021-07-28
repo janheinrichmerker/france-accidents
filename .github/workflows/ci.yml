@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    name: "🏗️ Build"
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        node: [12, 14]
+    steps:
+      - name: "📥 Check-out"
+        uses: actions/checkout@v2
+      - name: "🧰 Install Node.js"
+        uses: actions/setup-node@v2.1.5
+        with:
+          node-version: ${{ matrix.node }}
+      - name: "♻️ Cache dependencies"
+        uses: actions/cache@v2.1.4
+        with:
+          path: |
+            node_modules
+          key: ${{ runner.os }}-node-${{ matrix.node }}-${{ hashFiles('**/yarn.lock') }}
+      - name: "🧰 Install dependencies"
+        run: yarn install --frozen-lockfile
+      - name: "🏗️ Build package"
+        run: yarn build
+  test:
+    name: "🧪 Test"
+    runs-on: ubuntu-20.04
+    needs:
+      - build
+    strategy:
+      matrix:
+        node: [12, 14]
+    steps:
+      - name: "📥 Check-out"
+        uses: actions/checkout@v2
+      - name: "🧰 Install Node.js"
+        uses: actions/setup-node@v2.1.5
+        with:
+          node-version: ${{ matrix.node }}
+      - name: "♻️ Cache dependencies"
+        uses: actions/cache@v2.1.4
+        with:
+          path: |
+            node_modules
+          key: ${{ runner.os }}-node-${{ matrix.node }}-${{ hashFiles('**/yarn.lock') }}
+      - name: "🧰 Install dependencies"
+        run: yarn install --frozen-lockfile
+      - name: "🧪 Review code"
+        run: yarn lint
+      - name: "🧪 Run tests"
+        run: yarn test
+      - name: "🧪 Report test coverage"
+        run: yarn coverage
+      - name: "📤 Upload test coverage"
+        uses: actions/upload-artifact@v2.2.2
+        with:
+          path: .coverage/
+          name: Test coverage
+      - name: "📤 Publish test coverage"
+        uses: codecov/codecov-action@v1
