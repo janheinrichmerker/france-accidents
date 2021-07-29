@@ -10,6 +10,12 @@ Visualizing [accidents in France from 2005 to 2016](https://kaggle.com/ahmedlahl
 
 _The project is developed as part of the [Information Retrieval and Visualization lecture](https://informatik.uni-halle.de/arbeitsgruppen/dbs/lehre/2757674_2757765/) lecture at [Martin Luther University Halle-Wittenberg](https://uni-halle.de)._
 
+## Ideas
+
+- Treemap or tree of accident categories
+- Plot number of injuries/fatalities on y-axis, month on x-axis, different plots for safety equipments
+- Icon based: vehicle type, situation, weather, curvature etc.
+
 ## License
 
 This project is [MIT licensed](LICENSE), you can use it for whatever you want as long as you mention this repository.
