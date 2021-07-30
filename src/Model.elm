@@ -24,8 +24,7 @@ type alias Characteristic =
     , collision : Collision
     , address : Address
     , geoOriginator : GeoOriginator
-    , latitude : Latitude
-    , longitude : Longitude
+    , coordinates: Coordinates
     }
 
 
@@ -99,6 +98,11 @@ type GeoOriginator
     | GeoOriginatorReunion
     | GeoOriginatorMayotte
 
+
+type alias Coordinates =
+    { latitude : Latitude
+    , longitude : Longitude
+    }
 
 type alias Latitude =
     Float
