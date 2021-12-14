@@ -13,6 +13,10 @@ type alias Accident =
     }
 
 
+type alias Characteristics =
+    List ( AccidentId, Characteristic )
+
+
 type alias Characteristic =
     { dateTime : Posix
     , lighting : Lighting
@@ -24,7 +28,7 @@ type alias Characteristic =
     , collision : Collision
     , address : Address
     , geoOriginator : GeoOriginator
-    , coordinates: Coordinates
+    , coordinates : Coordinates
     }
 
 
@@ -103,6 +107,7 @@ type alias Coordinates =
     { latitude : Latitude
     , longitude : Longitude
     }
+
 
 type alias Latitude =
     Float
