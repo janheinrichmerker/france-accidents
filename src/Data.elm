@@ -1,7 +1,7 @@
 module Data exposing (..)
 
-import Csv.Decode exposing (Decoder, Error, FieldNames(..), andThen, decodeCsv, fail, field, int, into, map, pipeline, string, succeed)
-import Model exposing (AccidentId, Address, Characteristic, Collision, Coordinates, Departement, GeoOriginator, Intersection, Lighting(..), Localisation, Muncipality, Weather)
+import Csv.Decode exposing (Decoder, Error, FieldNames(..), andThen, decodeCsv, fail, field, float, int, into, map, pipeline, string, succeed)
+import Model exposing (AccidentId, Address, Characteristic, Collision(..), Coordinates, Departement, GeoOriginator(..), Intersection(..), Lighting(..), Localisation(..), Muncipality, Weather(..))
 import Time exposing (Posix)
 import Time.DateTime exposing (DateTime, dateTime, minute)
 import Time.TimeZones exposing (europe_paris)
@@ -108,10 +108,10 @@ decodeCharacteristicHourMinute =
                     hourMinute - (hour * (10 ^ 2))
             in
             if hour < 0 || hour > 24 then
-                fail "Invalid hour format"
+                fail ("Invalid hour format '" ++ String.fromInt hour ++ "'")
 
             else if minute < 0 || minute > 59 then
-                fail "Invalid hour format"
+                fail ("Invalid minute format '" ++ String.fromInt minute ++ "'")
 
             else
                 succeed ( hour, minute )
@@ -140,51 +140,179 @@ decodeCharacteristicLighting =
                     succeed LightingNightWithPublicLighting
 
                 _ ->
-                    fail "Unknown lighting."
+                    fail ("Unknown lighting '" ++ String.fromInt lighting ++ "'.")
         )
         (field "lum" int)
 
 
 decodeCharacteristicDepartement : Decoder Departement
 decodeCharacteristicDepartement =
-    fail "not implemented"
+    field "dep" int
 
 
 decodeCharacteristicMuncipality : Decoder Muncipality
 decodeCharacteristicMuncipality =
-    fail "not implemented"
+    field "com" int
 
 
 decodeCharacteristicLocalisation : Decoder Localisation
 decodeCharacteristicLocalisation =
-    fail "not implemented"
+    andThen
+        (\localisation ->
+            case localisation of
+                1 ->
+                    succeed LocalisationOutOfAgglomeration
+
+                2 ->
+                    succeed LocalisationInBuiltUpAreas
+
+                _ ->
+                    fail ("Unknown localisation '" ++ String.fromInt localisation ++ "'.")
+        )
+        (field "agg" int)
 
 
 decodeCharacteristicIntersection : Decoder Intersection
 decodeCharacteristicIntersection =
-    fail "not implemented"
+    andThen
+        (\intersection ->
+            case intersection of
+                1 ->
+                    succeed IntersectionOutOfIntersection
+
+                2 ->
+                    succeed IntersectionX
+
+                3 ->
+                    succeed IntersectionT
+
+                4 ->
+                    succeed IntersectionY
+
+                5 ->
+                    succeed IntersectionMoreThan4Branches
+
+                6 ->
+                    succeed IntersectionGiratory
+
+                7 ->
+                    succeed IntersectionPlace
+
+                8 ->
+                    succeed IntersectionLevelCrossing
+
+                9 ->
+                    succeed IntersectionOther
+
+                _ ->
+                    fail ("Unknown intersection '" ++ String.fromInt intersection ++ "'.")
+        )
+        (field "int" int)
 
 
 decodeCharacteristicWeather : Decoder Weather
 decodeCharacteristicWeather =
-    fail "not implemented"
+    andThen
+        (\weather ->
+            case weather of
+                1 ->
+                    succeed WeatherNormal
+
+                2 ->
+                    succeed WeatherLightRain
+
+                3 ->
+                    succeed WeatherHeavyRain
+
+                4 ->
+                    succeed WeatherSnowHail
+
+                5 ->
+                    succeed WeatherFogSmoke
+
+                6 ->
+                    succeed WeatherStrongWindStorm
+
+                7 ->
+                    succeed WeatherDazzling
+
+                8 ->
+                    succeed WeatherCloudy
+
+                9 ->
+                    succeed WeatherOther
+
+                _ ->
+                    fail ("Unknown weather '" ++ String.fromInt weather ++ "'.")
+        )
+        (field "atm" int)
 
 
 decodeCharacteristicCollision : Decoder Collision
 decodeCharacteristicCollision =
-    fail "not implemented"
+    andThen
+        (\collision ->
+            case collision of
+                1 ->
+                    succeed CollisionTwoVehiclesFrontal
+
+                2 ->
+                    succeed CollisionTwoVehiclesRear
+
+                3 ->
+                    succeed CollisionTwoVehiclesSide
+
+                4 ->
+                    succeed CollisionThreeOrMoreVehiclesChain
+
+                5 ->
+                    succeed CollisionThreeOrMoreVehiclesMultipleCollisions
+
+                6 ->
+                    succeed CollisionOther
+
+                7 ->
+                    succeed CollisionNone
+
+                _ ->
+                    fail ("Unknown collision '" ++ String.fromInt collision ++ "'.")
+        )
+        (field "col" int)
 
 
 decodeCharacteristicAddress : Decoder Address
 decodeCharacteristicAddress =
-    fail "not implemented"
+    field "adr" string
 
 
 decodeCharacteristicGeoOriginator : Decoder GeoOriginator
 decodeCharacteristicGeoOriginator =
-    fail "not implemented"
+    andThen
+        (\geoOriginator ->
+            case geoOriginator of
+                "M" ->
+                    succeed GeoOriginatorMetropole
+
+                "A" ->
+                    succeed GeoOriginatorAntilles
+
+                "G" ->
+                    succeed GeoOriginatorGuyane
+
+                "R" ->
+                    succeed GeoOriginatorReunion
+
+                "Y" ->
+                    succeed GeoOriginatorMayotte
+
+                _ ->
+                    fail ("Unknown geo originator '" ++ geoOriginator ++ "'.")
+        )
+        (field "gps" string)
 
 
 decodeCharacteristicCoordinates : Decoder Coordinates
 decodeCharacteristicCoordinates =
-    fail "not implemented"
+    into Coordinates
+        |> pipeline (field "lat" float)
+        |> pipeline (field "lat" float)
