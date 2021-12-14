@@ -117,6 +117,10 @@ type alias Longitude =
     Float
 
 
+type alias Places =
+    List ( AccidentId, Place )
+
+
 type alias Place =
     { road : Road
     , roadNumber : RoadNumber
@@ -145,6 +149,7 @@ type Road
     | RoadCommunalWay
     | RoadOffPublicNetwork
     | RoadPublicParking
+    | RoadUrbanMetropolitan
     | RoadOther
 
 
@@ -161,7 +166,8 @@ type alias RoadNumberIndexLetter =
 
 
 type TrafficRegime
-    = TrafficRegimeOneWay
+    = TrafficRegimeUnknown
+    | TrafficRegimeOneWay
     | TrafficRegimeBidirectional
     | TrafficRegimeSeparatedLanes
     | TrafficRegimeVariableAssignmentLanes
@@ -172,13 +178,15 @@ type alias NumberLanes =
 
 
 type ReservedLane
-    = ReservedLaneBikePath
+    = ReservedLaneNone
+    | ReservedLaneBikePath
     | ReservedLaneCycleBank
     | ReservedLaneReservedChannel
 
 
 type Profile
-    = ProfileFlat
+    = ProfileUnknown
+    | ProfileFlat
     | ProfileSloped
     | ProfileHillTop
     | ProfileHillBottom
@@ -208,7 +216,8 @@ type alias RoadwayTrafficWidth =
 
 
 type SurfaceCondition
-    = SurfaceConditionNormal
+    = SurfaceConditionUnknown
+    | SurfaceConditionNormal
     | SurfaceConditionWet
     | SurfaceConditionPuddles
     | SurfaceConditionFlooded
@@ -220,7 +229,8 @@ type SurfaceCondition
 
 
 type Infrastructure
-    = InfrastructureUndergroundOrTunnel
+    = InfrastructureNone
+    | InfrastructureUndergroundOrTunnel
     | InfrastructureBridgeOrOverpass
     | InfrastructureExchangerOrConnectionBrace
     | InfrastructureRailway
@@ -230,7 +240,8 @@ type Infrastructure
 
 
 type Situation
-    = SituationOnRoad
+    = SituationNone
+    | SituationOnRoad
     | SituationOnHardShoulder
     | SituationOnVerge
     | SituationOnSidewalk
