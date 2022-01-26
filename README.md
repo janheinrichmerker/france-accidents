@@ -10,6 +10,22 @@ Visualizing [accidents in France from 2005 to 2016](https://kaggle.com/ahmedlahl
 
 _The project is developed as part of the [Information Retrieval and Visualization lecture](https://informatik.uni-halle.de/arbeitsgruppen/dbs/lehre/2757674_2757765/) lecture at [Martin Luther University Halle-Wittenberg](https://uni-halle.de)._
 
+## Usage
+
+Start a web server with the visualizations running on http://localhost:8080/:
+
+```shell
+yarn start
+```
+
+If you want to deploy the compiled, static resources to a HTTP server, run
+
+```shell
+yarn build
+```
+
+and copy the `dist/` folder to your web server's content root.
+
 ## Ideas
 
 - Treemap or tree of accident categories
