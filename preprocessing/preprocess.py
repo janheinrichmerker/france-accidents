@@ -30,7 +30,9 @@ def parse_artifact(json: dict) -> Optional[Artifact]:
         return None
     if not str(json["name"]).endswith(".csv"):
         return None
-    return Artifact(json["name"], json["contentUrl"])
+    name: str =  json["name"]
+    name = name.replace("_", "-")
+    return Artifact(name, json["contentUrl"])
 
 
 def get_artifacts() -> list[Artifact]:
