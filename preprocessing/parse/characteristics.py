@@ -12,8 +12,8 @@ from model import Characteristic, Light, Intersection, AtmosphericConditions, \
 
 class CharacteristicsParser(Parser):
 
+    @staticmethod
     def _parse_file(
-            self,
             path: Path,
             progress: tqdm,
     ) -> Iterable[Characteristic]:
