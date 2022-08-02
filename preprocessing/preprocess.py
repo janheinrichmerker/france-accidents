@@ -7,7 +7,8 @@ from requests import get
 from tqdm.auto import tqdm
 
 # Directory paths.
-from parsers import PARSERS
+from parse import Parser
+from parse.characteristics import CharacteristicsParser
 
 PROJECT_DIR = Path(__file__).parent.parent
 DATA_DIR = PROJECT_DIR / "static" / "data"
@@ -15,8 +16,17 @@ DATA_DIR.mkdir(exist_ok=True)
 CACHE_DIR = DATA_DIR / "cache"
 CACHE_DIR.mkdir(exist_ok=True)
 
-# URLs
+# Dataset base URL to fetch available data.
 DATASET_URL = "https://www.data.gouv.fr/en/datasets/53698f4ca3a729239d2036df/"
+
+# Parsers:
+PARSERS: dict[str, Parser] = {
+    "caracteristiques": CharacteristicsParser(),
+    # "lieux": TODO,
+    # "usagers": PassengersParser(),
+    # "vehicules": VehicleParser(),
+    # "vehicules-immatricules-baac": TODO,
+}
 
 
 class Artifact(NamedTuple):
