@@ -1,6 +1,5 @@
 from json import loads
 from pathlib import Path
-
 from typing import NamedTuple, Optional
 
 from bs4 import BeautifulSoup
@@ -8,6 +7,8 @@ from requests import get
 from tqdm.auto import tqdm
 
 # Directory paths.
+from parsers import PARSERS
+
 PROJECT_DIR = Path(__file__).parent.parent
 DATA_DIR = PROJECT_DIR / "static" / "data"
 DATA_DIR.mkdir(exist_ok=True)
@@ -30,7 +31,7 @@ def parse_artifact(json: dict) -> Optional[Artifact]:
         return None
     if not str(json["name"]).endswith(".csv"):
         return None
-    name: str =  json["name"]
+    name: str = json["name"]
     name = name.replace("_", "-")
     return Artifact(name, json["contentUrl"])
 
@@ -57,30 +58,40 @@ def get_artifacts() -> list[Artifact]:
     return artifacts
 
 
-def cache_artifact(artifact: Artifact) -> None:
+def cache_artifact(artifact: Artifact) -> Path:
     path = CACHE_DIR / artifact.name
     if path.exists():
         assert path.is_file()
-        return
+        return path
     response = get(artifact.url)
     with path.open("wb") as file:
         file.write(response.content)
+    return path
 
 
-def cache_artifacts() -> None:
+def cache_artifacts() -> list[Path]:
     artifacts = get_artifacts()
     artifacts = tqdm(
         artifacts,
         desc="Downloading artifacts",
         unit="file"
     )
-    for artifact in artifacts:
+    return [
         cache_artifact(artifact)
+        for artifact in artifacts
+    ]
 
 
 def main() -> None:
-    cache_artifacts()
+    files: list[Path] = cache_artifacts()
+    for prefix, parser in PARSERS.items():
+        matching_files = [
+            file
+            for file in files
+            if file.name.startswith(prefix)
+        ]
+        parser.parse(matching_files, DATA_DIR)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
