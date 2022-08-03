@@ -113,14 +113,14 @@ class Location(NamedTuple):
     accident_id: int
     road_category: RoadCategory
     road: str
-    road_index_number: int
+    road_index_number: Optional[int]
     road_index_alpha: Optional[str]
     traffic_regime: Optional[TrafficRegime]
-    lanes_count: int
+    lanes_count: Optional[int]
     dedicated_lane: Optional[DedicatedLane]
     profile: Optional[Profile]
     upstream_terminal: Optional[int]
-    upstream_terminal_distance_meters: Optional[int]
+    upstream_terminal_distance_meters: Optional[float]
     curvature: Optional[Curvature]
     central_reservation_width_meters: int
     road_traffic_width_meters: float
