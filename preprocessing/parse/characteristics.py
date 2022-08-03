@@ -5,13 +5,15 @@ from typing import Iterable
 
 from tqdm.auto import tqdm
 
-from parse import Parser
-from model import Characteristic, Light, Intersection, AtmosphericConditions, \
-    Collision, LocationRegime
+from parse import Parser, Formatter
+from model import (
+    Characteristic, Light, Intersection, AtmosphericConditions, Collision,
+    LocationRegime
+)
+from parse.util import count_lines
 
 
-class CharacteristicsParser(Parser):
-
+class CharacteristicsCsvParser(Parser[Characteristic]):
     @staticmethod
     def _parse_file(
             path: Path,
@@ -83,20 +85,20 @@ class CharacteristicsParser(Parser):
                 )
                 progress.update(1)
 
-    def parse(self, input_paths: list[Path], output_dir: Path) -> None:
-        output_path = output_dir / "characteristics.csv"
-
-        # Compute total count.
-        num_lines = 0
-        for path in input_paths:
-            with path.open("r", encoding="latin-1") as file:
-                num_lines += sum(1 for _ in file)
-
+    def parse(self, input_paths: list[Path]) -> Iterable[Characteristic]:
         progress = tqdm(
             desc="Parsing characteristics",
-            total=num_lines,
+            total=count_lines(input_paths),
             unit="line",
         )
+        for path in input_paths:
+            yield from self._parse_file(path, progress)
+
+
+class CharacteristicsCsvFormatter(Formatter[Characteristic]):
+    def format(self, items: Iterable[Characteristic],
+               output_dir: Path) -> None:
+        output_path = output_dir / "characteristics.csv"
 
         with output_path.open("w") as output_file:
             fieldnames = [
@@ -115,34 +117,33 @@ class CharacteristicsParser(Parser):
             ]
             writer = DictWriter(output_file, fieldnames=fieldnames)
             writer.writeheader()
-            for path in input_paths:
-                for characteristic in self._parse_file(path, progress):
-                    writer.writerow({
-                        "accident_id": characteristic.accident_id,
-                        "timestamp": characteristic.timestamp.isoformat(),
-                        "latitude": characteristic.latitude or "",
-                        "longitude": characteristic.longitude or "",
-                        "department": characteristic.department,
-                        "commune": characteristic.commune,
-                        "address": characteristic.address,
-                        "location": (
-                            characteristic.location.name
-                            if characteristic.location else ""
-                        ),
-                        "light": (
-                            characteristic.light.name
-                            if characteristic.light else ""
-                        ),
-                        "atmospheric_conditions": (
-                            characteristic.atmospheric_conditions.name
-                            if characteristic.atmospheric_conditions else ""
-                        ),
-                        "intersection": (
-                            characteristic.intersection.name
-                            if characteristic.intersection else ""
-                        ),
-                        "collision": (
-                            characteristic.collision.name
-                            if characteristic.collision else ""
-                        ),
-                    })
+            for characteristic in items:
+                writer.writerow({
+                    "accident_id": characteristic.accident_id,
+                    "timestamp": characteristic.timestamp.isoformat(),
+                    "latitude": characteristic.latitude or "",
+                    "longitude": characteristic.longitude or "",
+                    "department": characteristic.department,
+                    "commune": characteristic.commune,
+                    "address": characteristic.address,
+                    "location": (
+                        characteristic.location.name
+                        if characteristic.location else ""
+                    ),
+                    "light": (
+                        characteristic.light.name
+                        if characteristic.light else ""
+                    ),
+                    "atmospheric_conditions": (
+                        characteristic.atmospheric_conditions.name
+                        if characteristic.atmospheric_conditions else ""
+                    ),
+                    "intersection": (
+                        characteristic.intersection.name
+                        if characteristic.intersection else ""
+                    ),
+                    "collision": (
+                        characteristic.collision.name
+                        if characteristic.collision else ""
+                    ),
+                })
