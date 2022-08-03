@@ -65,5 +65,61 @@ class Characteristic(NamedTuple):
     commune: str
 
 
+class RoadCategory(IntEnum):
+    HIGHWAY = 1
+    NATIONAL_ROAD = 2
+    DEPARTMENTAL_ROAD = 3
+    MUNICIPAL_ROADS = 4
+    OFF_THE_PUBLIC_NETWORK = 5
+    PARKING_LOT_OPEN_TO_PUBLIC_TRAFFIC = 6
+    URBAN_METROPOLITAN_ROADS = 7
+    OTHER = 8
+
+
+class TrafficRegime(IntEnum):
+    ONE_WAY = 1
+    BIDIRECTIONAL = 2
+    WITH_SEPARATE_LANES = 3
+    WITH_VARIABLE_ASSIGNMENT_LANES = 4
+
+
+class DedicatedLane(IntEnum):
+    NONE = 0
+    BICYCLE_PATH = 1
+    CYCLE_LANE = 2
+    RESERVED_LANE = 3
+
+
+class Profile(IntEnum):
+    FLAT = 1
+    SLOPE = 2
+    TOP_OF_HILL = 3
+    BOTTOM_OF_HILL = 4
+
+
+class Curvature(IntEnum):
+    STRAIGHT = 1
+    LEFT_HAND_CURVE = 2
+    RIGHT_HAND_CURVE = 3
+    S_CURVE = 4
+
+
+class Location(NamedTuple):
+    accident_id: int
+    road_category: RoadCategory
+    road_id: int
+    road_index_number: int
+    road_index_alpha: str
+    traffic_regime: TrafficRegime
+    num_lanes: int
+    dedicated_lane: DedicatedLane
+    profile: Profile
+    upstream_terminal: Optional[int]
+    upstream_terminal_distance_meters: Optional[int]
+    curvature: Curvature
+    central_reservation_width_meters: int
+    road_traffic_width_meters: int
+
+
 class Accident(Characteristic):
     pass
