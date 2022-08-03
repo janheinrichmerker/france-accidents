@@ -285,6 +285,7 @@ class Vehicle(NamedTuple):
         assert self.vehicle_name[1:].isnumeric()
         assert self.vehicle_name[:1].isalpha()
         assert self.vehicle_name[:1].isupper()
+        assert self.occupancy is None or self.occupancy >= 0
 
 
 class Accident(NamedTuple):
