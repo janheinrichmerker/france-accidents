@@ -78,7 +78,7 @@ class RoadCategory(IntEnum):
     OFF_THE_PUBLIC_NETWORK = 5
     PARKING_LOT_OPEN_TO_PUBLIC_TRAFFIC = 6
     URBAN_METROPOLITAN_ROADS = 7
-    OTHER = 8
+    OTHER = 9
 
 
 class TrafficRegime(IntEnum):
@@ -112,18 +112,28 @@ class Curvature(IntEnum):
 class Location(NamedTuple):
     accident_id: int
     road_category: RoadCategory
-    road_id: int
+    road: str
     road_index_number: int
-    road_index_alpha: str
-    traffic_regime: TrafficRegime
-    num_lanes: int
-    dedicated_lane: DedicatedLane
-    profile: Profile
+    road_index_alpha: Optional[str]
+    traffic_regime: Optional[TrafficRegime]
+    lanes_count: int
+    dedicated_lane: Optional[DedicatedLane]
+    profile: Optional[Profile]
     upstream_terminal: Optional[int]
     upstream_terminal_distance_meters: Optional[int]
-    curvature: Curvature
+    curvature: Optional[Curvature]
     central_reservation_width_meters: int
-    road_traffic_width_meters: int
+    road_traffic_width_meters: float
+
+    def __int__(self):
+        assert self.accident_id >= 0
+        assert self.road_index_number >= 0
+        assert self.lanes_count >= 0
+        assert self.upstream_terminal >= 0
+        assert self.upstream_terminal_distance_meters >= 0
+        assert self.central_reservation_width_meters >= 0
+        assert self.road_traffic_width_meters >= 0
+
 
 
 class Accident(Characteristic):
