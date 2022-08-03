@@ -64,6 +64,11 @@ class Characteristic(NamedTuple):
     department: str
     commune: str
 
+    def __int__(self):
+        assert self.accident_id >= 0
+        assert self.latitude is None or -90 <= self.latitude <= 90
+        assert self.longitude is None or -180 <= self.longitude <= 180
+
 
 class RoadCategory(IntEnum):
     HIGHWAY = 1

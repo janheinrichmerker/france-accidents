@@ -30,6 +30,8 @@ class CharacteristicsCsvParser(Parser[Characteristic]):
         with path.open("r", encoding="latin-1") as file:
             reader = DictReader(file, delimiter=delimiter, quotechar='"')
             for row in reader:
+                for key in row:
+                    row[key] = str(row[key]).strip()
                 hour_minute_str = str(row["hrmn"]).replace(":", "")
                 assert len(hour_minute_str) <= 4
                 hour_minute_str = (
