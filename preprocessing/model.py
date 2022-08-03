@@ -152,9 +152,9 @@ class VehicleCategory(IntEnum):
     LIGHT_VEHICLE_WITH_CARAVAN = 8
     LIGHT_VEHICLE_WITH_TRAILER = 9
     COMMERCIAL_VEHICLE_ONLY_WEIGHT_RATING_AT_LEAST_1_5_T_AT_MOST_3_5_T = 10
-    COMMERCIAL_VEHICLE_WITH_CARAVAN_WEIGHT_RATING_AT_LEAST_1_5_T_AT_MOST_3_5_T\
+    COMMERCIAL_VEHICLE_WITH_CARAVAN_WEIGHT_RATING_AT_LEAST_1_5_T_AT_MOST_3_5_T \
         = 11
-    COMMERCIAL_VEHICLE_WITH_TRAILER_WEIGHT_RATING_AT_LEAST_1_5_T_AT_MOST_3_5_T\
+    COMMERCIAL_VEHICLE_WITH_TRAILER_WEIGHT_RATING_AT_LEAST_1_5_T_AT_MOST_3_5_T \
         = 12
     TRUCK_ONLY_WEIGHT_RATING_MORE_THAN_3_5_T_AT_MOST_7_5_T = 13
     TRUCK_ONLY_WEIGHT_RATING_MORE_THAN_7_5_T = 14
@@ -266,16 +266,25 @@ class Engine(IntEnum):
 
 class Vehicle(NamedTuple):
     accident_id: int
-    vehicle_id: int
-    vehicle_id_alpha: str
-    traffic_direction: TrafficDirection
+    vehicle_name: str
+    vehicle_id: Optional[int]
+    traffic_direction: Optional[TrafficDirection]
     vehicle_category: VehicleCategory
-    fixed_obstacle: FixedObstacle
-    mobile_obstacle: MobileObstacle
-    initial_shock_point: ShockPoint
-    primary_manoeuvre: Manoeuvre
-    engine: Engine
-    occupancy: int
+    fixed_obstacle: Optional[FixedObstacle]
+    mobile_obstacle: Optional[MobileObstacle]
+    shock_point: Optional[ShockPoint]
+    primary_manoeuvre: Optional[Manoeuvre]
+    engine: Optional[Engine]
+    occupancy: Optional[int]
+
+    def __int__(self):
+        assert self.accident_id >= 0
+        assert self.vehicle_id >= 0
+        assert self.vehicle_name.isalnum()
+        assert len(self.vehicle_name) == 3
+        assert self.vehicle_name[1:].isnumeric()
+        assert self.vehicle_name[:1].isalpha()
+        assert self.vehicle_name[:1].isupper()
 
 
 class Accident(NamedTuple):
