@@ -63,3 +63,7 @@ class Characteristic(NamedTuple):
     location: Optional[LocationRegime]
     department: str
     commune: str
+
+
+class Accident(Characteristic):
+    pass

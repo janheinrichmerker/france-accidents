@@ -1,15 +1,15 @@
-from csv import DictReader, DictWriter
+from csv import DictReader
 from datetime import datetime
 from pathlib import Path
 from typing import Iterable
 
 from tqdm.auto import tqdm
 
-from parse import Parser, Formatter
 from model import (
     Characteristic, Light, Intersection, AtmosphericConditions, Collision,
     LocationRegime
 )
+from parse import Parser
 from parse.util import count_lines
 
 
@@ -93,57 +93,3 @@ class CharacteristicsCsvParser(Parser[Characteristic]):
         )
         for path in input_paths:
             yield from self._parse_file(path, progress)
-
-
-class CharacteristicsCsvFormatter(Formatter[Characteristic]):
-    def format(self, items: Iterable[Characteristic],
-               output_dir: Path) -> None:
-        output_path = output_dir / "characteristics.csv"
-
-        with output_path.open("w") as output_file:
-            fieldnames = [
-                "accident_id",
-                "timestamp",
-                "latitude",
-                "longitude",
-                "department",
-                "commune",
-                "address",
-                "location",
-                "light",
-                "atmospheric_conditions",
-                "intersection",
-                "collision",
-            ]
-            writer = DictWriter(output_file, fieldnames=fieldnames)
-            writer.writeheader()
-            for characteristic in items:
-                writer.writerow({
-                    "accident_id": characteristic.accident_id,
-                    "timestamp": characteristic.timestamp.isoformat(),
-                    "latitude": characteristic.latitude or "",
-                    "longitude": characteristic.longitude or "",
-                    "department": characteristic.department,
-                    "commune": characteristic.commune,
-                    "address": characteristic.address,
-                    "location": (
-                        characteristic.location.name
-                        if characteristic.location else ""
-                    ),
-                    "light": (
-                        characteristic.light.name
-                        if characteristic.light else ""
-                    ),
-                    "atmospheric_conditions": (
-                        characteristic.atmospheric_conditions.name
-                        if characteristic.atmospheric_conditions else ""
-                    ),
-                    "intersection": (
-                        characteristic.intersection.name
-                        if characteristic.intersection else ""
-                    ),
-                    "collision": (
-                        characteristic.collision.name
-                        if characteristic.collision else ""
-                    ),
-                })
