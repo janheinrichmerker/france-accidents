@@ -288,6 +288,100 @@ class Vehicle(NamedTuple):
         assert self.occupancy is None or self.occupancy >= 0
 
 
+class Place(IntEnum):
+    FRONT_LEFT_MOTORCYCLE_FRONT = 1
+    FRONT_RIGHT_MOTORCYCLE_REAR = 2
+    REAR_RIGHT_MOTORCYCLE_SIDECAR = 3
+    REAR_LEFT = 4
+    REAR_CENTER = 5
+    FRONT_CENTER = 6
+    CENTER_LEFT = 7
+    CENTER_MIDDLE = 8
+    CENTER_RIGHT = 9
+    PEDESTRIAN = 10
+
+
+class PersonCategory(IntEnum):
+    DRIVER = 1
+    PASSENGER = 2
+    PEDESTRIAN = 3
+
+
+class Severity(IntEnum):
+    UNHARMED = 1
+    KILLED = 2
+    INJURED_HOSPITALIZED = 3
+    SLIGHTLY_INJURED = 4
+
+
+class Sex(IntEnum):
+    FEMALE = 2
+    MALE = 1
+
+
+class TravelReason(IntEnum):
+    HOME_TO_WORK = 1
+    HOME_TO_SCHOOL = 2
+    SHOPPING = 3
+    PROFESSIONAL = 4
+    WALKING_LEISURE = 5
+    OTHER = 9
+
+
+class SafetyEquipment(IntEnum):
+    BELT = 1
+    HEADSET = 2
+    CHILDREN_DEVICE = 3
+    REFLECTIVE_VEST = 4
+    AIRBAG = 5  # todo or 7
+    GLOVES = 6  # todo or 7
+    OTHER = 9
+
+
+class PedestrianLocation(IntEnum):
+    ON_PAVEMENT_AT_LEAST_50_M_FROM_PEDESTRIAN_CROSSING = 1
+    ON_PAVEMENT_AT_MOST_50_M_FROM_PEDESTRIAN_CROSSING = 2
+    ON_PEDESTRIAN_CROSSING_WITHOUT_LIGHT_SIGNAL = 3
+    ON_PEDESTRIAN_CROSSING_WITH_LIGHT_SIGNAL = 4
+    ON_SIDEWALK = 5
+    ON_ROAD_SHOULDER = 6
+    ON_EMERGENCY_BAY_OR_SHOULDER = 7
+    ON_COUNTER_AISLE = 8
+
+
+class PedestrianAction(IntEnum):
+    DIRECTION_OF_IMPACTING_VEHICLE = 1
+    OPPOSITE_DIRECTION_OF_IMPACTING_VEHICLE = 2
+    CROSSING = 3
+    MASKED = 4
+    PLAYING_RUNNING = 5
+    WITH_ANIMAL = 6
+    OTHER = 9
+    GETTING_ON_OFF_VEHICLE = 99  # todo A
+
+
+class PedestrianCompany(IntEnum):
+    ALONE = 1
+    ACCOMPANIED = 2
+    GROUP = 3
+
+
+class Person(NamedTuple):
+    accident_id: int
+    vehicle_name: str
+    vehicle_id: Optional[int]
+    place: Place
+    user_category: PersonCategory
+    severity: Severity
+    sex: Sex
+    birth_year: int
+    travel_reason: TravelReason
+    safety_equipment: Collection[SafetyEquipment]
+    pedestrian_location: PedestrianLocation
+    pedestrian_action: PedestrianAction
+    pedestrian_company: PedestrianCompany
+
+
 class Accident(NamedTuple):
     accident_id: int
     characteristic: Characteristic
