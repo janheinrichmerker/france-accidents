@@ -135,6 +135,7 @@ class Location(NamedTuple):
         assert self.road_traffic_width_meters >= 0
 
 
-
-class Accident(Characteristic):
-    pass
+class Accident(NamedTuple):
+    accident_id: int
+    characteristic: Characteristic
+    location: Location
