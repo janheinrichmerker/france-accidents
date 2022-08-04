@@ -35,8 +35,6 @@ def main() -> None:
     locations = LocationsCsvParser().parse(_matching_files(files, "lieux"))
     vehicles = VehiclesCsvParser().parse(_matching_files(files, "vehicules"))
     persons = PersonsCsvParser().parse(_matching_files(files, "usagers"))
-    for _ in persons:
-        pass
 
     accident_characteristics: dict[int, Characteristic] = {
         characteristic.accident_id: characteristic

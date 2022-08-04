@@ -4,7 +4,7 @@ from typing import Iterable
 
 from tqdm.auto import tqdm
 
-from model import Accident
+from model import Accident, Person
 from parse import Formatter
 
 
@@ -29,7 +29,13 @@ class AccidentsJsonlFormatter(Formatter[Accident]):
                     for vehicle in json["vehicles"]
                 ]
                 json["persons"] = [
-                    person._asdict()
+                    _person_json(person)
                     for person in json["persons"]
                 ]
                 file.write(f"{dumps(json)}\n")
+
+
+def _person_json(person: Person) -> dict:
+    json = person._asdict()
+    json["safety_equipment"] = list(json["safety_equipment"])
+    return json
