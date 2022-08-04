@@ -5,7 +5,7 @@ from typing import Iterable
 from tqdm.auto import tqdm
 
 from model import (
-    Location, Vehicle, TrafficDirection, VehicleCategory, FixedObstacle,
+    Vehicle, TrafficDirection, VehicleCategory, FixedObstacle,
     MobileObstacle, ShockPoint, Manoeuvre, Engine
 )
 from parse import Parser
@@ -85,7 +85,7 @@ class VehiclesCsvParser(Parser[Vehicle]):
                     print(path, row)
                     raise
 
-    def parse(self, input_paths: list[Path]) -> Iterable[Location]:
+    def parse(self, input_paths: list[Path]) -> Iterable[Vehicle]:
         progress = tqdm(
             desc="Parsing vehicles",
             total=count_lines(input_paths),
