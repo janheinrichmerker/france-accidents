@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import IntEnum
-from typing import Optional, NamedTuple, Collection
+from typing import Optional, NamedTuple, Collection, Set
 
 
 class Light(IntEnum):
@@ -370,16 +370,16 @@ class Person(NamedTuple):
     accident_id: int
     vehicle_name: str
     vehicle_id: Optional[int]
-    place: Place
-    user_category: PersonCategory
+    place: Optional[Place]
+    category: PersonCategory
     severity: Severity
     sex: Sex
-    birth_year: int
-    travel_reason: TravelReason
-    safety_equipment: Collection[SafetyEquipment]
-    pedestrian_location: PedestrianLocation
-    pedestrian_action: PedestrianAction
-    pedestrian_company: PedestrianCompany
+    birth_year: Optional[int]
+    travel_reason: Optional[TravelReason]
+    safety_equipment: Set[SafetyEquipment]
+    pedestrian_location: Optional[PedestrianLocation]
+    pedestrian_action: Optional[PedestrianAction]
+    pedestrian_company: Optional[PedestrianCompany]
 
 
 class Accident(NamedTuple):
