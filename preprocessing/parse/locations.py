@@ -100,7 +100,7 @@ class LocationsCsvParser(Parser[Location]):
     def parse(self, input_paths: list[Path]) -> Iterable[Location]:
         progress = tqdm(
             desc="Parsing locations",
-            total=count_lines(input_paths),
+            total=count_lines(input_paths) - len(input_paths),
             unit="line",
         )
         for path in input_paths:

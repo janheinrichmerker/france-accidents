@@ -90,7 +90,7 @@ class CharacteristicsCsvParser(Parser[Characteristic]):
     def parse(self, input_paths: list[Path]) -> Iterable[Characteristic]:
         progress = tqdm(
             desc="Parsing characteristics",
-            total=count_lines(input_paths),
+            total=count_lines(input_paths) - len(input_paths),
             unit="line",
         )
         for path in input_paths:

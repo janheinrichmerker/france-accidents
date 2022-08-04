@@ -88,7 +88,7 @@ class VehiclesCsvParser(Parser[Vehicle]):
     def parse(self, input_paths: list[Path]) -> Iterable[Vehicle]:
         progress = tqdm(
             desc="Parsing vehicles",
-            total=count_lines(input_paths),
+            total=count_lines(input_paths) - len(input_paths),
             unit="line",
         )
         for path in input_paths:
