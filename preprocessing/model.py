@@ -1,6 +1,7 @@
+from collections.abc import Set, Collection
 from datetime import datetime
 from enum import IntEnum
-from typing import Optional, NamedTuple, Collection, Set
+from typing import Optional, NamedTuple
 
 
 class Light(IntEnum):
@@ -64,11 +65,6 @@ class Characteristic(NamedTuple):
     department: str
     commune: str
 
-    def __int__(self):
-        assert self.accident_id >= 0
-        assert self.latitude is None or -90 <= self.latitude <= 90
-        assert self.longitude is None or -180 <= self.longitude <= 180
-
 
 class RoadCategory(IntEnum):
     HIGHWAY = 1
@@ -125,15 +121,6 @@ class Location(NamedTuple):
     central_reservation_width_meters: int
     road_traffic_width_meters: float
 
-    def __int__(self):
-        assert self.accident_id >= 0
-        assert self.road_index_number >= 0
-        assert self.lanes_count >= 0
-        assert self.upstream_terminal >= 0
-        assert self.upstream_terminal_distance_meters >= 0
-        assert self.central_reservation_width_meters >= 0
-        assert self.road_traffic_width_meters >= 0
-
 
 class TrafficDirection(IntEnum):
     INCREASING_REFERENCE_NUMBER = 1
@@ -152,10 +139,8 @@ class VehicleCategory(IntEnum):
     LIGHT_VEHICLE_WITH_CARAVAN = 8
     LIGHT_VEHICLE_WITH_TRAILER = 9
     COMMERCIAL_VEHICLE_ONLY_WEIGHT_RATING_AT_LEAST_1_5_T_AT_MOST_3_5_T = 10
-    COMMERCIAL_VEHICLE_WITH_CARAVAN_WEIGHT_RATING_AT_LEAST_1_5_T_AT_MOST_3_5_T \
-        = 11
-    COMMERCIAL_VEHICLE_WITH_TRAILER_WEIGHT_RATING_AT_LEAST_1_5_T_AT_MOST_3_5_T \
-        = 12
+    COMMERCIAL_VEHICLE_WITH_CARAVAN_WEIGHT_RATING_AT_LEAST_1_5_T_AT_MOST_3_5_T = 11
+    COMMERCIAL_VEHICLE_WITH_TRAILER_WEIGHT_RATING_AT_LEAST_1_5_T_AT_MOST_3_5_T = 12
     TRUCK_ONLY_WEIGHT_RATING_MORE_THAN_3_5_T_AT_MOST_7_5_T = 13
     TRUCK_ONLY_WEIGHT_RATING_MORE_THAN_7_5_T = 14
     TRUCK_MORE_THAN_3_5_T_WITH_TRAILER = 15
@@ -277,16 +262,6 @@ class Vehicle(NamedTuple):
     engine: Optional[Engine]
     occupancy: Optional[int]
 
-    def __int__(self):
-        assert self.accident_id >= 0
-        assert self.vehicle_id >= 0
-        assert self.vehicle_name.isalnum()
-        assert len(self.vehicle_name) == 3
-        assert self.vehicle_name[1:].isnumeric()
-        assert self.vehicle_name[:1].isalpha()
-        assert self.vehicle_name[:1].isupper()
-        assert self.occupancy is None or self.occupancy >= 0
-
 
 class Place(IntEnum):
     FRONT_LEFT_MOTORCYCLE_FRONT = 1
@@ -384,6 +359,29 @@ class Person(NamedTuple):
 
 class Accident(NamedTuple):
     accident_id: int
-    characteristic: Characteristic
-    location: Location
+    timestamp: datetime
+    latitude: Optional[float]
+    longitude: Optional[float]
+    address: str
+    light: Optional[Light]
+    intersection: Optional[Intersection]
+    atmospheric_conditions: Optional[AtmosphericConditions]
+    collision: Optional[Collision]
+    location: Optional[LocationRegime]
+    department: str
+    commune: str
+    road_category: RoadCategory
+    road: str
+    road_index_number: Optional[int]
+    road_index_alpha: Optional[str]
+    traffic_regime: Optional[TrafficRegime]
+    lanes_count: Optional[int]
+    dedicated_lane: Optional[DedicatedLane]
+    profile: Optional[Profile]
+    upstream_terminal: Optional[int]
+    upstream_terminal_distance_meters: Optional[float]
+    curvature: Optional[Curvature]
+    central_reservation_width_meters: int
+    road_traffic_width_meters: float
     vehicles: Collection[Vehicle]
+    persons: Collection[Person]
