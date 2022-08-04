@@ -1,38 +1,121 @@
 module Main exposing (main)
 
-import Browser
-import Html exposing (Html, button, div, text)
-import Html.Events exposing (onClick)
+import Browser exposing (Document, UrlRequest, application)
+import Browser.Navigation exposing (Key)
+import Data exposing (HttpJsonError, errorToString, expectAccidentJsonLines)
+import Html exposing (Html, br, h1, li, pre, strong, text, ul)
+import Http
+import List
+import Model exposing (Accident)
+import String
+import Url exposing (Url)
 
 
-main : Program () Model Msg
-main =
-    Browser.sandbox { init = 0, update = update, view = view }
+type Resource t
+    = Failure String
+    | Loading
+    | Success t
 
 
 type alias Model =
-    Int
+    { accidents : Resource (List Accident)
+    }
+
+
+init : Flags -> Url -> Key -> ( Model, Cmd Msg )
+init _ _ _ =
+    ( { accidents = Loading }
+    , Http.get
+        { url = "/data/accidents-10000.jsonl"
+        , expect = expectAccidentJsonLines GotAccidentsData
+        }
+    )
 
 
 type Msg
-    = Increment
-    | Decrement
+    = NoOp
+    | GotAccidentsData (Result HttpJsonError (List Accident))
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Increment ->
-            model + 1
+        NoOp ->
+            ( model, Cmd.none )
 
-        Decrement ->
-            model - 1
+        GotAccidentsData result ->
+            let
+                resource =
+                    case result of
+                        Ok data ->
+                            Success data
+
+                        Err err ->
+                            Failure (errorToString err)
+            in
+            ( { model | accidents = resource }, Cmd.none )
 
 
-view : Model -> Html Msg
-view model =
-    div []
-        [ button [ onClick Decrement ] [ text "-" ]
-        , div [] [ text (String.fromInt model) ]
-        , button [ onClick Increment ] [ text "+" ]
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    Sub.none
+
+
+onUrlRequest : UrlRequest -> Msg
+onUrlRequest _ =
+    NoOp
+
+
+onUrlChange : Url -> Msg
+onUrlChange _ =
+    NoOp
+
+
+viewCharacteristics : Resource (List Accident) -> Html msg
+viewCharacteristics accidents =
+    let
+        dataText =
+            case accidents of
+                Failure message ->
+                    text ("Unable to load accidents: " ++ message)
+
+                Loading ->
+                    text "Loading..."
+
+                Success fullText ->
+                    pre []
+                        [ text (String.fromInt (List.length fullText))
+                        ]
+    in
+    li
+        []
+        [ strong [] [ text "Accidents: " ]
+        , br [] []
+        , dataText
         ]
+
+
+view : Model -> Document Msg
+view model =
+    { title = "🇫🇷 Accidents in France"
+    , body =
+        [ h1 [] [ text "Stocks" ]
+        , ul [] [ viewCharacteristics model.accidents ]
+        ]
+    }
+
+
+type alias Flags =
+    ()
+
+
+main : Program Flags Model Msg
+main =
+    application
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        , onUrlRequest = onUrlRequest
+        , onUrlChange = onUrlChange
+        }
