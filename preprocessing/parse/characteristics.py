@@ -42,7 +42,7 @@ class CharacteristicsCsvParser(Parser[Characteristic]):
                 yield Characteristic(
                     accident_id=int(row["Num_Acc"]),
                     timestamp=datetime(
-                        year=int(row["an"]),
+                        year=2000 + int(row["an"]),
                         month=int(row["mois"]),
                         day=int(row["jour"]),
                         hour=int(hour_minute_str[0:2]),
