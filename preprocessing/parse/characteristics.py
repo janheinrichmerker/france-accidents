@@ -1,24 +1,24 @@
 from csv import DictReader
 from datetime import datetime
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Tuple
 
 from tqdm.auto import tqdm
 
 from model import (
     Characteristic, Light, Intersection, AtmosphericConditions, Collision,
-    LocationRegime
+    LocationRegime, AccidentId
 )
 from parse import Parser
 from parse.util import count_lines
 
 
-class CharacteristicsCsvParser(Parser[Characteristic]):
+class CharacteristicsCsvParser(Parser[Tuple[AccidentId, Characteristic]]):
     @staticmethod
     def _parse_file(
             path: Path,
             progress: tqdm,
-    ) -> Iterable[Characteristic]:
+    ) -> Iterable[Tuple[AccidentId, Characteristic]]:
         file_year = int(path.name.split("-")[-1].removesuffix(".csv"))
         delimiter: str
         if file_year >= 2019:
@@ -39,55 +39,62 @@ class CharacteristicsCsvParser(Parser[Characteristic]):
                 )
                 assert len(hour_minute_str) == 4
 
-                yield Characteristic(
-                    accident_id=int(row["Num_Acc"]),
-                    timestamp=datetime(
-                        year=2000 + int(row["an"]),
-                        month=int(row["mois"]),
-                        day=int(row["jour"]),
-                        hour=int(hour_minute_str[0:2]),
-                        minute=int(hour_minute_str[2:4]),
+                yield (
+                    AccidentId(
+                        accident_id=int(row["Num_Acc"]),
                     ),
-                    latitude=(
-                        float(row["lat"].replace(",", "."))
-                        if row["lat"] not in ["", "-"] else None
-                    ),
-                    longitude=(
-                        float(row["long"].replace(",", "."))
-                        if row["long"] not in ["", "-"] else None
-                    ),
-                    address=str(row["adr"]),
-                    light=(
-                        Light(int(row["lum"]))
-                        if int(row["lum"]) != -1
-                        else None
-                    ),
-                    intersection=(
-                        Intersection(int(row["int"]))
-                        if int(row["int"]) != -1 and int(row["int"]) != 0
-                        else None
-                    ),
-                    atmospheric_conditions=(
-                        AtmosphericConditions(int(row["atm"]))
-                        if row["atm"] != "" and int(row["atm"]) != -1
-                        else None
-                    ),
-                    collision=(
-                        Collision(int(row["col"]))
-                        if row["col"] != "" and int(row["col"]) != -1
-                        else None
-                    ),
-                    location=(
-                        LocationRegime(int(row["agg"]))
-                        if True or row["agg"] != ""
-                        else None
-                    ),
-                    department=str(row["dep"]),
-                    commune=str(row["com"]),
+                    Characteristic(
+                        timestamp=datetime(
+                            year=2000 + int(row["an"]),
+                            month=int(row["mois"]),
+                            day=int(row["jour"]),
+                            hour=int(hour_minute_str[0:2]),
+                            minute=int(hour_minute_str[2:4]),
+                        ),
+                        latitude=(
+                            float(row["lat"].replace(",", "."))
+                            if row["lat"] not in ["", "-"] else None
+                        ),
+                        longitude=(
+                            float(row["long"].replace(",", "."))
+                            if row["long"] not in ["", "-"] else None
+                        ),
+                        address=str(row["adr"]),
+                        light=(
+                            Light(int(row["lum"]))
+                            if int(row["lum"]) != -1
+                            else None
+                        ),
+                        intersection=(
+                            Intersection(int(row["int"]))
+                            if int(row["int"]) != -1 and int(row["int"]) != 0
+                            else None
+                        ),
+                        atmospheric_conditions=(
+                            AtmosphericConditions(int(row["atm"]))
+                            if row["atm"] != "" and int(row["atm"]) != -1
+                            else None
+                        ),
+                        collision=(
+                            Collision(int(row["col"]))
+                            if row["col"] != "" and int(row["col"]) != -1
+                            else None
+                        ),
+                        location=(
+                            LocationRegime(int(row["agg"]))
+                            if True or row["agg"] != ""
+                            else None
+                        ),
+                        department=str(row["dep"]),
+                        commune=str(row["com"]),
+                    )
                 )
                 progress.update(1)
 
-    def parse(self, input_paths: list[Path]) -> Iterable[Characteristic]:
+    def parse(
+            self,
+            input_paths: list[Path]
+    ) -> Iterable[Tuple[AccidentId, Characteristic]]:
         progress = tqdm(
             desc="Parsing characteristics",
             total=count_lines(input_paths) - len(input_paths),

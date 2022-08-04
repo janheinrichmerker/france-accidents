@@ -1,24 +1,24 @@
 from csv import DictReader
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Tuple
 
 from tqdm.auto import tqdm
 
 from model import (
     Vehicle, TrafficDirection, VehicleCategory, FixedObstacle,
-    MobileObstacle, ShockPoint, Manoeuvre, Engine
+    MobileObstacle, ShockPoint, Manoeuvre, Engine, VehicleId, AccidentId
 )
 from parse import Parser
 from parse.util import count_lines
 
 
-class VehiclesCsvParser(Parser[Vehicle]):
+class VehiclesCsvParser(Parser[Tuple[AccidentId, VehicleId, Vehicle]]):
 
     @staticmethod
     def _parse_file(
             path: Path,
             progress: tqdm,
-    ) -> Iterable[Vehicle]:
+    ) -> Iterable[Tuple[AccidentId, VehicleId, Vehicle]]:
         file_year = int(path.name.split("-")[-1].removesuffix(".csv"))
         delimiter: str
         if file_year >= 2019:
@@ -28,13 +28,22 @@ class VehiclesCsvParser(Parser[Vehicle]):
         with path.open("r") as file:
             reader = DictReader(file, delimiter=delimiter, quotechar='"')
             for row in reader:
-                try:
-                    for key in row:
-                        row[key] = str(row[key]).strip()
-                    if row["catv"] == "19":
-                        row["catv"] = "40"
-                    yield Vehicle(
+                for key in row:
+                    row[key] = str(row[key]).strip()
+                if row["catv"] == "19":
+                    row["catv"] = "40"
+                yield (
+                    AccidentId(
                         accident_id=int(row["Num_Acc"]),
+                    ),
+                    VehicleId(
+                        vehicle_id=(
+                            int(str(row["id_vehicule"]).replace(" ", ""))
+                            if "id_vehicule" in row else None
+                        ),
+                        vehicle_name=str(row["num_veh"]),
+                    ),
+                    Vehicle(
                         vehicle_id=(
                             int(str(row["id_vehicule"]).replace(" ", ""))
                             if "id_vehicule" in row else None
@@ -79,13 +88,14 @@ class VehiclesCsvParser(Parser[Vehicle]):
                             int(row["occutc"])
                             if row["occutc"] != "" else None
                         ),
+                        persons=[],
                     )
-                    progress.update(1)
-                except:
-                    print(path, row)
-                    raise
+                )
+                progress.update(1)
 
-    def parse(self, input_paths: list[Path]) -> Iterable[Vehicle]:
+    def parse(
+            self, input_paths: list[Path]
+    ) -> Iterable[Tuple[AccidentId, VehicleId, Vehicle]]:
         progress = tqdm(
             desc="Parsing vehicles",
             total=count_lines(input_paths) - len(input_paths),
