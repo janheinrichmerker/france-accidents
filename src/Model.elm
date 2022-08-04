@@ -50,21 +50,6 @@ type LocationRegime
     | LocationRegimeInBuiltUpAreas
 
 
-type alias Characteristic =
-    { timestamp : Date
-    , latitude : Maybe Float
-    , longitude : Maybe Float
-    , address : String
-    , light : Maybe Light
-    , intersection : Maybe Intersection
-    , atmospheric_conditions : Maybe AtmosphericConditions
-    , collision : Maybe Collision
-    , location : Maybe LocationRegime
-    , department : String
-    , commune : String
-    }
-
-
 type RoadCategory
     = RoadCategoryHighway
     | RoadCategoryNationalRoad
@@ -102,23 +87,6 @@ type Curvature
     | CurvatureLeftHandCurve
     | CurvatureRightHandCurve
     | CurvatureSCurve
-
-
-type alias Location =
-    { road_category : RoadCategory
-    , road : String
-    , road_index_number : Maybe Int
-    , road_index_alpha : Maybe String
-    , traffic_regime : Maybe TrafficRegime
-    , lanes_count : Maybe Int
-    , dedicated_lane : Maybe DedicatedLane
-    , profile : Maybe Profile
-    , upstream_terminal : Maybe Int
-    , upstream_terminal_distance_meters : Maybe Float
-    , curvature : Maybe Curvature
-    , central_reservation_width_meters : Int
-    , road_traffic_width_meters : Float
-    }
 
 
 type Place
