@@ -1,12 +1,12 @@
 from csv import DictReader
 from itertools import chain
 from pathlib import Path
-from typing import Iterable, Set
+from typing import Iterable, FrozenSet
 
 from tqdm.auto import tqdm
 
 from model import (
-    Location, Vehicle, Person, Place, PersonCategory, Severity, Sex,
+    Vehicle, Person, Place, PersonCategory, Severity, Sex,
     TravelReason, SafetyEquipment, PedestrianLocation, PedestrianAction,
     PedestrianCompany
 )
@@ -19,15 +19,15 @@ class PersonsCsvParser(Parser[Person]):
     @staticmethod
     def _equipment(
             value: str
-    ) -> Set[SafetyEquipment]:
+    ) -> FrozenSet[SafetyEquipment]:
         if value in {"0", "-1", "11"}:
-            return set()
+            return frozenset()
         elif value == "8":
-            return {SafetyEquipment.OTHER}
+            return frozenset({SafetyEquipment.OTHER})
         elif value == "7":
-            return {SafetyEquipment.AIRBAG, SafetyEquipment.GLOVES}
+            return frozenset({SafetyEquipment.AIRBAG, SafetyEquipment.GLOVES})
         else:
-            return {SafetyEquipment(int(value))}
+            return frozenset({SafetyEquipment(int(value))})
 
     @staticmethod
     def _parse_file(
@@ -109,7 +109,7 @@ class PersonsCsvParser(Parser[Person]):
                     print(path, row)
                     raise
 
-    def parse(self, input_paths: list[Path]) -> Iterable[Location]:
+    def parse(self, input_paths: list[Path]) -> Iterable[Person]:
         progress = tqdm(
             desc="Parsing vehicles",
             total=count_lines(input_paths),
