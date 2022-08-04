@@ -1,25 +1,11 @@
 module Data exposing (..)
 
-import Date exposing (Date)
 import Http
+import Iso8601
 import Json.Decode exposing (Decoder, andThen, decodeString, fail, float, int, list, nullable, string, succeed)
 import Json.Decode.Pipeline exposing (required)
-import Model exposing (Accident, AtmosphericConditions(..), Characteristic, Collision(..), Curvature(..), DedicatedLane(..), Engine(..), FixedObstacle(..), Intersection(..), Light(..), LocationRegime(..), Manoeuvre(..), MobileObstacle(..), PedestrianAction(..), PedestrianCompany(..), PedestrianLocation(..), Person, PersonCategory(..), Place(..), Profile(..), RoadCategory(..), SafetyEquipment(..), Severity(..), Sex(..), ShockPoint(..), TrafficDirection(..), TrafficRegime(..), TravelReason(..), Vehicle, VehicleCategory(..))
+import Model exposing (Accident, AtmosphericConditions(..), Collision(..), Curvature(..), DedicatedLane(..), Engine(..), FixedObstacle(..), Intersection(..), Light(..), LocationRegime(..), Manoeuvre(..), MobileObstacle(..), PedestrianAction(..), PedestrianCompany(..), PedestrianLocation(..), Person, PersonCategory(..), Place(..), Profile(..), RoadCategory(..), SafetyEquipment(..), Severity(..), Sex(..), ShockPoint(..), TrafficDirection(..), TrafficRegime(..), TravelReason(..), Vehicle, VehicleCategory(..))
 import Result as Http
-
-
-date : Decoder Date
-date =
-    string
-        |> andThen
-            (\str ->
-                case Date.fromIsoString str of
-                    Err err ->
-                        fail err
-
-                    Ok data ->
-                        succeed data
-            )
 
 
 light : Decoder Light
@@ -979,7 +965,7 @@ accident : Decoder Accident
 accident =
     succeed Accident
         |> required "accident_id" int
-        |> required "timestamp" date
+        |> required "timestamp" Iso8601.decoder
         |> required "latitude" (nullable float)
         |> required "longitude" (nullable float)
         |> required "address" string
