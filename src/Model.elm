@@ -1,6 +1,6 @@
 module Model exposing (..)
 
-import Date exposing (Date)
+import Time exposing (Posix)
 
 
 type Light
@@ -324,7 +324,7 @@ type alias Vehicle =
 
 type alias Accident =
     { accident_id : Int
-    , timestamp : Date
+    , timestamp : Posix
     , latitude : Maybe Float
     , longitude : Maybe Float
     , address : String
