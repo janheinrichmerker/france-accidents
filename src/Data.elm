@@ -1031,3 +1031,32 @@ expectJsonLines toMsg decoder =
 expectAccidentJsonLines : (Result HttpJsonError (List Accident) -> msg) -> Http.Expect msg
 expectAccidentJsonLines toMsg =
     expectJsonLines toMsg accident
+
+
+httpErrorToString : Http.Error -> String
+httpErrorToString error =
+    case error of
+        Http.BadUrl str ->
+            "Bad URL: " ++ str
+
+        Http.Timeout ->
+            "Timeout"
+
+        Http.NetworkError ->
+            "Network error"
+
+        Http.BadStatus status ->
+            "Bad status: " ++ String.fromInt status
+
+        Http.BadBody str ->
+            "Bad body: " ++ str
+
+
+errorToString : HttpJsonError -> String
+errorToString error =
+    case error of
+        HttpError inner ->
+            httpErrorToString inner
+
+        JsonDecodeError inner ->
+            Json.Decode.errorToString inner
