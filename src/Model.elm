@@ -1,7 +1,6 @@
 module Model exposing (..)
 
 import Date exposing (Date)
-import Set exposing (Set)
 
 
 type Light
@@ -207,7 +206,7 @@ type alias Person =
     , sex : Sex
     , birth_year : Maybe Int
     , travel_reason : Maybe TravelReason
-    , safety_equipment : Set SafetyEquipment
+    , safety_equipment : List SafetyEquipment
     , pedestrian_location : Maybe PedestrianLocation
     , pedestrian_action : Maybe PedestrianAction
     , pedestrian_company : Maybe PedestrianCompany
