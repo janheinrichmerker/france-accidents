@@ -1,9 +1,11 @@
 module Data exposing (..)
 
 import Date exposing (Date)
-import Json.Decode exposing (Decoder, andThen, fail, float, int, list, nullable, string, succeed)
+import Http
+import Json.Decode exposing (Decoder, andThen, decodeString, fail, float, int, list, nullable, string, succeed)
 import Json.Decode.Pipeline exposing (required)
 import Model exposing (Accident, AtmosphericConditions(..), Characteristic, Collision(..), Curvature(..), DedicatedLane(..), Engine(..), FixedObstacle(..), Intersection(..), Light(..), LocationRegime(..), Manoeuvre(..), MobileObstacle(..), PedestrianAction(..), PedestrianCompany(..), PedestrianLocation(..), Person, PersonCategory(..), Place(..), Profile(..), RoadCategory(..), SafetyEquipment(..), Severity(..), Sex(..), ShockPoint(..), TrafficDirection(..), TrafficRegime(..), TravelReason(..), Vehicle, VehicleCategory(..))
+import Result as Http
 
 
 date : Decoder Date
@@ -1001,4 +1003,45 @@ accident =
         |> required "curvature" (nullable curvature)
         |> required "central_reservation_width_meters" int
         |> required "road_traffic_width_meters" float
-        |> required "vehicles" (list vehicle)
+        |> required "vehicles"
+            (list vehicle)
+
+
+expectStringLines : (Result Http.Error (List String) -> msg) -> Http.Expect msg
+expectStringLines toMsg =
+    Http.expectString
+        (\result ->
+            toMsg (Result.map String.lines result)
+        )
+
+
+type HttpJsonError
+    = HttpError Http.Error
+    | JsonDecodeError Json.Decode.Error
+
+
+expectJsonLines : (Result HttpJsonError (List a) -> msg) -> Decoder a -> Http.Expect msg
+expectJsonLines toMsg decoder =
+    expectStringLines
+        (\result ->
+            result
+                |> Result.mapError HttpError
+                |> Result.andThen
+                    (\lines ->
+                        lines
+                            |> List.foldl
+                                (\line results ->
+                                    line
+                                        |> decodeString decoder
+                                        |> Result.mapError JsonDecodeError
+                                        |> Result.map2 (\xs x -> List.append xs [ x ]) results
+                                )
+                                (Ok [])
+                    )
+                |> toMsg
+        )
+
+
+expectAccidentJsonLines : (Result HttpJsonError (List Accident) -> msg) -> Http.Expect msg
+expectAccidentJsonLines toMsg =
+    expectJsonLines toMsg accident
