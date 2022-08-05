@@ -43,13 +43,13 @@ intersection =
                     "OUT_OF_INTERSECTION" ->
                         succeed IntersectionOutOfIntersection
 
-                    "XINTERSECTION" ->
+                    "X_INTERSECTION" ->
                         succeed IntersectionXIntersection
 
-                    "TINTERSECTION" ->
+                    "T_INTERSECTION" ->
                         succeed IntersectionTIntersection
 
-                    "YINTERSECTION" ->
+                    "Y_INTERSECTION" ->
                         succeed IntersectionYIntersection
 
                     "INTERSECTION_WITH_MORE_THAN_4_BRANCHES" ->
@@ -125,7 +125,7 @@ collision =
                     "TWO_VEHICLES_FROM_THE_SIDE" ->
                         succeed CollisionTwoVehiclesFromTheSide
 
-                    "THREE_OR_MORE_VEHICLES_IN_ACHAIN" ->
+                    "THREE_OR_MORE_VEHICLES_IN_A_CHAIN" ->
                         succeed CollisionThreeOrMoreVehiclesInAChain
 
                     "THREE_OR_MORE_VEHICLES_MULTIPLE_COLLISIONS" ->
@@ -278,7 +278,7 @@ curvature =
                     "RIGHT_HAND_CURVE" ->
                         succeed CurvatureRightHandCurve
 
-                    "SCURVE" ->
+                    "S_CURVE" ->
                         succeed CurvatureSCurve
 
                     unknown ->
@@ -454,10 +454,10 @@ pedestrianLocation =
         |> andThen
             (\str ->
                 case str of
-                    "ON_PAVEMENT_AT_LEAST_50_MFROM_PEDESTRIAN_CROSSING" ->
+                    "ON_PAVEMENT_AT_LEAST_50_M_FROM_PEDESTRIAN_CROSSING" ->
                         succeed PedestrianLocationOnPavementAtLeast50MFromPedestrianCrossing
 
-                    "ON_PAVEMENT_AT_MOST_50_MFROM_PEDESTRIAN_CROSSING" ->
+                    "ON_PAVEMENT_AT_MOST_50_M_FROM_PEDESTRIAN_CROSSING" ->
                         succeed PedestrianLocationOnPavementAtMost50MFromPedestrianCrossing
 
                     "ON_PEDESTRIAN_CROSSING_WITHOUT_LIGHT_SIGNAL" ->
@@ -591,22 +591,22 @@ vehicleCategory =
                     "LIGHT_VEHICLE_WITH_TRAILER" ->
                         succeed VehicleCategoryLightVehicleWithTrailer
 
-                    "COMMERCIAL_VEHICLE_ONLY_WEIGHT_RATING_AT_LEAST_1_5_TAT_MOST_3_5_T" ->
+                    "COMMERCIAL_VEHICLE_ONLY_WEIGHT_RATING_AT_LEAST_1_5_T_AT_MOST_3_5_T" ->
                         succeed VehicleCategoryCommercialVehicleOnlyWeightRatingAtLeast1_5TAtMost3_5T
 
-                    "COMMERCIAL_VEHICLE_WITH_CARAVAN_WEIGHT_RATING_AT_LEAST_1_5_TAT_MOST_3_5_T" ->
+                    "COMMERCIAL_VEHICLE_WITH_CARAVAN_WEIGHT_RATING_AT_LEAST_1_5_T_AT_MOST_3_5_T" ->
                         succeed VehicleCategoryCommercialVehicleWithCaravanWeightRatingAtLeast1_5TAtMost3_5T
 
-                    "COMMERCIAL_VEHICLE_WITH_TRAILER_WEIGHT_RATING_AT_LEAST_1_5_TAT_MOST_3_5_T" ->
+                    "COMMERCIAL_VEHICLE_WITH_TRAILER_WEIGHT_RATING_AT_LEAST_1_5_T_AT_MOST_3_5_T" ->
                         succeed VehicleCategoryCommercialVehicleWithTrailerWeightRatingAtLeast1_5TAtMost3_5T
 
-                    "TRUCK_ONLY_WEIGHT_RATING_MORE_THAN_3_5_TAT_MOST_7_5_T" ->
+                    "TRUCK_ONLY_WEIGHT_RATING_MORE_THAN_3_5_T_AT_MOST_7_5_T" ->
                         succeed VehicleCategoryTruckOnlyWeightRatingMoreThan3_5TAtMost7_5T
 
                     "TRUCK_ONLY_WEIGHT_RATING_MORE_THAN_7_5_T" ->
                         succeed VehicleCategoryTruckOnlyWeightRatingMoreThan7_5T
 
-                    "TRUCK_MORE_THAN_3_5_TWITH_TRAILER" ->
+                    "TRUCK_MORE_THAN_3_5_T_WITH_TRAILER" ->
                         succeed VehicleCategoryTruckMoreThan3_5TWithTrailer
 
                     "ROAD_TRACTOR_ONLY" ->
@@ -934,7 +934,7 @@ person : Decoder Person
 person =
     succeed Person
         |> required "place" (nullable place)
-        |> required "category" personCategory
+        |> required "category" (nullable personCategory)
         |> required "severity" severity
         |> required "sex" sex
         |> required "birth_year" (nullable int)
@@ -951,7 +951,7 @@ vehicle =
         |> required "vehicle_name" string
         |> required "vehicle_id" (nullable int)
         |> required "traffic_direction" (nullable trafficDirection)
-        |> required "vehicle_category" vehicleCategory
+        |> required "vehicle_category" (nullable vehicleCategory)
         |> required "fixed_obstacle" (nullable fixedObstacle)
         |> required "mobile_obstacle" (nullable mobileObstacle)
         |> required "shock_point" (nullable shockPoint)
@@ -1015,6 +1015,7 @@ expectJsonLines toMsg decoder =
                 |> Result.andThen
                     (\lines ->
                         lines
+                            |> List.filter (\line -> not (String.isEmpty line))
                             |> List.foldl
                                 (\line results ->
                                     line

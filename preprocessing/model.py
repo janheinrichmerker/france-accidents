@@ -204,7 +204,7 @@ class PedestrianCompany(IntEnum):
 
 class Person(NamedTuple):
     place: Optional[Place]
-    category: PersonCategory
+    category: Optional[PersonCategory]
     severity: Severity
     sex: Sex
     birth_year: Optional[int]
@@ -356,7 +356,7 @@ class Vehicle(NamedTuple):
     vehicle_name: str
     vehicle_id: Optional[int]
     traffic_direction: Optional[TrafficDirection]
-    vehicle_category: VehicleCategory
+    vehicle_category: Optional[VehicleCategory]
     fixed_obstacle: Optional[FixedObstacle]
     mobile_obstacle: Optional[MobileObstacle]
     shock_point: Optional[ShockPoint]

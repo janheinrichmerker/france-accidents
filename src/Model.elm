@@ -169,7 +169,7 @@ type PedestrianCompany
 
 type alias Person =
     { place : Maybe Place
-    , category : PersonCategory
+    , category : Maybe PersonCategory
     , severity : Severity
     , sex : Sex
     , birth_year : Maybe Int
@@ -311,7 +311,7 @@ type alias Vehicle =
     { vehicle_name : String
     , vehicle_id : Maybe Int
     , traffic_direction : Maybe TrafficDirection
-    , vehicle_category : VehicleCategory
+    , vehicle_category : Maybe VehicleCategory
     , fixed_obstacle : Maybe FixedObstacle
     , mobile_obstacle : Maybe MobileObstacle
     , shock_point : Maybe ShockPoint
