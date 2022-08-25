@@ -51,6 +51,13 @@ Here are the steps required:
     pipenv run python preprocessing/preprocess.py 
     ```
 
+### Sampling for testing
+
+To randomly sample a smaller test dataset for testing purposes, run the following:
+```shell
+shuf -n 1000 static/data/accidents.jsonl > static/data/accidents-sample.jsonl
+```
+
 ## Ideas
 
 - Treemap or tree of accident categories
