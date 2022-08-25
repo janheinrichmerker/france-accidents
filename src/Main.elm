@@ -26,7 +26,7 @@ init : Flags -> Url -> Key -> ( Model, Cmd Msg )
 init _ _ _ =
     ( { accidents = Loading }
     , Http.get
-        { url = "/data/accidents-10000.jsonl"
+        { url = "/data/accidents-sample.jsonl"
         , expect = expectAccidentJsonLines GotAccidentsData
         }
     )
