@@ -59,11 +59,53 @@ shuf -n 1000 static/data/accidents.jsonl > static/data/accidents-sample.jsonl
 ```
 
 ## Ideas
+- treemap (or tree):
+  - collision types
+  - road category
+  - light conditions
+  - weather
+  - intersection type
+  - road curvature
+  - vehicle type
+  - situation
+  - interact: switch between tree and treemap
 
-- Treemap or tree of accident categories
-- Plot number of injuries/fatalities on y-axis, month on x-axis, different plots for safety equipments
-- Icon based: vehicle type, situation, weather, curvature etc.
+- time series
+  - x-axis: time
+  - interaction: strip year or not
+    (might be possible to detect yearly trends)
+  - y-axis: number of injuries/fatalities
+  - interaction: switch between injuries and fatalities
+  - banking to 45 degrees
+  - interaction: toggle color scale of line:
+    - none
+    - birth year
+  - interaction: filter for different safety equipment
 
+- icon-based (stick figures) für personen
+  - filter for drivers/passengers
+  - maybe more filtering
+  - young vs. old drivers
+  - sex
+  - reason for travelling
+  - safety equipment
+  - alone vs. accompanied by
+  - plot in geographical coordinates
+    - grid every ?? kilometers
+    - interaction: change aggregation type
+      - average values and plot one single stick figure per grid cell
+      - plot each incident as one stick figure but overlay with x-ray technique
+        - that way no detail is lost by aggregation
+  - interaction: additional color dimension
+    - proportion of persons injured or dead
+
+## Questions
+- Are there repeating yearly patterns? Are roads more dangerous in winter?
+- Do older or younger drivers drive more safely?
+- Where are more / the more severe accidents? city or rural areas?
+- Do the proportion of dead and injured persons correlate? Where are they most different?
+- Do dedicated bicycle lanes make roads safer for cyclists?
+  
 ## License
 
 This project is [MIT licensed](LICENSE), you can use it for whatever you want as long as you mention this repository.
