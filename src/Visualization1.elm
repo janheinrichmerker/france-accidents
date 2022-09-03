@@ -1,6 +1,6 @@
 module Visualization1 exposing (..)
 
-import Html exposing (Html, text)
+import Html exposing (Html, div, text)
 import Model exposing (Accident)
 
 
@@ -26,4 +26,8 @@ update msg model =
 
 view : Model -> List Accident -> Html msg
 view model accidents =
-    text (String.fromInt (List.length accidents))
+    div
+        []
+        [ text "Visualization 1"
+        , text (String.fromInt (List.length accidents))
+        ]
