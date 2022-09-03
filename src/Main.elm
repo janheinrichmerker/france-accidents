@@ -6,15 +6,15 @@ import Data exposing (HttpJsonError, errorToString, expectAccidentJsonLines)
 import Html exposing (Html, br, h1, li, pre, strong, text, ul)
 import Http
 import List
-import Model exposing (Accident)
+import Model exposing (Accident, Resource(..))
 import String
 import Url exposing (Url)
 
 
-type Resource t
-    = Failure String
-    | Loading
-    | Success t
+type CurrentVisualization
+    = CurrentVisualization1
+    | CurrentVisualization2
+    | CurrentVisualization3
 
 
 type alias Model =

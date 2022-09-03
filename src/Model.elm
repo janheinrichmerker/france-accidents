@@ -350,3 +350,9 @@ type alias Accident =
     , road_traffic_width_meters : Float
     , vehicles : List Vehicle
     }
+
+
+type Resource t
+    = Failure String
+    | Loading
+    | Success t
