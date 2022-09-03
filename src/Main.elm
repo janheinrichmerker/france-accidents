@@ -3,11 +3,11 @@ module Main exposing (main)
 import Browser exposing (Document, UrlRequest, application)
 import Browser.Navigation exposing (Key)
 import Data exposing (HttpJsonError, errorToString, expectAccidentJsonLines)
-import Html exposing (Html, br, h1, li, pre, strong, text, ul)
+import Html exposing (Html, a, div, h1, li, text, ul)
+import Html.Attributes exposing (href)
+import Html.Events exposing (onClick)
 import Http
-import List
 import Model exposing (Accident, Resource(..))
-import String
 import Url exposing (Url)
 import Visualization1
 import Visualization2
@@ -99,28 +99,27 @@ onUrlChange _ =
     NoOp
 
 
-viewCharacteristics : Resource (List Accident) -> Html msg
-viewCharacteristics accidents =
-    let
-        dataText =
-            case accidents of
-                Failure message ->
-                    text ("Unable to load accidents: " ++ message)
+viewAccidents : Model -> Html msg
+viewAccidents model =
+    case model.accidents of
+        Failure message ->
+            text ("Unable to load accidents: " ++ message)
 
-                Loading ->
-                    text "Loading..."
+        Loading ->
+            text "Loading accidents..."
 
-                Success fullText ->
-                    pre []
-                        [ text (String.fromInt (List.length fullText))
-                        ]
-    in
-    li
-        []
-        [ strong [] [ text "Accidents: " ]
-        , br [] []
-        , dataText
-        ]
+        Success fullText ->
+            div []
+                [ case model.currentVisualization of
+                    CurrentVisualization1 ->
+                        Visualization1.view model.visualization1 fullText
+
+                    CurrentVisualization2 ->
+                        Visualization2.view model.visualization2 fullText
+
+                    CurrentVisualization3 ->
+                        Visualization3.view model.visualization3 fullText
+                ]
 
 
 view : Model -> Document Msg
@@ -128,7 +127,28 @@ view model =
     { title = "🇫🇷 Accidents in France"
     , body =
         [ h1 [] [ text "Accidents" ]
-        , ul [] [ viewCharacteristics model.accidents ]
+        , ul
+            []
+            [ li
+                []
+                [ a
+                    [ onClick (SelectVisualization CurrentVisualization1), href "#" ]
+                    [ text "Visualization 1" ]
+                ]
+            , li
+                []
+                [ a
+                    [ onClick (SelectVisualization CurrentVisualization2), href "#" ]
+                    [ text "Visualization 2" ]
+                ]
+            , li
+                []
+                [ a
+                    [ onClick (SelectVisualization CurrentVisualization3), href "#" ]
+                    [ text "Visualization 3" ]
+                ]
+            ]
+        , viewAccidents model
         ]
     }
 
