@@ -9,6 +9,9 @@ import List
 import Model exposing (Accident, Resource(..))
 import String
 import Url exposing (Url)
+import Visualization1
+import Visualization2
+import Visualization3
 
 
 type CurrentVisualization
@@ -19,12 +22,21 @@ type CurrentVisualization
 
 type alias Model =
     { accidents : Resource (List Accident)
+    , currentVisualization : CurrentVisualization
+    , visualization1 : Visualization1.Model
+    , visualization2 : Visualization2.Model
+    , visualization3 : Visualization3.Model
     }
 
 
 init : Flags -> Url -> Key -> ( Model, Cmd Msg )
 init _ _ _ =
-    ( { accidents = Loading }
+    ( { accidents = Loading
+      , currentVisualization = CurrentVisualization1
+      , visualization1 = Visualization1.init
+      , visualization2 = Visualization2.init
+      , visualization3 = Visualization3.init
+      }
     , Http.get
         { url = "/data/accidents-sample.jsonl"
         , expect = expectAccidentJsonLines GotAccidentsData
@@ -35,6 +47,10 @@ init _ _ _ =
 type Msg
     = NoOp
     | GotAccidentsData (Result HttpJsonError (List Accident))
+    | SelectVisualization CurrentVisualization
+    | VisualizationMsg1 Visualization1.Msg
+    | VisualizationMsg2 Visualization2.Msg
+    | VisualizationMsg3 Visualization3.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -54,6 +70,18 @@ update msg model =
                             Failure (errorToString err)
             in
             ( { model | accidents = resource }, Cmd.none )
+
+        SelectVisualization vis ->
+            ( { model | currentVisualization = vis }, Cmd.none )
+
+        VisualizationMsg1 msg1 ->
+            ( { model | visualization1 = Visualization1.update msg1 model.visualization1 }, Cmd.none )
+
+        VisualizationMsg2 msg2 ->
+            ( { model | visualization2 = Visualization2.update msg2 model.visualization2 }, Cmd.none )
+
+        VisualizationMsg3 msg3 ->
+            ( { model | visualization3 = Visualization3.update msg3 model.visualization3 }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -99,7 +127,7 @@ view : Model -> Document Msg
 view model =
     { title = "🇫🇷 Accidents in France"
     , body =
-        [ h1 [] [ text "Stocks" ]
+        [ h1 [] [ text "Accidents" ]
         , ul [] [ viewCharacteristics model.accidents ]
         ]
     }
