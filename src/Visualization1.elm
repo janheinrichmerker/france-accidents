@@ -1,6 +1,6 @@
 module Visualization1 exposing (..)
 
-import Html exposing (Html, div, text)
+import Html.Styled exposing (Html, br, div, text)
 import Model exposing (Accident)
 
 
@@ -29,5 +29,6 @@ view model accidents =
     div
         []
         [ text "Visualization 1"
+        , br [] []
         , text (String.fromInt (List.length accidents))
         ]

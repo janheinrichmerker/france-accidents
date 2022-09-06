@@ -2,10 +2,11 @@ module Main exposing (main)
 
 import Browser exposing (Document, UrlRequest, application)
 import Browser.Navigation exposing (Key)
+import Css exposing (FontWeight, bold, borderBottom3, displayFlex, em, ex, fontWeight, listStyle, margin2, none, normal, padding, padding2, px, rgb, solid, zero)
 import Data exposing (HttpJsonError, errorToString, expectAccidentJsonLines)
-import Html exposing (Html, a, div, h1, li, text, ul)
-import Html.Attributes exposing (href)
-import Html.Events exposing (onClick)
+import Html.Styled exposing (Html, button, div, h1, h2, header, li, main_, nav, text, toUnstyled, ul)
+import Html.Styled.Attributes exposing (css)
+import Html.Styled.Events exposing (onClick)
 import Http
 import Model exposing (Accident, Resource(..))
 import Url exposing (Url)
@@ -122,33 +123,90 @@ viewAccidents model =
                 ]
 
 
+visualizationLabel : CurrentVisualization -> String
+visualizationLabel vis =
+    case vis of
+        CurrentVisualization1 ->
+            "Visualization 1"
+
+        CurrentVisualization2 ->
+            "Visualization 2"
+
+        CurrentVisualization3 ->
+            "Visualization 3"
+
+
+selectVisualizationButton : Model -> CurrentVisualization -> Html Msg
+selectVisualizationButton model vis =
+    let
+        buttonFontWeight =
+            if vis == model.currentVisualization then
+                fontWeight bold
+
+            else
+                fontWeight normal
+    in
+    li
+        [ css
+            [ padding2 (ex 0.25) (em 0.5)
+            , margin2 (ex 0.5) (em 1)
+            ]
+        ]
+        [ button
+            [ onClick (SelectVisualization vis)
+            , css [ buttonFontWeight ]
+            ]
+            [ text (visualizationLabel vis) ]
+        ]
+
+
+siteHeader : Model -> Html Msg
+siteHeader model =
+    header
+        [ css
+            [ borderBottom3 (px 1) solid (rgb 0 0 0) ]
+        ]
+        [ h1 [] [ text "Accidents" ]
+        , h2 [] [ text (visualizationLabel model.currentVisualization) ]
+        ]
+
+
+siteNav : Model -> Html Msg
+siteNav model =
+    nav
+        [ css
+            [ borderBottom3 (px 1) solid (rgb 0 0 0) ]
+        ]
+        [ ul
+            [ css
+                [ displayFlex
+                , listStyle none
+                , padding zero
+                ]
+            ]
+            [ selectVisualizationButton model CurrentVisualization1
+            , selectVisualizationButton model CurrentVisualization2
+            , selectVisualizationButton model CurrentVisualization3
+            ]
+        ]
+
+
+siteMain : Model -> Html Msg
+siteMain model =
+    main_
+        [ css
+            [ margin2 (ex 1) zero ]
+        ]
+        [ viewAccidents model ]
+
+
 view : Model -> Document Msg
 view model =
     { title = "🇫🇷 Accidents in France"
     , body =
-        [ h1 [] [ text "Accidents" ]
-        , ul
-            []
-            [ li
-                []
-                [ a
-                    [ onClick (SelectVisualization CurrentVisualization1), href "#" ]
-                    [ text "Visualization 1" ]
-                ]
-            , li
-                []
-                [ a
-                    [ onClick (SelectVisualization CurrentVisualization2), href "#" ]
-                    [ text "Visualization 2" ]
-                ]
-            , li
-                []
-                [ a
-                    [ onClick (SelectVisualization CurrentVisualization3), href "#" ]
-                    [ text "Visualization 3" ]
-                ]
-            ]
-        , viewAccidents model
+        [ siteHeader model |> toUnstyled
+        , siteNav model |> toUnstyled
+        , siteMain model |> toUnstyled
         ]
     }
 
