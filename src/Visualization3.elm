@@ -12,6 +12,11 @@ type Msg
     = NoOp
 
 
+label : String
+label =
+    "Accident Type Tree"
+
+
 init : Model
 init =
     {}
@@ -28,7 +33,7 @@ view : Model -> List Accident -> Html msg
 view model accidents =
     div
         []
-        [ text "Visualization 3"
+        [ text label
         , br [] []
         , text (String.fromInt (List.length accidents))
         ]

@@ -12,6 +12,11 @@ type Msg
     = NoOp
 
 
+label : String
+label =
+    "Severity Time Series"
+
+
 init : Model
 init =
     {}
@@ -28,7 +33,7 @@ view : Model -> List Accident -> Html msg
 view model accidents =
     div
         []
-        [ text "Visualization 1"
+        [ text label
         , br [] []
         , text (String.fromInt (List.length accidents))
         ]

@@ -59,7 +59,7 @@ shuf -n 1000 static/data/accidents.jsonl > static/data/accidents-sample.jsonl
 ```
 
 ## Ideas
-- treemap (or tree):
+- treemap (or tree) of accident types:
   - collision types
   - road category
   - light conditions

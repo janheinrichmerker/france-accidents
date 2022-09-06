@@ -100,8 +100,8 @@ onUrlChange _ =
     NoOp
 
 
-viewAccidents : Model -> Html msg
-viewAccidents model =
+visualization : Model -> Html msg
+visualization model =
     case model.accidents of
         Failure message ->
             text ("Unable to load accidents: " ++ message)
@@ -127,13 +127,13 @@ visualizationLabel : CurrentVisualization -> String
 visualizationLabel vis =
     case vis of
         CurrentVisualization1 ->
-            "Visualization 1"
+            Visualization1.label
 
         CurrentVisualization2 ->
-            "Visualization 2"
+            Visualization2.label
 
         CurrentVisualization3 ->
-            "Visualization 3"
+            Visualization3.label
 
 
 selectVisualizationButton : Model -> CurrentVisualization -> Html Msg
@@ -197,7 +197,7 @@ siteMain model =
         [ css
             [ margin2 (ex 1) zero ]
         ]
-        [ viewAccidents model ]
+        [ visualization model ]
 
 
 view : Model -> Document Msg
