@@ -23,6 +23,7 @@
             "gampleman/elm-visualization": "2.3.0",
             "isaacseymour/deprecated-time": "1.0.0",
             "justinmimbs/date": "3.2.1",
+            "rtfeldman/elm-css": "17.1.1",
             "rtfeldman/elm-iso8601-date-strings": "1.1.4",
             "ryannhg/date-format": "2.3.0"
         },
@@ -44,6 +45,7 @@
             "ianmackenzie/elm-units-interval": "2.3.0",
             "ianmackenzie/elm-units-prefixed": "2.7.0",
             "justinmimbs/time-extra": "1.1.0",
+            "robinheghan/murmur3": "1.0.0",
             "rtfeldman/elm-hex": "1.0.0"
         }
     },
