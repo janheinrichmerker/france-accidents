@@ -18,7 +18,7 @@ import TypedSvg exposing (g, line, svg, text_)
 import TypedSvg.Attributes
 import TypedSvg.Core exposing (Svg)
 import TypedSvg.Types exposing (Align(..), AnchorAlignment(..), Length(..), MeetOrSlice(..), Paint(..), Scale(..), Transform(..))
-import Utils exposing (reverseTuple, toBucketDict)
+import Utils exposing (mapConsecutive, reverseTuple, toBucketDict)
 
 
 type AspectRatio
@@ -506,11 +506,6 @@ view model accidents =
         , fromUnstyled
             (linePlot aspectRatio data)
         ]
-
-
-mapConsecutive : (a -> a -> b) -> List a -> Maybe (List b)
-mapConsecutive mapper list =
-    Maybe.map (\l2 -> List.map2 mapper list l2) <| List.tail list
 
 
 computeAspectRatio : Model -> List Point2D -> Float

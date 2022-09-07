@@ -9,6 +9,11 @@ reverseTuple ( a, b ) =
     ( b, a )
 
 
+mapConsecutive : (a -> a -> b) -> List a -> Maybe (List b)
+mapConsecutive mapper list =
+    Maybe.map (\l2 -> List.map2 mapper list l2) <| List.tail list
+
+
 appendToOrCreateList : a -> Maybe (List a) -> List a
 appendToOrCreateList newElement oldList =
     case oldList of
