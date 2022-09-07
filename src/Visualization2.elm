@@ -17,16 +17,16 @@ label =
     "Person Characteristics Stick Figures"
 
 
-init : Model
+init : ( Model, Cmd Msg )
 init =
-    {}
+    ( {}, Cmd.none )
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         NoOp ->
-            model
+            ( model, Cmd.none )
 
 
 view : Model -> List Accident -> Html msg

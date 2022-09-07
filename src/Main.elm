@@ -32,16 +32,34 @@ type alias Model =
 
 init : Flags -> Url -> Key -> ( Model, Cmd Msg )
 init _ _ _ =
+    let
+        ( model1, cmd1 ) =
+            Visualization1.init
+
+        ( model2, cmd2 ) =
+            Visualization2.init
+
+        ( model3, cmd3 ) =
+            Visualization3.init
+
+        loadAccidentsCmd =
+            Http.get
+                { url = "/data/accidents-sample.jsonl"
+                , expect = expectAccidentJsonLines GotAccidentsData
+                }
+    in
     ( { accidents = Loading
       , currentVisualization = CurrentVisualization1
-      , visualization1 = Visualization1.init
-      , visualization2 = Visualization2.init
-      , visualization3 = Visualization3.init
+      , visualization1 = model1
+      , visualization2 = model2
+      , visualization3 = model3
       }
-    , Http.get
-        { url = "/data/accidents-sample.jsonl"
-        , expect = expectAccidentJsonLines GotAccidentsData
-        }
+    , Cmd.batch
+        [ loadAccidentsCmd
+        , Cmd.map VisualizationMsg1 cmd1
+        , Cmd.map VisualizationMsg2 cmd2
+        , Cmd.map VisualizationMsg3 cmd3
+        ]
     )
 
 
@@ -76,13 +94,25 @@ update msg model =
             ( { model | currentVisualization = vis }, Cmd.none )
 
         VisualizationMsg1 msg1 ->
-            ( { model | visualization1 = Visualization1.update msg1 model.visualization1 }, Cmd.none )
+            let
+                ( model1, cmd1 ) =
+                    Visualization1.update msg1 model.visualization1
+            in
+            ( { model | visualization1 = model1 }, Cmd.map VisualizationMsg1 cmd1 )
 
         VisualizationMsg2 msg2 ->
-            ( { model | visualization2 = Visualization2.update msg2 model.visualization2 }, Cmd.none )
+            let
+                ( model2, cmd2 ) =
+                    Visualization2.update msg2 model.visualization2
+            in
+            ( { model | visualization2 = model2 }, Cmd.map VisualizationMsg2 cmd2 )
 
         VisualizationMsg3 msg3 ->
-            ( { model | visualization3 = Visualization3.update msg3 model.visualization3 }, Cmd.none )
+            let
+                ( model3, cmd3 ) =
+                    Visualization3.update msg3 model.visualization3
+            in
+            ( { model | visualization3 = model3 }, Cmd.map VisualizationMsg3 cmd3 )
 
 
 subscriptions : Model -> Sub Msg
