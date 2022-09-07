@@ -108,29 +108,53 @@ isKilled person =
             False
 
 
-toPoint2D : Accident -> Maybe Point2D
-toPoint2D accident =
+computeDimensionY : Model -> Accident -> Maybe Float
+computeDimensionY model accident =
     let
-        x =
-            toFloat (posixToMillis accident.timestamp)
-
         persons : List Person
         persons =
             List.foldl (\vehicle agg -> List.append agg vehicle.persons) [] accident.vehicles
 
-        numPersons =
-            List.length persons
+        number : Float
+        number =
+            case model.dimensionY of
+                DimensionYInjured _ ->
+                    toFloat (List.length (List.filter isInjured persons))
 
-        numInjured =
-            List.length (List.filter isInjured persons)
+                DimensionYKilled _ ->
+                    toFloat (List.length (List.filter isKilled persons))
 
-        numKilled =
-            List.length (List.filter isKilled persons)
+        reference : DimensionReference
+        reference =
+            case model.dimensionY of
+                DimensionYInjured ref ->
+                    ref
+
+                DimensionYKilled ref ->
+                    ref
+
+        referenceNumber : Float
+        referenceNumber =
+            case reference of
+                DimensionReferenceAbsolute ->
+                    number
+
+                DimensionReferenceRelative ->
+                    number / toFloat (List.length persons)
+    in
+    Just referenceNumber
+
+
+toPoint2D : Model -> Accident -> Maybe Point2D
+toPoint2D model accident =
+    let
+        x =
+            toFloat (posixToMillis accident.timestamp)
 
         y =
-            toFloat numInjured / toFloat numPersons
+            computeDimensionY model accident
     in
-    Just (Point2D "" x y)
+    Maybe.map (\justY -> Point2D "" x justY) y
 
 
 {-| Remove accidents that have a timestamp in the future, i.e., an invalid timestamp.
@@ -155,7 +179,7 @@ sortByTimestamp accidents =
 toPoints2D : Model -> List Accident -> List Point2D
 toPoints2D model accidents =
     List.filterMap
-        toPoint2D
+        (toPoint2D model)
         (accidents |> filterByTimestamp model |> sortByTimestamp)
 
 
