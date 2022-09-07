@@ -25,9 +25,20 @@ type AspectRatio
     | AspectRatioBanking45
 
 
+type DimensionReference
+    = DimensionReferenceRelative
+    | DimensionReferenceAbsolute
+
+
+type DimensionY
+    = DimensionYInjured DimensionReference
+    | DimensionYKilled DimensionReference
+
+
 type alias Model =
     { timestamp : Maybe Posix
     , aspectRatio : AspectRatio
+    , dimensionY : DimensionY
     }
 
 
@@ -35,6 +46,7 @@ type Msg
     = NoOp
     | GotTime Posix
     | SelectAspectRatio AspectRatio
+    | SelectDimensionY DimensionY
 
 
 label : String
@@ -46,6 +58,7 @@ init : ( Model, Cmd Msg )
 init =
     ( { timestamp = Nothing
       , aspectRatio = AspectRatioBanking45
+      , dimensionY = DimensionYInjured DimensionReferenceAbsolute
       }
     , getTime
     )
@@ -62,6 +75,9 @@ update msg model =
 
         SelectAspectRatio aspectRatio ->
             ( { model | aspectRatio = aspectRatio }, Cmd.none )
+
+        SelectDimensionY dimensionY ->
+            ( { model | dimensionY = dimensionY }, Cmd.none )
 
 
 getTime : Cmd Msg
@@ -196,6 +212,64 @@ aspectRatioSelector model =
         ]
 
 
+dimensionReferenceLabel : DimensionReference -> String
+dimensionReferenceLabel dimensionReference =
+    case dimensionReference of
+        DimensionReferenceAbsolute ->
+            "absolute"
+
+        DimensionReferenceRelative ->
+            "relative"
+
+
+dimensionYLabel : DimensionY -> String
+dimensionYLabel dimensionY =
+    case dimensionY of
+        DimensionYInjured reference ->
+            "Injured (" ++ dimensionReferenceLabel reference ++ ")"
+
+        DimensionYKilled reference ->
+            "Killed (" ++ dimensionReferenceLabel reference ++ ")"
+
+
+dimensionYSelectorOption : Model -> DimensionY -> Html Msg
+dimensionYSelectorOption model dimensionY =
+    option
+        [ onClick (SelectDimensionY dimensionY)
+        , selected (model.dimensionY == dimensionY)
+        ]
+        [ text (dimensionYLabel dimensionY) ]
+
+
+dimensionYSelector : Model -> Html Msg
+dimensionYSelector model =
+    let
+        viewId =
+            "dimension-y-selector"
+
+        option =
+            dimensionYSelectorOption model
+
+        options =
+            List.map
+                option
+                [ DimensionYInjured DimensionReferenceAbsolute
+                , DimensionYKilled DimensionReferenceAbsolute
+                , DimensionYInjured DimensionReferenceRelative
+                , DimensionYKilled DimensionReferenceRelative
+                ]
+    in
+    form
+        []
+        [ Html.Styled.label
+            [ Html.Styled.Attributes.for viewId ]
+            [ text "Choose an Y dimension: " ]
+        , select
+            [ Html.Styled.Attributes.name viewId, Html.Styled.Attributes.id viewId ]
+            options
+        ]
+
+
 view : Model -> List Accident -> Html Msg
 view model accidents =
     let
@@ -215,6 +289,7 @@ view model accidents =
         , br [] []
         , text (String.fromInt (List.length accidents))
         , aspectRatioSelector model
+        , dimensionYSelector model
         , h3 []
             [ text ("Aspect Ratio: " ++ String.fromFloat aspectRatio)
             ]
