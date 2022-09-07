@@ -5,7 +5,7 @@ import Color exposing (black)
 import Html.Styled exposing (Html, br, div, form, fromUnstyled, h3, option, select, text)
 import Html.Styled.Attributes exposing (selected)
 import Html.Styled.Events exposing (onClick)
-import Model exposing (Accident)
+import Model exposing (Accident, Person, Severity(..), Vehicle)
 import Path exposing (Path)
 import Scale exposing (ContinuousScale)
 import Shape
@@ -67,14 +67,50 @@ getTime =
     perform GotTime now
 
 
+isInjured : Person -> Bool
+isInjured person =
+    case person.severity of
+        SeverityInjuredHospitalized ->
+            True
+
+        SeveritySlightlyInjured ->
+            True
+
+        _ ->
+            False
+
+
+isKilled : Person -> Bool
+isKilled person =
+    case person.severity of
+        SeverityKilled ->
+            True
+
+        _ ->
+            False
+
+
 toPoint2D : Accident -> Maybe Point2D
 toPoint2D accident =
     let
         x =
             toFloat (posixToMillis accident.timestamp)
 
+        persons : List Person
+        persons =
+            List.foldl (\vehicle agg -> List.append agg vehicle.persons) [] accident.vehicles
+
+        numPersons =
+            List.length persons
+
+        numInjured =
+            List.length (List.filter isInjured persons)
+
+        numKilled =
+            List.length (List.filter isKilled persons)
+
         y =
-            accident.road_traffic_width_meters
+            toFloat numInjured / toFloat numPersons
     in
     Just (Point2D "" x y)
 
