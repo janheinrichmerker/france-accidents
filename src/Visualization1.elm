@@ -20,6 +20,8 @@ import TypedSvg.Types exposing (Align(..), AnchorAlignment(..), Length(..), Meet
 
 type AspectRatio
     = AspectRatioSquare
+    | AspectRatio2to1
+    | AspectRatio16to9
     | AspectRatioBanking45
 
 
@@ -149,6 +151,12 @@ aspectRatioSelectorOption model aspectRatio =
                 AspectRatioBanking45 ->
                     "Banking to 45 degrees"
 
+                AspectRatio16to9 ->
+                    "16:9"
+
+                AspectRatio2to1 ->
+                    "2:1"
+
                 AspectRatioSquare ->
                     "1:1"
     in
@@ -171,7 +179,11 @@ aspectRatioSelector model =
         options =
             List.map
                 option
-                [ AspectRatioBanking45, AspectRatioSquare ]
+                [ AspectRatioBanking45
+                , AspectRatioSquare
+                , AspectRatio2to1
+                , AspectRatio16to9
+                ]
     in
     form
         []
@@ -220,7 +232,13 @@ computeAspectRatio : Model -> List Point2D -> Float
 computeAspectRatio model data =
     case model.aspectRatio of
         AspectRatioSquare ->
-            1
+            1 / 1
+
+        AspectRatio2to1 ->
+            2 / 1
+
+        AspectRatio16to9 ->
+            16 / 9
 
         AspectRatioBanking45 ->
             Maybe.withDefault 1 (computeAspectRatioBanking45 data)
