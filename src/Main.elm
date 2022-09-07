@@ -130,7 +130,7 @@ onUrlChange _ =
     NoOp
 
 
-visualization : Model -> Html msg
+visualization : Model -> Html Msg
 visualization model =
     case model.accidents of
         Failure message ->
@@ -139,17 +139,20 @@ visualization model =
         Loading ->
             text "Loading accidents..."
 
-        Success fullText ->
+        Success accidents ->
             div []
                 [ case model.currentVisualization of
                     CurrentVisualization1 ->
-                        Visualization1.view model.visualization1 fullText
+                        Html.Styled.map VisualizationMsg1
+                            (Visualization1.view model.visualization1 accidents)
 
                     CurrentVisualization2 ->
-                        Visualization2.view model.visualization2 fullText
+                        Html.Styled.map VisualizationMsg2
+                            (Visualization2.view model.visualization2 accidents)
 
                     CurrentVisualization3 ->
-                        Visualization3.view model.visualization3 fullText
+                        Html.Styled.map VisualizationMsg3
+                            (Visualization3.view model.visualization3 accidents)
                 ]
 
 

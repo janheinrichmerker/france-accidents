@@ -29,7 +29,7 @@ update msg model =
             ( model, Cmd.none )
 
 
-view : Model -> List Accident -> Html msg
+view : Model -> List Accident -> Html Msg
 view model accidents =
     div
         []
