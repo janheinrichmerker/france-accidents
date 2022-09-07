@@ -346,7 +346,7 @@ type alias Accident =
     , upstream_terminal : Maybe Int
     , upstream_terminal_distance_meters : Maybe Float
     , curvature : Maybe Curvature
-    , central_reservation_width_meters : Int
+    , central_reservation_width_meters : Float
     , road_traffic_width_meters : Float
     , vehicles : List Vehicle
     }

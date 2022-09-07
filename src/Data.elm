@@ -987,7 +987,7 @@ accident =
         |> required "upstream_terminal" (nullable int)
         |> required "upstream_terminal_distance_meters" (nullable float)
         |> required "curvature" (nullable curvature)
-        |> required "central_reservation_width_meters" int
+        |> required "central_reservation_width_meters" float
         |> required "road_traffic_width_meters" float
         |> required "vehicles"
             (list vehicle)
