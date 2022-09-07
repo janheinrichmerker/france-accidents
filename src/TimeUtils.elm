@@ -1,11 +1,21 @@
 module TimeUtils exposing (..)
 
 import Time exposing (Posix)
-import Time.DateTime exposing (DateTime, fromPosix, setDay, setHour, setMillisecond, setMinute, setSecond, setYear, toPosix)
+import Time.Date exposing (Weekday(..))
+import Time.DateTime exposing (DateTime, addDays, fromPosix, setDay, setHour, setMillisecond, setMinute, setSecond, setYear, toPosix, weekday)
 
 
-retainDay : Posix -> Posix
-retainDay time =
+setWeekday : Weekday -> DateTime -> DateTime
+setWeekday newDay date =
+    if weekday date == newDay then
+        date
+
+    else
+        date |> addDays -1 |> setWeekday newDay
+
+
+retainMonth : Posix -> Posix
+retainMonth time =
     let
         date : DateTime
         date =
@@ -14,6 +24,7 @@ retainDay time =
         floorDate : DateTime
         floorDate =
             date
+                |> setDay 0
                 |> setHour 0
                 |> setMinute 0
                 |> setSecond 0
@@ -32,7 +43,7 @@ retainWeek time =
         floorDate : DateTime
         floorDate =
             date
-                |> setDay 0
+                |> setWeekday Mon
                 |> setHour 0
                 |> setMinute 0
                 |> setSecond 0

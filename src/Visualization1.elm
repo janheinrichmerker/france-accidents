@@ -13,7 +13,7 @@ import Shape
 import Statistics exposing (extent, quantile)
 import Task exposing (perform)
 import Time exposing (Posix, millisToPosix, now, posixToMillis)
-import TimeUtils exposing (removeYear, retainDay, retainWeek)
+import TimeUtils exposing (removeYear, retainMonth, retainWeek)
 import TypedSvg exposing (g, line, svg, text_)
 import TypedSvg.Attributes
 import TypedSvg.Core exposing (Svg)
@@ -45,8 +45,8 @@ type GroupX
 
 type AggregateX
     = AggregateXNone
-    | AggregateXPerDay
     | AggregateXPerWeek
+    | AggregateXPerMonth
 
 
 type alias Model =
@@ -78,7 +78,7 @@ init =
       , aspectRatio = AspectRatioBanking45
       , dimensionY = DimensionYInjured DimensionReferenceAbsolute
       , groupX = GroupXByYear
-      , aggregateX = AggregateXNone
+      , aggregateX = AggregateXPerWeek
       }
     , getTime
     )
@@ -220,11 +220,11 @@ toAggregatedTimestamp aggregateX timestamp =
         AggregateXNone ->
             timestamp
 
-        AggregateXPerDay ->
-            retainDay timestamp
-
         AggregateXPerWeek ->
             retainWeek timestamp
+
+        AggregateXPerMonth ->
+            retainMonth timestamp
 
 
 toGroupedTimestamp : GroupX -> Posix -> Posix
@@ -434,11 +434,11 @@ aggregateXLabel aggregateX =
         AggregateXNone ->
             "no aggregation"
 
-        AggregateXPerDay ->
-            "per day"
-
         AggregateXPerWeek ->
             "per week"
+
+        AggregateXPerMonth ->
+            "per month"
 
 
 aggregateXSelectorOption : Model -> AggregateX -> Html Msg
@@ -463,8 +463,8 @@ aggregateXSelector model =
             List.map
                 option
                 [ AggregateXNone
-                , AggregateXPerDay
                 , AggregateXPerWeek
+                , AggregateXPerMonth
                 ]
     in
     form
