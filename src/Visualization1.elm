@@ -2,6 +2,7 @@ module Visualization1 exposing (..)
 
 import Axis
 import Color exposing (black)
+import Dict exposing (Dict)
 import Html.Styled exposing (Html, br, div, form, fromUnstyled, h3, option, select, text)
 import Html.Styled.Attributes exposing (selected)
 import Html.Styled.Events exposing (onClick)
@@ -11,11 +12,13 @@ import Scale exposing (ContinuousScale)
 import Shape
 import Statistics exposing (extent, quantile)
 import Task exposing (perform)
-import Time exposing (Posix, now, posixToMillis)
+import Time exposing (Posix, millisToPosix, now, posixToMillis)
+import TimeUtils exposing (removeYear, retainDay, retainWeek)
 import TypedSvg exposing (g, line, svg, text_)
 import TypedSvg.Attributes
 import TypedSvg.Core exposing (Svg)
 import TypedSvg.Types exposing (Align(..), AnchorAlignment(..), Length(..), MeetOrSlice(..), Paint(..), Scale(..), Transform(..))
+import Utils exposing (reverseTuple, toBucketDict)
 
 
 type AspectRatio
@@ -131,12 +134,21 @@ isKilled person =
             False
 
 
-computeDimensionY : Model -> Accident -> Maybe Float
-computeDimensionY model accident =
+computeDimensionX : Posix -> Maybe Float
+computeDimensionX timestamp =
+    Just (toFloat (posixToMillis timestamp))
+
+
+computeDimensionY : Model -> List Accident -> Maybe Float
+computeDimensionY model accidents =
     let
+        vehicles : List Vehicle
+        vehicles =
+            List.foldl (\accident agg -> List.append agg accident.vehicles) [] accidents
+
         persons : List Person
         persons =
-            List.foldl (\vehicle agg -> List.append agg vehicle.persons) [] accident.vehicles
+            List.foldl (\vehicle agg -> List.append agg vehicle.persons) [] vehicles
 
         number : Float
         number =
@@ -168,16 +180,19 @@ computeDimensionY model accident =
     Just referenceNumber
 
 
-toPoint2D : Model -> Accident -> Maybe Point2D
-toPoint2D model accident =
+toPoint2D : Model -> ( Posix, List Accident ) -> Maybe Point2D
+toPoint2D model ( timestamp, accidents ) =
     let
         x =
-            toFloat (posixToMillis accident.timestamp)
+            computeDimensionX timestamp
 
         y =
-            computeDimensionY model accident
+            computeDimensionY model accidents
     in
-    Maybe.map (\justY -> Point2D "" x justY) y
+    Maybe.map2
+        (\justX justY -> Point2D "" justX justY)
+        x
+        y
 
 
 {-| Remove accidents that have a timestamp in the future, i.e., an invalid timestamp.
@@ -192,18 +207,68 @@ filterByTimestamp model accidents =
             accidents
 
 
-{-| Sort accidents in chronological order, i.e., by ascending timestamp.
+{-| Sort buckets in chronological order, i.e., by ascending timestamp.
 -}
-sortByTimestamp : List Accident -> List Accident
-sortByTimestamp accidents =
-    List.sortBy (\accident -> posixToMillis accident.timestamp) accidents
+sortByBucketTimestamp : List ( Posix, List Accident ) -> List ( Posix, List Accident )
+sortByBucketTimestamp buckets =
+    List.sortBy (Tuple.first >> posixToMillis) buckets
+
+
+toAggregatedTimestamp : AggregateX -> Posix -> Posix
+toAggregatedTimestamp aggregateX timestamp =
+    case aggregateX of
+        AggregateXNone ->
+            timestamp
+
+        AggregateXPerDay ->
+            retainDay timestamp
+
+        AggregateXPerWeek ->
+            retainWeek timestamp
+
+
+toGroupedTimestamp : GroupX -> Posix -> Posix
+toGroupedTimestamp groupX timestamp =
+    case groupX of
+        GroupXNever ->
+            timestamp
+
+        GroupXByYear ->
+            removeYear timestamp
+
+
+toTimestampKey : Model -> Accident -> Posix
+toTimestampKey model accident =
+    accident.timestamp
+        |> toAggregatedTimestamp model.aggregateX
+        |> toGroupedTimestamp model.groupX
+
+
+associateTimestampKey : Model -> Accident -> ( Accident, Posix )
+associateTimestampKey model accident =
+    ( accident, toTimestampKey model accident )
+
+
+bucketsByTimestamp : Model -> List Accident -> List ( Posix, List Accident )
+bucketsByTimestamp model accidents =
+    accidents
+        |> List.map (associateTimestampKey model)
+        |> List.map reverseTuple
+        |> List.map (Tuple.mapFirst posixToMillis)
+        |> toBucketDict
+        |> Dict.toList
+        |> List.map (Tuple.mapFirst millisToPosix)
 
 
 toPoints2D : Model -> List Accident -> List Point2D
 toPoints2D model accidents =
     List.filterMap
         (toPoint2D model)
-        (accidents |> filterByTimestamp model |> sortByTimestamp)
+        (accidents
+            |> filterByTimestamp model
+            |> bucketsByTimestamp model
+            |> sortByBucketTimestamp
+        )
 
 
 aspectRatioSelectorOption : Model -> AspectRatio -> Html Msg
