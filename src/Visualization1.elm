@@ -2,7 +2,9 @@ module Visualization1 exposing (..)
 
 import Axis
 import Color exposing (black)
-import Html.Styled exposing (Html, br, div, fromUnstyled, h3, text)
+import Html.Styled exposing (Html, br, div, form, fromUnstyled, h3, option, select, text)
+import Html.Styled.Attributes exposing (selected)
+import Html.Styled.Events exposing (onClick)
 import Model exposing (Accident)
 import Path exposing (Path)
 import Scale exposing (ContinuousScale)
@@ -16,13 +18,21 @@ import TypedSvg.Core exposing (Svg)
 import TypedSvg.Types exposing (Align(..), AnchorAlignment(..), Length(..), MeetOrSlice(..), Paint(..), Scale(..), Transform(..))
 
 
+type AspectRatio
+    = AspectRatioSquare
+    | AspectRatioBanking45
+
+
 type alias Model =
-    { timestamp : Maybe Posix }
+    { timestamp : Maybe Posix
+    , aspectRatio : AspectRatio
+    }
 
 
 type Msg
     = NoOp
     | GotTime Posix
+    | SelectAspectRatio AspectRatio
 
 
 label : String
@@ -32,7 +42,9 @@ label =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { timestamp = Nothing }
+    ( { timestamp = Nothing
+      , aspectRatio = AspectRatioBanking45
+      }
     , getTime
     )
 
@@ -45,6 +57,14 @@ update msg model =
 
         GotTime posix ->
             ( { model | timestamp = Just posix }, Cmd.none )
+
+        SelectAspectRatio aspectRatio ->
+            ( { model | aspectRatio = aspectRatio }, Cmd.none )
+
+
+getTime : Cmd Msg
+getTime =
+    perform GotTime now
 
 
 toPoint2D : Accident -> Maybe Point2D
@@ -59,11 +79,8 @@ toPoint2D accident =
     Just (Point2D "" x y)
 
 
-getTime : Cmd Msg
-getTime =
-    perform GotTime now
-
-
+{-| Remove accidents that have a timestamp in the future, i.e., an invalid timestamp.
+-}
 filterByTimestamp : Model -> List Accident -> List Accident
 filterByTimestamp model accidents =
     case model.timestamp of
@@ -74,6 +91,8 @@ filterByTimestamp model accidents =
             accidents
 
 
+{-| Sort accidents in chronological order, i.e., by ascending timestamp.
+-}
 sortByTimestamp : List Accident -> List Accident
 sortByTimestamp accidents =
     List.sortBy (\accident -> posixToMillis accident.timestamp) accidents
@@ -86,6 +105,49 @@ toPoints2D model accidents =
         (accidents |> filterByTimestamp model |> sortByTimestamp)
 
 
+aspectRatioSelectorOption : Model -> AspectRatio -> Html Msg
+aspectRatioSelectorOption model aspectRatio =
+    let
+        name =
+            case aspectRatio of
+                AspectRatioBanking45 ->
+                    "Banking to 45 degrees"
+
+                AspectRatioSquare ->
+                    "1:1"
+    in
+    option
+        [ onClick (SelectAspectRatio aspectRatio)
+        , selected (model.aspectRatio == aspectRatio)
+        ]
+        [ text name ]
+
+
+aspectRatioSelector : Model -> Html Msg
+aspectRatioSelector model =
+    let
+        viewId =
+            "aspect-ratio-selector"
+
+        option =
+            aspectRatioSelectorOption model
+
+        options =
+            List.map
+                option
+                [ AspectRatioBanking45, AspectRatioSquare ]
+    in
+    form
+        []
+        [ Html.Styled.label
+            [ Html.Styled.Attributes.for viewId ]
+            [ text "Choose an aspect ratio: " ]
+        , select
+            [ Html.Styled.Attributes.name viewId, Html.Styled.Attributes.id viewId ]
+            options
+        ]
+
+
 view : Model -> List Accident -> Html Msg
 view model accidents =
     let
@@ -95,33 +157,21 @@ view model accidents =
         data =
             AxisData2D "Time" "Road Width" points
 
-        aspectRatio : Maybe Float
+        aspectRatio : Float
         aspectRatio =
-            computeAspectRatio points
+            computeAspectRatio model points
     in
     div
         []
         [ text label
         , br [] []
         , text (String.fromInt (List.length accidents))
+        , aspectRatioSelector model
         , h3 []
-            [ text
-                (Maybe.withDefault
-                    "Aspect-Ratio nicht berechnet."
-                    (Maybe.map
-                        (\ar -> "Aspect Ratio: " ++ String.fromFloat ar)
-                        aspectRatio
-                    )
-                )
+            [ text ("Aspect Ratio: " ++ String.fromFloat aspectRatio)
             ]
         , fromUnstyled
-            (linePlot
-                w
-                --(Maybe.withDefault 1 aspectRatio)
-                4
-                --2
-                data
-            )
+            (linePlot aspectRatio data)
         ]
 
 
@@ -130,8 +180,18 @@ mapConsecutive mapper list =
     Maybe.map (\l2 -> List.map2 mapper list l2) <| List.tail list
 
 
-computeAspectRatio : List Point2D -> Maybe Float
-computeAspectRatio data =
+computeAspectRatio : Model -> List Point2D -> Float
+computeAspectRatio model data =
+    case model.aspectRatio of
+        AspectRatioSquare ->
+            1
+
+        AspectRatioBanking45 ->
+            Maybe.withDefault 1 (computeAspectRatioBanking45 data)
+
+
+computeAspectRatioBanking45 : List Point2D -> Maybe Float
+computeAspectRatioBanking45 data =
     let
         slopes : Maybe (List Float)
         slopes =
@@ -164,22 +224,22 @@ computeAspectRatio data =
         rangeY
 
 
-w : Float
-w =
-    900
-
-
-padding : Float
-padding =
-    60
-
-
-linePlot : Float -> Float -> AxisData2D -> Svg msg
-linePlot width aspectRatio model =
+linePlot : Float -> AxisData2D -> Svg msg
+linePlot aspectRatio model =
     let
+        width : Float
+        width =
+            900
+
+        height : Float
         height =
             width / aspectRatio
 
+        padding : Float
+        padding =
+            60
+
+        xTicks : Int
         xTicks =
             10
 
