@@ -140,6 +140,11 @@ update msg model =
             ( { model | dimensions = moveDown idx model.dimensions }, Cmd.none )
 
 
+partitionDimension : List Accident -> PartitionersDimension -> List (List Accident)
+partitionDimension accidents ( _, partitioner ) =
+    List.map (\pred -> List.filter pred accidents) partitioner
+
+
 view : Model -> List Accident -> Html Msg
 view model accidents =
     div
