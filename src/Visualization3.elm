@@ -2,20 +2,13 @@ module Visualization3 exposing (..)
 
 import Html.Styled exposing (Html, br, div, text)
 import Model exposing (Accident, Collision(..), Light(..), RoadCategory(..))
+import Partition exposing (Partitioner, Partitioners, equalityPartitioner)
 import Reorderable exposing (Reorderable, moveDown, moveUp)
 
 
 type TreeLayout
     = TreeLayoutGraph
     | TreeLayoutTreeMap
-
-
-type alias Partitioner =
-    Accident -> Bool
-
-
-type alias Partitioners =
-    List Partitioners
 
 
 type Dimension
@@ -30,7 +23,7 @@ type Dimension
 
 
 type alias PartitionersDimension =
-    ( Dimension, Partitioners )
+    ( Dimension, Partitioner Accident )
 
 
 type alias Model =
@@ -51,23 +44,13 @@ label =
     "Accident Type Tree"
 
 
-equalityPartitioner : (Accident -> a) -> a -> Partitioner
-equalityPartitioner mapper value accident =
-    mapper accident == value
-
-
-equalityPartitioners : (Accident -> a) -> List a -> Partitioners
-equalityPartitioners mapper values =
-    List.map (equalityPartitioner mapper) values
-
-
 init : ( Model, Cmd Msg )
 init =
     ( { treeLayout = TreeLayoutTreeMap
       , dimensions =
             Reorderable.fromList
                 [ ( DimensionCollisionType
-                  , equalityPartitioners .collision
+                  , equalityPartitioner .collision
                         [ Just CollisionTwoVehiclesFront
                         , Just CollisionTwoVehiclesFromTheRear
                         , Just CollisionTwoVehiclesFromTheSide
@@ -78,7 +61,7 @@ init =
                         ]
                   )
                 , ( DimensionRoadCategory
-                  , equalityPartitioners .road_category
+                  , equalityPartitioner .road_category
                         [ RoadCategoryHighway
                         , RoadCategoryNationalRoad
                         , RoadCategoryDepartmentalRoad
@@ -90,7 +73,7 @@ init =
                         ]
                   )
                 , ( DimensionLightCondition
-                  , equalityPartitioners .light
+                  , equalityPartitioner .light
                         [ Just LightDaylight
                         , Just LightDuskOrDawn
                         , Just LightNightWithoutPublicLighting
@@ -138,11 +121,6 @@ update msg model =
 
         MoveDownDimension idx ->
             ( { model | dimensions = moveDown idx model.dimensions }, Cmd.none )
-
-
-partitionDimension : List Accident -> PartitionersDimension -> List (List Accident)
-partitionDimension accidents ( _, partitioner ) =
-    List.map (\pred -> List.filter pred accidents) partitioner
 
 
 view : Model -> List Accident -> Html Msg
