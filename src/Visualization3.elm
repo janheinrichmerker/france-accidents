@@ -41,11 +41,15 @@ type alias Model =
     }
 
 
+type MoveDirection
+    = MoveDirectionUp
+    | MoveDirectionDown
+
+
 type Msg
     = NoOp
     | SelectTreeLayout TreeLayout
-    | MoveUpDimension Int
-    | MoveDownDimension Int
+    | MoveDimension Int MoveDirection
 
 
 label : String
@@ -130,10 +134,10 @@ update msg model =
         SelectTreeLayout layout ->
             ( { model | treeLayout = layout }, Cmd.none )
 
-        MoveUpDimension idx ->
+        MoveDimension idx MoveDirectionUp ->
             ( { model | dimensions = moveUp idx model.dimensions }, Cmd.none )
 
-        MoveDownDimension idx ->
+        MoveDimension idx MoveDirectionDown ->
             ( { model | dimensions = moveDown idx model.dimensions }, Cmd.none )
 
 
