@@ -1,7 +1,7 @@
 module Visualization3 exposing (..)
 
 import Color exposing (black)
-import Html.Styled exposing (Html, br, div, fromUnstyled, text)
+import Html.Styled exposing (Html, br, div, fromUnstyled, li, text, ul)
 import Model exposing (Accident, Collision(..), Light(..), RoadCategory(..))
 import Partition exposing (Partitioner, Partitioners, equalityPartitioner, partitionTree)
 import Reorderable exposing (Reorderable, moveDown, moveUp)
@@ -15,6 +15,7 @@ import TypedSvg.Types exposing (Align(..), Length(..), MeetOrSlice(..), Paint(..
 type TreeLayout
     = TreeLayoutGraph
     | TreeLayoutTreemap
+    | TreeLayoutList
 
 
 type Dimension
@@ -232,6 +233,28 @@ treemapNode axis w h node =
         )
 
 
+treeList : Tree Int -> Html Msg
+treeList tree =
+    let
+        convertLabel : Int -> Html Msg
+        convertLabel nodeLabel =
+            text (String.fromInt nodeLabel)
+
+        convertTree : Html Msg -> List (Html Msg) -> Html Msg
+        convertTree nodeLabel children =
+            case children of
+                [] ->
+                    li [] [ nodeLabel ]
+
+                _ ->
+                    li []
+                        [ nodeLabel
+                        , ul [] children
+                        ]
+    in
+    ul [] [ Tree.restructure convertLabel convertTree tree ]
+
+
 viewTree : TreeLayout -> Tree Int -> Html Msg
 viewTree layout tree =
     case layout of
@@ -241,6 +264,9 @@ viewTree layout tree =
 
         TreeLayoutTreemap ->
             treemap tree
+
+        TreeLayoutList ->
+            treeList tree
 
 
 buildTree : Model -> List Accident -> Tree Int
