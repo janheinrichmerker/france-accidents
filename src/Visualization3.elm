@@ -1,7 +1,9 @@
 module Visualization3 exposing (..)
 
 import Color exposing (black)
-import Html.Styled exposing (Html, br, div, fromUnstyled, li, text, ul)
+import Html.Styled exposing (Html, br, div, form, fromUnstyled, li, option, select, text, ul)
+import Html.Styled.Attributes exposing (selected)
+import Html.Styled.Events exposing (onClick)
 import Model exposing (Accident, Collision(..), Light(..), RoadCategory(..))
 import Partition exposing (Partitioner, Partitioners, equalityPartitioner, partitionTree)
 import Reorderable exposing (Reorderable, moveDown, moveUp)
@@ -278,6 +280,56 @@ buildTree model accidents =
     Tree.map List.length accidentTree
 
 
+treeLayoutLabel : TreeLayout -> String
+treeLayoutLabel treeLayout =
+    case treeLayout of
+        TreeLayoutGraph ->
+            "graph"
+
+        TreeLayoutTreemap ->
+            "treemap"
+
+        TreeLayoutList ->
+            "list"
+
+
+treeLayoutSelectorOption : Model -> TreeLayout -> Html Msg
+treeLayoutSelectorOption model treeLayout =
+    option
+        [ onClick (SelectTreeLayout treeLayout)
+        , selected (model.treeLayout == treeLayout)
+        ]
+        [ text (treeLayoutLabel treeLayout) ]
+
+
+treeLayoutSelector : Model -> Html Msg
+treeLayoutSelector model =
+    let
+        viewId =
+            "tree-layout-selector"
+
+        option =
+            treeLayoutSelectorOption model
+
+        options =
+            List.map
+                option
+                [ TreeLayoutGraph
+                , TreeLayoutTreemap
+                , TreeLayoutList
+                ]
+    in
+    form
+        []
+        [ Html.Styled.label
+            [ Html.Styled.Attributes.for viewId ]
+            [ text "Tree layout: " ]
+        , select
+            [ Html.Styled.Attributes.name viewId, Html.Styled.Attributes.id viewId ]
+            options
+        ]
+
+
 view : Model -> List Accident -> Html Msg
 view model accidents =
     div
@@ -285,5 +337,6 @@ view model accidents =
         [ text label
         , br [] []
         , text (String.fromInt (List.length accidents))
+        , treeLayoutSelector model
         , viewTree model.treeLayout (buildTree model accidents)
         ]
