@@ -113,6 +113,11 @@ init =
     )
 
 
+partitioners : Model -> Partitioners Accident
+partitioners model =
+    List.map Tuple.second (Reorderable.toList model.dimensions)
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
