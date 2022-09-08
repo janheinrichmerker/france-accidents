@@ -10,6 +10,14 @@ type TreeLayout
     | TreeLayoutTreeMap
 
 
+type alias Partitioner =
+    Accident -> Bool
+
+
+type alias Partitioners =
+    List Partitioners
+
+
 type Dimension
     = DimensionCollisionType
     | DimensionRoadCategory
@@ -19,6 +27,10 @@ type Dimension
     | DimensionRoadCurvature
     | DimensionVehicleType
     | DimensionSituation
+
+
+type alias PartitionersDimension =
+    ( Dimension, Partitioners )
 
 
 type alias Model =
@@ -37,6 +49,16 @@ type Msg
 label : String
 label =
     "Accident Type Tree"
+
+
+equalityPartitioner : (Accident -> a) -> a -> Partitioner
+equalityPartitioner mapper value accident =
+    mapper accident == value
+
+
+equalityPartitioners : (Accident -> a) -> List a -> Partitioners
+equalityPartitioners mapper values =
+    List.map (equalityPartitioner mapper) values
 
 
 init : ( Model, Cmd Msg )
