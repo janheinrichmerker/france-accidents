@@ -3,7 +3,7 @@ module Visualization3 exposing (..)
 import Color exposing (black)
 import Html.Styled exposing (Html, br, div, fromUnstyled, text)
 import Model exposing (Accident, Collision(..), Light(..), RoadCategory(..))
-import Partition exposing (Partitioner, Partitioners, equalityPartitioner)
+import Partition exposing (Partitioner, Partitioners, equalityPartitioner, partitionTree)
 import Reorderable exposing (Reorderable, moveDown, moveUp)
 import Tree exposing (Tree)
 import TypedSvg exposing (svg)
@@ -232,6 +232,26 @@ treemapNode axis w h node =
         )
 
 
+viewTree : TreeLayout -> Tree Int -> Html Msg
+viewTree layout tree =
+    case layout of
+        TreeLayoutGraph ->
+            -- todo
+            text "Not yet implemented."
+
+        TreeLayoutTreeMap ->
+            treemap tree
+
+
+buildTree : Model -> List Accident -> Tree Int
+buildTree model accidents =
+    let
+        accidentTree =
+            partitionTree accidents (partitioners model)
+    in
+    Tree.map List.length accidentTree
+
+
 view : Model -> List Accident -> Html Msg
 view model accidents =
     div
@@ -239,4 +259,5 @@ view model accidents =
         [ text label
         , br [] []
         , text (String.fromInt (List.length accidents))
+        , viewTree model.treeLayout (buildTree model accidents)
         ]
