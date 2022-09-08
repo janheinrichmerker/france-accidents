@@ -1,7 +1,7 @@
 module Visualization3 exposing (..)
 
 import Color exposing (black)
-import Html.Styled exposing (Html, br, div, form, fromUnstyled, li, option, select, text, ul)
+import Html.Styled exposing (Html, br, button, div, form, fromUnstyled, li, ol, option, select, text, ul)
 import Html.Styled.Attributes exposing (selected)
 import Html.Styled.Events exposing (onClick)
 import Model exposing (Accident, Collision(..), Light(..), RoadCategory(..))
@@ -334,6 +334,86 @@ treeLayoutSelector model =
         ]
 
 
+dimensionLabel : Dimension -> String
+dimensionLabel dimension =
+    case dimension of
+        DimensionCollisionType ->
+            "collision type"
+
+        DimensionRoadCategory ->
+            "road category"
+
+        DimensionLightCondition ->
+            "light condition"
+
+        DimensionWeather ->
+            "weather"
+
+        DimensionIntersectionType ->
+            "intersection type"
+
+        DimensionRoadCurvature ->
+            "road curvature"
+
+        DimensionVehicleType ->
+            "vehicle type"
+
+        DimensionSituation ->
+            "situation"
+
+
+moveLabel : MoveDirection -> String
+moveLabel direction =
+    case direction of
+        MoveDirectionUp ->
+            "↑"
+
+        MoveDirectionDown ->
+            "↓"
+
+
+canMove : Reorderable a -> Int -> MoveDirection -> Bool
+canMove items index direction =
+    case direction of
+        MoveDirectionUp ->
+            index > 0
+
+        MoveDirectionDown ->
+            index < Reorderable.length items - 1
+
+
+moveDimensionButton : Reorderable a -> Int -> MoveDirection -> Maybe (Html Msg)
+moveDimensionButton dimensions index direction =
+    if canMove dimensions index direction then
+        Just
+            (button
+                [ onClick (MoveDimension index direction) ]
+                [ text (moveLabel direction) ]
+            )
+
+    else
+        Nothing
+
+
+dimensionsSelector : Model -> Html Msg
+dimensionsSelector model =
+    ol
+        []
+        (List.indexedMap
+            (\index ( dimension, _ ) ->
+                li
+                    []
+                    (List.filterMap identity
+                        [ Just (text (dimensionLabel dimension ++ " "))
+                        , moveDimensionButton model.dimensions index MoveDirectionUp
+                        , moveDimensionButton model.dimensions index MoveDirectionDown
+                        ]
+                    )
+            )
+            (Reorderable.toList model.dimensions)
+        )
+
+
 view : Model -> List Accident -> Html Msg
 view model accidents =
     div
@@ -342,5 +422,6 @@ view model accidents =
         , br [] []
         , text (String.fromInt (List.length accidents))
         , treeLayoutSelector model
+        , dimensionsSelector model
         , viewTree model.treeLayout (buildTree model accidents)
         ]
