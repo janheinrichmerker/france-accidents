@@ -14,7 +14,7 @@ import TypedSvg.Types exposing (Align(..), Length(..), MeetOrSlice(..), Paint(..
 
 type TreeLayout
     = TreeLayoutGraph
-    | TreeLayoutTreeMap
+    | TreeLayoutTreemap
 
 
 type Dimension
@@ -52,7 +52,7 @@ label =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { treeLayout = TreeLayoutTreeMap
+    ( { treeLayout = TreeLayoutTreemap
       , dimensions =
             Reorderable.fromList
                 [ ( DimensionCollisionType
@@ -134,7 +134,7 @@ update msg model =
             ( { model | dimensions = moveDown idx model.dimensions }, Cmd.none )
 
 
-type SplitAxis
+type TreemapSplitAxis
     = SplitX
     | SplitY
 
@@ -165,7 +165,7 @@ treemap tree =
         )
 
 
-treemapNode : SplitAxis -> Float -> Float -> Tree Int -> Svg Msg
+treemapNode : TreemapSplitAxis -> Float -> Float -> Tree Int -> Svg Msg
 treemapNode axis w h node =
     let
         parentWeight =
@@ -239,7 +239,7 @@ viewTree layout tree =
             -- todo
             text "Not yet implemented."
 
-        TreeLayoutTreeMap ->
+        TreeLayoutTreemap ->
             treemap tree
 
 
