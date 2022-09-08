@@ -1,7 +1,7 @@
 module Visualization3 exposing (..)
 
 import Html.Styled exposing (Html, br, div, text)
-import Model exposing (Accident)
+import Model exposing (Accident, Collision(..), Light(..), RoadCategory(..))
 import Reorderable exposing (Reorderable, moveDown, moveUp)
 
 
@@ -35,7 +35,7 @@ type alias PartitionersDimension =
 
 type alias Model =
     { treeLayout : TreeLayout
-    , dimensions : Reorderable Dimension
+    , dimensions : Reorderable PartitionersDimension
     }
 
 
@@ -66,14 +66,58 @@ init =
     ( { treeLayout = TreeLayoutTreeMap
       , dimensions =
             Reorderable.fromList
-                [ DimensionCollisionType
-                , DimensionRoadCategory
-                , DimensionLightCondition
-                , DimensionWeather
-                , DimensionIntersectionType
-                , DimensionRoadCurvature
-                , DimensionVehicleType
-                , DimensionSituation
+                [ ( DimensionCollisionType
+                  , equalityPartitioners .collision
+                        [ Just CollisionTwoVehiclesFront
+                        , Just CollisionTwoVehiclesFromTheRear
+                        , Just CollisionTwoVehiclesFromTheSide
+                        , Just CollisionThreeOrMoreVehiclesInAChain
+                        , Just CollisionThreeOrMoreVehiclesMultipleCollisions
+                        , Just CollisionOtherCollision
+                        , Just CollisionWithoutCollision
+                        ]
+                  )
+                , ( DimensionRoadCategory
+                  , equalityPartitioners .road_category
+                        [ RoadCategoryHighway
+                        , RoadCategoryNationalRoad
+                        , RoadCategoryDepartmentalRoad
+                        , RoadCategoryMunicipalRoads
+                        , RoadCategoryOffThePublicNetwork
+                        , RoadCategoryParkingLotOpenToPublicTraffic
+                        , RoadCategoryUrbanMetropolitanRoads
+                        , RoadCategoryOther
+                        ]
+                  )
+                , ( DimensionLightCondition
+                  , equalityPartitioners .light
+                        [ Just LightDaylight
+                        , Just LightDuskOrDawn
+                        , Just LightNightWithoutPublicLighting
+                        , Just LightNightWithPublicLightingOff
+                        , Just LightNightWithPublicLightingOn
+                        ]
+                  )
+                , ( DimensionWeather
+                  , []
+                    -- todo
+                  )
+                , ( DimensionIntersectionType
+                  , []
+                    -- todo
+                  )
+                , ( DimensionRoadCurvature
+                  , []
+                    -- todo
+                  )
+                , ( DimensionVehicleType
+                  , []
+                    -- todo
+                  )
+                , ( DimensionSituation
+                  , []
+                    -- todo
+                  )
                 ]
       }
     , Cmd.none
