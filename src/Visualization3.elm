@@ -139,8 +139,8 @@ type SplitAxis
     | SplitY
 
 
-viewTreemap : Tree Int -> Html Msg
-viewTreemap tree =
+treemap : Tree Int -> Html Msg
+treemap tree =
     let
         w =
             500
@@ -160,13 +160,13 @@ viewTreemap tree =
             ]
             [ TypedSvg.g
                 [ TypedSvg.Attributes.transform [ Translate padding padding ] ]
-                [ drawTreemapNode SplitX w h tree ]
+                [ treemapNode SplitX w h tree ]
             ]
         )
 
 
-drawTreemapNode : SplitAxis -> Float -> Float -> Tree Int -> Svg Msg
-drawTreemapNode axis w h node =
+treemapNode : SplitAxis -> Float -> Float -> Tree Int -> Svg Msg
+treemapNode axis w h node =
     let
         parentWeight =
             Tree.label node
@@ -208,12 +208,12 @@ drawTreemapNode axis w h node =
                         SplitX ->
                             TypedSvg.g
                                 [ TypedSvg.Attributes.transform [ Translate (w * offset) 0 ] ]
-                                [ drawTreemapNode SplitY (w * weight) h tree ]
+                                [ treemapNode SplitY (w * weight) h tree ]
 
                         SplitY ->
                             TypedSvg.g
                                 [ TypedSvg.Attributes.transform [ Translate 0 (h * offset) ] ]
-                                [ drawTreemapNode SplitX w (h * weight) tree ]
+                                [ treemapNode SplitX w (h * weight) tree ]
                 )
                 (Tuple.second offsetChildTrees)
     in
