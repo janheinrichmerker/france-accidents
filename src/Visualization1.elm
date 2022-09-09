@@ -6,6 +6,7 @@ import Dict exposing (Dict)
 import Html.Styled exposing (Html, div, form, fromUnstyled, h3, option, select, text)
 import Html.Styled.Attributes exposing (selected)
 import Html.Styled.Events exposing (onClick)
+import List.Extra
 import Model exposing (Accident, Person, Severity(..), Vehicle)
 import Path exposing (Path)
 import Scale exposing (ContinuousScale)
@@ -28,14 +29,16 @@ type AspectRatio
     | AspectRatioBanking45
 
 
-type DimensionReference
-    = DimensionReferenceRelative
-    | DimensionReferenceAbsolute
+type Reference
+    = ReferenceRelative
+    | ReferenceAbsolute
 
 
-type DimensionY
-    = DimensionYInjured DimensionReference
-    | DimensionYKilled DimensionReference
+type Dimension
+    = DimensionUnharmedPersons
+    | DimensionInjuredPersons
+    | DimensionKilledPersons
+    | DimensionPersons
 
 
 type GroupX
@@ -52,7 +55,8 @@ type AggregateX
 type alias Model =
     { timestamp : Maybe Posix
     , aspectRatio : AspectRatio
-    , dimensionY : DimensionY
+    , dimension : Dimension
+    , reference : Reference
     , groupX : GroupX
     , aggregateX : AggregateX
     }
@@ -62,7 +66,8 @@ type Msg
     = NoOp
     | GotTime Posix
     | SelectAspectRatio AspectRatio
-    | SelectDimensionY DimensionY
+    | SelectDimension Dimension
+    | SelectReference Reference
     | SelectGroupX GroupX
     | SelectAggregateX AggregateX
 
@@ -76,7 +81,8 @@ init : ( Model, Cmd Msg )
 init =
     ( { timestamp = Nothing
       , aspectRatio = AspectRatioBanking45
-      , dimensionY = DimensionYInjured DimensionReferenceAbsolute
+      , dimension = DimensionInjuredPersons
+      , reference = ReferenceAbsolute
       , groupX = GroupXByYear
       , aggregateX = AggregateXPerWeek
       }
@@ -96,8 +102,11 @@ update msg model =
         SelectAspectRatio aspectRatio ->
             ( { model | aspectRatio = aspectRatio }, Cmd.none )
 
-        SelectDimensionY dimensionY ->
-            ( { model | dimensionY = dimensionY }, Cmd.none )
+        SelectDimension dimension ->
+            ( { model | dimension = dimension }, Cmd.none )
+
+        SelectReference reference ->
+            ( { model | reference = reference }, Cmd.none )
 
         SelectGroupX groupX ->
             ( { model | groupX = groupX }, Cmd.none )
@@ -109,6 +118,16 @@ update msg model =
 getTime : Cmd Msg
 getTime =
     perform GotTime now
+
+
+isUnharmed : Person -> Bool
+isUnharmed person =
+    case person.severity of
+        SeverityUnharmed ->
+            True
+
+        _ ->
+            False
 
 
 isInjured : Person -> Bool
@@ -150,34 +169,35 @@ computeDimensionY model accidents =
         persons =
             List.foldl (\vehicle agg -> List.append agg vehicle.persons) [] vehicles
 
-        number : Float
-        number =
-            case model.dimensionY of
-                DimensionYInjured _ ->
-                    toFloat (List.length (List.filter isInjured persons))
+        filter : Person -> Bool
+        filter =
+            case model.dimension of
+                DimensionUnharmedPersons ->
+                    isUnharmed
 
-                DimensionYKilled _ ->
-                    toFloat (List.length (List.filter isKilled persons))
+                DimensionInjuredPersons ->
+                    isInjured
 
-        reference : DimensionReference
-        reference =
-            case model.dimensionY of
-                DimensionYInjured ref ->
-                    ref
+                DimensionKilledPersons ->
+                    isKilled
 
-                DimensionYKilled ref ->
-                    ref
+                DimensionPersons ->
+                    \_ -> True
 
-        referenceNumber : Float
-        referenceNumber =
-            case reference of
-                DimensionReferenceAbsolute ->
-                    number
+        numberPersonsFiltered : Int
+        numberPersonsFiltered =
+            List.Extra.count filter persons
 
-                DimensionReferenceRelative ->
-                    number / toFloat (List.length persons)
+        discriminator : Int
+        discriminator =
+            case model.reference of
+                ReferenceAbsolute ->
+                    1
+
+                ReferenceRelative ->
+                    List.length persons
     in
-    Just referenceNumber
+    Just (toFloat numberPersonsFiltered / toFloat discriminator)
 
 
 toPoint2D : Model -> ( Posix, List Accident ) -> Maybe Point2D
@@ -324,58 +344,100 @@ aspectRatioSelector model =
         ]
 
 
-dimensionReferenceLabel : DimensionReference -> String
-dimensionReferenceLabel dimensionReference =
-    case dimensionReference of
-        DimensionReferenceAbsolute ->
-            "absolute"
+dimensionLabel : Dimension -> String
+dimensionLabel dimension =
+    case dimension of
+        DimensionPersons ->
+            "persons"
 
-        DimensionReferenceRelative ->
-            "relative"
+        DimensionUnharmedPersons ->
+            "unharmed persons"
 
+        DimensionInjuredPersons ->
+            "injured persons"
 
-dimensionYLabel : DimensionY -> String
-dimensionYLabel dimensionY =
-    case dimensionY of
-        DimensionYInjured reference ->
-            "Injured (" ++ dimensionReferenceLabel reference ++ ")"
-
-        DimensionYKilled reference ->
-            "Killed (" ++ dimensionReferenceLabel reference ++ ")"
+        DimensionKilledPersons ->
+            "killed persons"
 
 
-dimensionYSelectorOption : Model -> DimensionY -> Html Msg
-dimensionYSelectorOption model dimensionY =
+dimensionSelectorOption : Model -> Dimension -> Html Msg
+dimensionSelectorOption model dimension =
     option
-        [ onClick (SelectDimensionY dimensionY)
-        , selected (model.dimensionY == dimensionY)
+        [ onClick (SelectDimension dimension)
+        , selected (model.dimension == dimension)
         ]
-        [ text (dimensionYLabel dimensionY) ]
+        [ text (dimensionLabel dimension) ]
 
 
-dimensionYSelector : Model -> Html Msg
-dimensionYSelector model =
+dimensionSelector : Model -> Html Msg
+dimensionSelector model =
     let
         viewId =
-            "dimension-y-selector"
+            "dimension-selector"
 
         option =
-            dimensionYSelectorOption model
+            dimensionSelectorOption model
 
         options =
             List.map
                 option
-                [ DimensionYInjured DimensionReferenceAbsolute
-                , DimensionYKilled DimensionReferenceAbsolute
-                , DimensionYInjured DimensionReferenceRelative
-                , DimensionYKilled DimensionReferenceRelative
+                [ DimensionKilledPersons
+                , DimensionInjuredPersons
+                , DimensionUnharmedPersons
+                , DimensionPersons
                 ]
     in
     form
         []
         [ Html.Styled.label
             [ Html.Styled.Attributes.for viewId ]
-            [ text "Y dimension: " ]
+            [ text "Dimension: " ]
+        , select
+            [ Html.Styled.Attributes.name viewId, Html.Styled.Attributes.id viewId ]
+            options
+        ]
+
+
+referenceLabel : Reference -> String
+referenceLabel dimensionReference =
+    case dimensionReference of
+        ReferenceAbsolute ->
+            "absolute"
+
+        ReferenceRelative ->
+            "relative"
+
+
+referenceSelectorOption : Model -> Reference -> Html Msg
+referenceSelectorOption model reference =
+    option
+        [ onClick (SelectReference reference)
+        , selected (model.reference == reference)
+        ]
+        [ text (referenceLabel reference) ]
+
+
+referenceSelector : Model -> Html Msg
+referenceSelector model =
+    let
+        viewId =
+            "reference-selector"
+
+        option =
+            referenceSelectorOption model
+
+        options =
+            List.map
+                option
+                [ ReferenceAbsolute
+                , ReferenceRelative
+                ]
+    in
+    form
+        []
+        [ Html.Styled.label
+            [ Html.Styled.Attributes.for viewId ]
+            [ text "Reference: " ]
         , select
             [ Html.Styled.Attributes.name viewId, Html.Styled.Attributes.id viewId ]
             options
@@ -494,7 +556,8 @@ view model accidents =
     div
         []
         [ aspectRatioSelector model
-        , dimensionYSelector model
+        , dimensionSelector model
+        , referenceSelector model
         , groupXSelector model
         , aggregateXSelector model
         , h3 []
