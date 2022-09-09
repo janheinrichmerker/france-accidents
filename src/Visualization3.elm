@@ -8,10 +8,13 @@ import Model exposing (Accident, AtmosphericConditions(..), Collision(..), Curva
 import Partition exposing (Partitioner, Partitioners, equalityPartitioner, maybeEqualityPartitioner, partitionTree)
 import Reorderable exposing (Reorderable)
 import Tree exposing (Tree)
+import TreeDiagram
+import TreeDiagram.Svg
+import TreeUtils exposing (toTreeDiagram)
 import TypedSvg exposing (svg)
 import TypedSvg.Attributes
 import TypedSvg.Core exposing (Svg)
-import TypedSvg.Types exposing (Align(..), Length(..), MeetOrSlice(..), Paint(..), Scale(..), Transform(..))
+import TypedSvg.Types exposing (Align(..), AnchorAlignment(..), Length(..), MeetOrSlice(..), Paint(..), Scale(..), Transform(..))
 
 
 type TreeLayout
@@ -220,6 +223,53 @@ update msg model =
             )
 
 
+{-| Represent edges as straight lines.
+-}
+drawLine : ( Float, Float ) -> Svg Msg
+drawLine ( targetX, targetY ) =
+    TypedSvg.line
+        [ TypedSvg.Attributes.x1 (Px 0)
+        , TypedSvg.Attributes.y1 (Px 0)
+        , TypedSvg.Attributes.x2 (Px targetX)
+        , TypedSvg.Attributes.y2 (Px targetY)
+        , TypedSvg.Attributes.stroke (Paint Color.black)
+        ]
+        []
+
+
+{-| Represent nodes as circles with the node value inside.
+-}
+drawNode : Int -> Svg Msg
+drawNode name =
+    TypedSvg.g
+        []
+        [ TypedSvg.circle
+            [ TypedSvg.Attributes.r (Px 16)
+            , TypedSvg.Attributes.stroke (Paint Color.black)
+            , TypedSvg.Attributes.fill (Paint Color.white)
+            , TypedSvg.Attributes.cx (Px 0)
+            , TypedSvg.Attributes.cy (Px 0)
+            ]
+            []
+        , TypedSvg.text_
+            [ TypedSvg.Attributes.textAnchor AnchorMiddle
+            , TypedSvg.Attributes.transform [ Translate 0 5, Rotate 90 0 0 ]
+            ]
+            [ TypedSvg.Core.text (String.fromInt name) ]
+        ]
+
+
+treeGraph : Tree Int -> Html Msg
+treeGraph tree =
+    let
+        treeDiagram : TreeDiagram.Tree Int
+        treeDiagram =
+            toTreeDiagram tree
+    in
+    TreeDiagram.Svg.draw TreeDiagram.defaultTreeLayout drawNode drawLine treeDiagram
+        |> fromUnstyled
+
+
 type TreemapSplitAxis
     = SplitX
     | SplitY
@@ -341,17 +391,16 @@ treeList tree =
 
 
 viewTree : TreeLayout -> Tree Int -> Html Msg
-viewTree layout tree =
+viewTree layout =
     case layout of
         TreeLayoutGraph ->
-            -- todo
-            text "Not yet implemented."
+            treeGraph
 
         TreeLayoutTreemap ->
-            treemap tree
+            treemap
 
         TreeLayoutList ->
-            treeList tree
+            treeList
 
 
 buildTree : Model -> List Accident -> Tree Int
