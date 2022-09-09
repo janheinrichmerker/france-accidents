@@ -15,7 +15,7 @@ import Statistics
 import Task exposing (perform)
 import Time exposing (Posix, millisToPosix, now, posixToMillis)
 import Time.DateTime
-import TimeUtils exposing (removeYear, retainMonth, retainWeek)
+import TimeUtils exposing (removeYear, retainMonth, retainQuarter, retainWeek, retainYear)
 import TypedSvg exposing (g, line, svg, text_)
 import TypedSvg.Attributes
 import TypedSvg.Core exposing (Svg)
@@ -51,6 +51,8 @@ type Aggregate
     = AggregateNone
     | AggregatePerWeek
     | AggregatePerMonth
+    | AggregatePerQuarter
+    | AggregatePerYear
 
 
 type alias Model =
@@ -235,6 +237,12 @@ toAggregatedTimestamp aggregateX timestamp =
 
         AggregatePerMonth ->
             retainMonth timestamp
+
+        AggregatePerQuarter ->
+            retainQuarter timestamp
+
+        AggregatePerYear ->
+            retainYear timestamp
 
 
 toGroupedTimestamp : Group -> Posix -> Posix
@@ -490,6 +498,12 @@ aggregateLabel aggregate =
         AggregatePerMonth ->
             "per month"
 
+        AggregatePerQuarter ->
+            "per quarter"
+
+        AggregatePerYear ->
+            "per year"
+
 
 aggregateSelectorOption : Model -> Aggregate -> Html Msg
 aggregateSelectorOption model aggregate =
@@ -515,6 +529,8 @@ aggregateSelector model =
                 [ AggregateNone
                 , AggregatePerWeek
                 , AggregatePerMonth
+                , AggregatePerQuarter
+                , AggregatePerYear
                 ]
     in
     form
