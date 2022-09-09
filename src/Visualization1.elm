@@ -153,11 +153,6 @@ isKilled person =
             False
 
 
-computeDimensionX : Posix -> Maybe Float
-computeDimensionX timestamp =
-    Just (toFloat (posixToMillis timestamp))
-
-
 computeDimensionY : Model -> List Accident -> Maybe Float
 computeDimensionY model accidents =
     let
@@ -200,18 +195,15 @@ computeDimensionY model accidents =
     Just (toFloat numberPersonsFiltered / toFloat discriminator)
 
 
-toPoint2D : Model -> ( Posix, List Accident ) -> Maybe Point2D
-toPoint2D model ( timestamp, accidents ) =
+toTimePoint : Model -> ( Posix, List Accident ) -> Maybe TimePoint
+toTimePoint model ( timestamp, accidents ) =
     let
-        x =
-            computeDimensionX timestamp
-
         y =
             computeDimensionY model accidents
     in
     Maybe.map2
-        (\justX justY -> Point2D "" justX justY)
-        x
+        (\justX justY -> TimePoint "" justX justY)
+        (Just timestamp)
         y
 
 
@@ -280,10 +272,10 @@ bucketsByTimestamp model accidents =
         |> List.map (Tuple.mapFirst millisToPosix)
 
 
-toPoints2D : Model -> List Accident -> List Point2D
+toPoints2D : Model -> List Accident -> List TimePoint
 toPoints2D model accidents =
     List.filterMap
-        (toPoint2D model)
+        (toTimePoint model)
         (accidents
             |> filterByTimestamp model
             |> bucketsByTimestamp model
@@ -546,8 +538,13 @@ view model accidents =
         points =
             toPoints2D model accidents
 
+        dataLabel : String
+        dataLabel =
+            dimensionLabel model.dimension ++ " (" ++ referenceLabel model.reference ++ ")"
+
+        data : TimeSeriesData
         data =
-            AxisData2D "Time" "Road Width" points
+            TimeSeriesData dataLabel points
 
         aspectRatio : Float
         aspectRatio =
@@ -564,11 +561,11 @@ view model accidents =
             [ text ("Aspect Ratio: " ++ String.fromFloat aspectRatio)
             ]
         , fromUnstyled
-            (linePlot aspectRatio data)
+            (timeSeriesLinePlot aspectRatio data)
         ]
 
 
-computeAspectRatio : Model -> List Point2D -> Float
+computeAspectRatio : Model -> List TimePoint -> Float
 computeAspectRatio model data =
     case model.aspectRatio of
         AspectRatioSquare ->
@@ -584,12 +581,16 @@ computeAspectRatio model data =
             Maybe.withDefault 1 (computeAspectRatioBanking45 data)
 
 
-computeAspectRatioBanking45 : List Point2D -> Maybe Float
+computeAspectRatioBanking45 : List TimePoint -> Maybe Float
 computeAspectRatioBanking45 data =
     let
+        points : List ( Float, Float )
+        points =
+            List.map timePointCoordinates data
+
         slopes : Maybe (List Float)
         slopes =
-            mapConsecutive (\a b -> abs ((b.y - a.y) / (b.x - a.x))) data
+            mapConsecutive (\( aX, aY ) ( bX, bY ) -> abs ((bY - aY) / (bX - aX))) points
 
         -- Calculate the Median.
         medianSlope : Maybe Float
@@ -601,7 +602,7 @@ computeAspectRatioBanking45 data =
         -- Calculate the range of x values, i.e., min and max.
         rangeX : Maybe ( Float, Float )
         rangeX =
-            extent (List.map (\point -> point.x) data)
+            extent (List.map Tuple.first points)
 
         -- Calculate the range of y values, i.e., min and max.
         rangeY : Maybe ( Float, Float )
@@ -618,8 +619,8 @@ computeAspectRatioBanking45 data =
         rangeY
 
 
-linePlot : Float -> AxisData2D -> Svg msg
-linePlot aspectRatio model =
+timeSeriesLinePlot : Float -> TimeSeriesData -> Svg msg
+timeSeriesLinePlot aspectRatio model =
     let
         width : Float
         width =
@@ -641,6 +642,8 @@ linePlot aspectRatio model =
         xScale =
             model.data
                 |> List.map .x
+                |> List.map posixToMillis
+                |> List.map toFloat
                 |> Statistics.extent
                 |> Maybe.withDefault ( 0, 0 )
                 |> Scale.linear ( 0, width )
@@ -659,14 +662,16 @@ linePlot aspectRatio model =
                 |> Scale.linear ( height, 0 )
                 |> Scale.nice yTicks
 
-        lineGenerator : ( Float, Float ) -> Maybe ( Float, Float )
-        lineGenerator ( x, y ) =
-            Just ( Scale.convert xScale x, Scale.convert yScale y )
+        convertScales : ( Float, Float ) -> ( Float, Float )
+        convertScales ( x, y ) =
+            ( Scale.convert xScale x, Scale.convert yScale y )
 
         line : Path
         line =
-            List.map (\p -> ( p.x, p.y )) model.data
-                |> List.map lineGenerator
+            model.data
+                |> List.map timePointCoordinates
+                |> List.map convertScales
+                |> List.map Just
                 |> Shape.line Shape.monotoneInXCurve
     in
     svg
@@ -685,7 +690,7 @@ linePlot aspectRatio model =
                 , TypedSvg.Attributes.x (Px 5)
                 , TypedSvg.Attributes.y (Px 5)
                 ]
-                [ TypedSvg.Core.text model.yDescription ]
+                [ TypedSvg.Core.text model.description ]
             ]
         , g
             [ TypedSvg.Attributes.transform [ Translate padding padding ]
@@ -700,12 +705,16 @@ linePlot aspectRatio model =
         ]
 
 
-type alias Point2D =
-    { pointName : String, x : Float, y : Float }
+type alias TimePoint =
+    { label : String, x : Posix, y : Float }
 
 
-type alias AxisData2D =
-    { xDescription : String
-    , yDescription : String
-    , data : List Point2D
+timePointCoordinates : TimePoint -> ( Float, Float )
+timePointCoordinates { x, y } =
+    ( x |> posixToMillis |> toFloat, y )
+
+
+type alias TimeSeriesData =
+    { description : String
+    , data : List TimePoint
     }
