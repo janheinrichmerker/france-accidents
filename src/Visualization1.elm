@@ -11,7 +11,7 @@ import Model exposing (Accident, Person, Severity(..), Vehicle)
 import Path exposing (Path)
 import Scale exposing (ContinuousScale)
 import Shape
-import Statistics exposing (extent, quantile)
+import Statistics
 import Task exposing (perform)
 import Time exposing (Posix, millisToPosix, now, posixToMillis)
 import TimeUtils exposing (removeYear, retainMonth, retainWeek)
@@ -153,8 +153,8 @@ isKilled person =
             False
 
 
-computeDimensionY : Model -> List Accident -> Maybe Float
-computeDimensionY model accidents =
+computeDimension : Model -> List Accident -> Float
+computeDimension model accidents =
     let
         vehicles : List Vehicle
         vehicles =
@@ -192,19 +192,16 @@ computeDimensionY model accidents =
                 ReferenceRelative ->
                     List.length persons
     in
-    Just (toFloat numberPersonsFiltered / toFloat discriminator)
+    toFloat numberPersonsFiltered / toFloat discriminator
 
 
-toTimePoint : Model -> ( Posix, List Accident ) -> Maybe TimePoint
+toTimePoint : Model -> ( Posix, List Accident ) -> TimePoint
 toTimePoint model ( timestamp, accidents ) =
     let
         y =
-            computeDimensionY model accidents
+            computeDimension model accidents
     in
-    Maybe.map2
-        (\justX justY -> TimePoint "" justX justY)
-        (Just timestamp)
-        y
+    ( timestamp, y )
 
 
 {-| Remove accidents that have a timestamp in the future, i.e., an invalid timestamp.
@@ -274,13 +271,11 @@ bucketsByTimestamp model accidents =
 
 toPoints2D : Model -> List Accident -> List TimePoint
 toPoints2D model accidents =
-    List.filterMap
-        (toTimePoint model)
-        (accidents
-            |> filterByTimestamp model
-            |> bucketsByTimestamp model
-            |> sortByBucketTimestamp
-        )
+    accidents
+        |> filterByTimestamp model
+        |> bucketsByTimestamp model
+        |> sortByBucketTimestamp
+        |> List.map (toTimePoint model)
 
 
 aspectRatioSelectorOption : Model -> AspectRatio -> Html Msg
@@ -596,18 +591,22 @@ computeAspectRatioBanking45 data =
         medianSlope : Maybe Float
         medianSlope =
             Maybe.andThen
-                (\justSlopes -> quantile 0.5 (List.sort justSlopes))
+                (\justSlopes -> Statistics.quantile 0.5 (List.sort justSlopes))
                 slopes
 
         -- Calculate the range of x values, i.e., min and max.
         rangeX : Maybe ( Float, Float )
         rangeX =
-            extent (List.map Tuple.first points)
+            points
+                |> List.map Tuple.first
+                |> Statistics.extent
 
         -- Calculate the range of y values, i.e., min and max.
         rangeY : Maybe ( Float, Float )
         rangeY =
-            Statistics.extent (List.map (\point -> point.y) data)
+            points
+                |> List.map Tuple.second
+                |> Statistics.extent
     in
     Maybe.map3
         (\sm ( xmin, xmax ) ( ymin, ymax ) ->
@@ -638,10 +637,14 @@ timeSeriesLinePlot aspectRatio model =
         xTicks =
             10
 
+        data : List TimePoint
+        data =
+            model.data
+
         xScale : ContinuousScale Float
         xScale =
-            model.data
-                |> List.map .x
+            data
+                |> List.map Tuple.first
                 |> List.map posixToMillis
                 |> List.map toFloat
                 |> Statistics.extent
@@ -654,8 +657,8 @@ timeSeriesLinePlot aspectRatio model =
 
         yScale : ContinuousScale Float
         yScale =
-            model.data
-                |> List.map .y
+            data
+                |> List.map Tuple.second
                 |> List.maximum
                 |> Maybe.withDefault 0
                 |> (\b -> ( 0, b ))
@@ -668,7 +671,7 @@ timeSeriesLinePlot aspectRatio model =
 
         line : Path
         line =
-            model.data
+            data
                 |> List.map timePointCoordinates
                 |> List.map convertScales
                 |> List.map Just
@@ -705,12 +708,16 @@ timeSeriesLinePlot aspectRatio model =
         ]
 
 
+type alias Point =
+    ( Float, Float )
+
+
 type alias TimePoint =
-    { label : String, x : Posix, y : Float }
+    ( Posix, Float )
 
 
 timePointCoordinates : TimePoint -> ( Float, Float )
-timePointCoordinates { x, y } =
+timePointCoordinates ( x, y ) =
     ( x |> posixToMillis |> toFloat, y )
 
 
