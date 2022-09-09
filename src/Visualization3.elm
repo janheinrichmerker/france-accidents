@@ -1,12 +1,12 @@
 module Visualization3 exposing (..)
 
 import Color exposing (black)
-import Html.Styled exposing (Html, br, button, div, form, fromUnstyled, li, ol, option, select, text, ul)
-import Html.Styled.Attributes exposing (selected)
+import Html.Styled exposing (Html, br, button, div, form, fromUnstyled, input, li, ol, option, select, text, ul)
+import Html.Styled.Attributes exposing (checked, selected, type_)
 import Html.Styled.Events exposing (onClick)
-import Model exposing (Accident, Collision(..), Light(..), RoadCategory(..))
-import Partition exposing (Partitioner, Partitioners, equalityPartitioner, partitionTree)
-import Reorderable exposing (Reorderable, moveDown, moveUp)
+import Model exposing (Accident, AtmosphericConditions(..), Collision(..), Curvature(..), DedicatedLane(..), Intersection(..), Light(..), LocationRegime(..), Profile(..), RoadCategory(..), TrafficRegime(..))
+import Partition exposing (Partitioner, Partitioners, equalityPartitioner, maybeEqualityPartitioner, partitionTree)
+import Reorderable exposing (Reorderable)
 import Tree exposing (Tree)
 import TypedSvg exposing (svg)
 import TypedSvg.Attributes
@@ -21,23 +21,25 @@ type TreeLayout
 
 
 type Dimension
-    = DimensionCollisionType
+    = DimensionLight
+    | DimensionIntersection
+    | DimensionAtmosphericConditions
+    | DimensionCollision
+    | DimensionLocationRegime
     | DimensionRoadCategory
-    | DimensionLightCondition
-    | DimensionWeather
-    | DimensionIntersectionType
-    | DimensionRoadCurvature
-    | DimensionVehicleType
-    | DimensionSituation
+    | DimensionTrafficRegime
+    | DimensionDedicatedLane
+    | DimensionProfile
+    | DimensionCurvature
 
 
-type alias PartitionersDimension =
-    ( Dimension, Partitioner Accident )
+type alias PartitionerDimension =
+    ( Dimension, Partitioner Accident, Bool )
 
 
 type alias Model =
     { treeLayout : TreeLayout
-    , dimensions : Reorderable PartitionersDimension
+    , dimensions : Reorderable PartitionerDimension
     }
 
 
@@ -50,6 +52,7 @@ type Msg
     = NoOp
     | SelectTreeLayout TreeLayout
     | MoveDimension Int MoveDirection
+    | ToggleDimension Int Bool
 
 
 label : String
@@ -57,64 +60,118 @@ label =
     "Accident Type Tree"
 
 
+initDimensions : List PartitionerDimension
+initDimensions =
+    [ ( DimensionLight
+      , maybeEqualityPartitioner .light
+            [ LightDaylight
+            , LightDuskOrDawn
+            , LightNightWithoutPublicLighting
+            , LightNightWithPublicLightingOff
+            , LightNightWithPublicLightingOn
+            ]
+      , True
+      )
+    , ( DimensionIntersection
+      , maybeEqualityPartitioner .intersection
+            [ IntersectionOutOfIntersection
+            , IntersectionXIntersection
+            , IntersectionTIntersection
+            , IntersectionYIntersection
+            , IntersectionIntersectionWithMoreThan4Branches
+            , IntersectionRoundabout
+            , IntersectionPlace
+            , IntersectionLevelCrossing
+            , IntersectionOtherIntersection
+            ]
+      , True
+      )
+    , ( DimensionAtmosphericConditions
+      , maybeEqualityPartitioner .atmospheric_conditions
+            [ AtmosphericConditionsNormal
+            , AtmosphericConditionsLightRain
+            , AtmosphericConditionsHeavyRain
+            , AtmosphericConditionsSnowHail
+            , AtmosphericConditionsFogSmoke
+            , AtmosphericConditionsStrongWindStorm
+            , AtmosphericConditionsDazzlingWeather
+            , AtmosphericConditionsOvercastWeather
+            ]
+      , False
+      )
+    , ( DimensionCollision
+      , maybeEqualityPartitioner .collision
+            [ CollisionTwoVehiclesFront
+            , CollisionTwoVehiclesFromTheRear
+            , CollisionTwoVehiclesFromTheSide
+            , CollisionThreeOrMoreVehiclesInAChain
+            , CollisionThreeOrMoreVehiclesMultipleCollisions
+            , CollisionWithoutCollision
+            ]
+      , False
+      )
+    , ( DimensionLocationRegime
+      , maybeEqualityPartitioner .location
+            [ LocationRegimeOutOfTown
+            , LocationRegimeInBuiltUpAreas
+            ]
+      , False
+      )
+    , ( DimensionRoadCategory
+      , equalityPartitioner .road_category
+            [ RoadCategoryHighway
+            , RoadCategoryNationalRoad
+            , RoadCategoryDepartmentalRoad
+            , RoadCategoryMunicipalRoads
+            , RoadCategoryOffThePublicNetwork
+            , RoadCategoryParkingLotOpenToPublicTraffic
+            , RoadCategoryUrbanMetropolitanRoads
+            ]
+      , True
+      )
+    , ( DimensionTrafficRegime
+      , maybeEqualityPartitioner .traffic_regime
+            [ TrafficRegimeOneWay
+            , TrafficRegimeBidirectional
+            , TrafficRegimeWithSeparateLanes
+            , TrafficRegimeWithVariableAssignmentLanes
+            ]
+      , False
+      )
+    , ( DimensionDedicatedLane
+      , maybeEqualityPartitioner .dedicated_lane
+            [ DedicatedLaneNone
+            , DedicatedLaneBicyclePath
+            , DedicatedLaneCycleLane
+            , DedicatedLaneReservedLane
+            ]
+      , False
+      )
+    , ( DimensionProfile
+      , maybeEqualityPartitioner .profile
+            [ ProfileFlat
+            , ProfileSlope
+            , ProfileTopOfHill
+            , ProfileBottomOfHill
+            ]
+      , True
+      )
+    , ( DimensionCurvature
+      , maybeEqualityPartitioner .curvature
+            [ CurvatureStraight
+            , CurvatureLeftHandCurve
+            , CurvatureRightHandCurve
+            , CurvatureSCurve
+            ]
+      , True
+      )
+    ]
+
+
 init : ( Model, Cmd Msg )
 init =
     ( { treeLayout = TreeLayoutTreemap
-      , dimensions =
-            Reorderable.fromList
-                [ ( DimensionCollisionType
-                  , equalityPartitioner .collision
-                        [ Just CollisionTwoVehiclesFront
-                        , Just CollisionTwoVehiclesFromTheRear
-                        , Just CollisionTwoVehiclesFromTheSide
-                        , Just CollisionThreeOrMoreVehiclesInAChain
-                        , Just CollisionThreeOrMoreVehiclesMultipleCollisions
-                        , Just CollisionOtherCollision
-                        , Just CollisionWithoutCollision
-                        ]
-                  )
-                , ( DimensionRoadCategory
-                  , equalityPartitioner .road_category
-                        [ RoadCategoryHighway
-                        , RoadCategoryNationalRoad
-                        , RoadCategoryDepartmentalRoad
-                        , RoadCategoryMunicipalRoads
-                        , RoadCategoryOffThePublicNetwork
-                        , RoadCategoryParkingLotOpenToPublicTraffic
-                        , RoadCategoryUrbanMetropolitanRoads
-                        , RoadCategoryOther
-                        ]
-                  )
-                , ( DimensionLightCondition
-                  , equalityPartitioner .light
-                        [ Just LightDaylight
-                        , Just LightDuskOrDawn
-                        , Just LightNightWithoutPublicLighting
-                        , Just LightNightWithPublicLightingOff
-                        , Just LightNightWithPublicLightingOn
-                        ]
-                  )
-                , ( DimensionWeather
-                  , []
-                    -- todo
-                  )
-                , ( DimensionIntersectionType
-                  , []
-                    -- todo
-                  )
-                , ( DimensionRoadCurvature
-                  , []
-                    -- todo
-                  )
-                , ( DimensionVehicleType
-                  , []
-                    -- todo
-                  )
-                , ( DimensionSituation
-                  , []
-                    -- todo
-                  )
-                ]
+      , dimensions = Reorderable.fromList initDimensions
       }
     , Cmd.none
     )
@@ -122,7 +179,10 @@ init =
 
 partitioners : Model -> Partitioners Accident
 partitioners model =
-    List.map Tuple.second (Reorderable.toList model.dimensions)
+    model.dimensions
+        |> Reorderable.toList
+        |> List.filter (\( _, _, active ) -> active)
+        |> List.map (\( _, partitioner, _ ) -> partitioner)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -135,10 +195,29 @@ update msg model =
             ( { model | treeLayout = layout }, Cmd.none )
 
         MoveDimension idx MoveDirectionUp ->
-            ( { model | dimensions = moveUp idx model.dimensions }, Cmd.none )
+            ( { model
+                | dimensions = Reorderable.moveUp idx model.dimensions
+              }
+            , Cmd.none
+            )
 
         MoveDimension idx MoveDirectionDown ->
-            ( { model | dimensions = moveDown idx model.dimensions }, Cmd.none )
+            ( { model
+                | dimensions = Reorderable.moveDown idx model.dimensions
+              }
+            , Cmd.none
+            )
+
+        ToggleDimension idx active ->
+            ( { model
+                | dimensions =
+                    Reorderable.update
+                        idx
+                        (\( dimension, partitioner, _ ) -> ( dimension, partitioner, active ))
+                        model.dimensions
+              }
+            , Cmd.none
+            )
 
 
 type TreemapSplitAxis
@@ -337,29 +416,35 @@ treeLayoutSelector model =
 dimensionLabel : Dimension -> String
 dimensionLabel dimension =
     case dimension of
-        DimensionCollisionType ->
+        DimensionLight ->
+            "light condition"
+
+        DimensionIntersection ->
+            "intersection type"
+
+        DimensionAtmosphericConditions ->
+            "weather"
+
+        DimensionCollision ->
             "collision type"
+
+        DimensionLocationRegime ->
+            "location type"
 
         DimensionRoadCategory ->
             "road category"
 
-        DimensionLightCondition ->
-            "light condition"
+        DimensionTrafficRegime ->
+            "traffic regime"
 
-        DimensionWeather ->
-            "weather"
+        DimensionDedicatedLane ->
+            "dedicated line"
 
-        DimensionIntersectionType ->
-            "intersection type"
+        DimensionProfile ->
+            "road profile"
 
-        DimensionRoadCurvature ->
+        DimensionCurvature ->
             "road curvature"
-
-        DimensionVehicleType ->
-            "vehicle type"
-
-        DimensionSituation ->
-            "situation"
 
 
 moveLabel : MoveDirection -> String
@@ -395,16 +480,27 @@ moveDimensionButton dimensions index direction =
         Nothing
 
 
+toggleDimensionButton : Int -> Bool -> Html Msg
+toggleDimensionButton index active =
+    input
+        [ type_ "checkbox"
+        , checked active
+        , onClick (ToggleDimension index (not active))
+        ]
+        []
+
+
 dimensionsSelector : Model -> Html Msg
 dimensionsSelector model =
     ol
         []
         (List.indexedMap
-            (\index ( dimension, _ ) ->
+            (\index ( dimension, _, active ) ->
                 li
                     []
                     (List.filterMap identity
                         [ Just (text (dimensionLabel dimension ++ " "))
+                        , Just (toggleDimensionButton index active)
                         , moveDimensionButton model.dimensions index MoveDirectionUp
                         , moveDimensionButton model.dimensions index MoveDirectionDown
                         ]
