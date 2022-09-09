@@ -4,6 +4,6 @@ import Tree exposing (Tree)
 import TreeDiagram
 
 
-toTreeLayout : Tree a -> TreeDiagram.Tree a
-toTreeLayout tree =
+toTreeDiagram : Tree a -> TreeDiagram.Tree a
+toTreeDiagram tree =
     Tree.restructure identity TreeDiagram.node tree
