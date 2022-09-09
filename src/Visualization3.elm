@@ -4,6 +4,7 @@ import Color exposing (black)
 import Html.Styled exposing (Html, br, button, div, form, fromUnstyled, input, li, ol, option, select, text, ul)
 import Html.Styled.Attributes exposing (checked, selected, type_)
 import Html.Styled.Events exposing (onClick)
+import List.Extra
 import Model exposing (Accident, AtmosphericConditions(..), Collision(..), Curvature(..), DedicatedLane(..), Intersection(..), Light(..), LocationRegime(..), Profile(..), RoadCategory(..), TrafficRegime(..))
 import Partition exposing (Partitioner, Partitioners, equalityPartitioner, maybeEqualityPartitioner, partitionTree)
 import Reorderable exposing (Reorderable)
@@ -37,12 +38,13 @@ type Dimension
 
 
 type alias PartitionerDimension =
-    ( Dimension, Partitioner Accident, Bool )
+    ( Dimension, Partitioner Accident )
 
 
 type alias Model =
     { treeLayout : TreeLayout
-    , dimensions : Reorderable PartitionerDimension
+    , enabledDimensions : Reorderable PartitionerDimension
+    , disabledDimensions : List PartitionerDimension
     }
 
 
@@ -63,8 +65,8 @@ label =
     "Accident Type Tree"
 
 
-initDimensions : List PartitionerDimension
-initDimensions =
+initEnabledDimensions : List PartitionerDimension
+initEnabledDimensions =
     [ ( DimensionLight
       , maybeEqualityPartitioner .light
             [ LightDaylight
@@ -73,7 +75,6 @@ initDimensions =
             , LightNightWithPublicLightingOff
             , LightNightWithPublicLightingOn
             ]
-      , True
       )
     , ( DimensionIntersection
       , maybeEqualityPartitioner .intersection
@@ -87,38 +88,6 @@ initDimensions =
             , IntersectionLevelCrossing
             , IntersectionOtherIntersection
             ]
-      , True
-      )
-    , ( DimensionAtmosphericConditions
-      , maybeEqualityPartitioner .atmospheric_conditions
-            [ AtmosphericConditionsNormal
-            , AtmosphericConditionsLightRain
-            , AtmosphericConditionsHeavyRain
-            , AtmosphericConditionsSnowHail
-            , AtmosphericConditionsFogSmoke
-            , AtmosphericConditionsStrongWindStorm
-            , AtmosphericConditionsDazzlingWeather
-            , AtmosphericConditionsOvercastWeather
-            ]
-      , False
-      )
-    , ( DimensionCollision
-      , maybeEqualityPartitioner .collision
-            [ CollisionTwoVehiclesFront
-            , CollisionTwoVehiclesFromTheRear
-            , CollisionTwoVehiclesFromTheSide
-            , CollisionThreeOrMoreVehiclesInAChain
-            , CollisionThreeOrMoreVehiclesMultipleCollisions
-            , CollisionWithoutCollision
-            ]
-      , False
-      )
-    , ( DimensionLocationRegime
-      , maybeEqualityPartitioner .location
-            [ LocationRegimeOutOfTown
-            , LocationRegimeInBuiltUpAreas
-            ]
-      , False
       )
     , ( DimensionRoadCategory
       , equalityPartitioner .road_category
@@ -130,25 +99,6 @@ initDimensions =
             , RoadCategoryParkingLotOpenToPublicTraffic
             , RoadCategoryUrbanMetropolitanRoads
             ]
-      , True
-      )
-    , ( DimensionTrafficRegime
-      , maybeEqualityPartitioner .traffic_regime
-            [ TrafficRegimeOneWay
-            , TrafficRegimeBidirectional
-            , TrafficRegimeWithSeparateLanes
-            , TrafficRegimeWithVariableAssignmentLanes
-            ]
-      , False
-      )
-    , ( DimensionDedicatedLane
-      , maybeEqualityPartitioner .dedicated_lane
-            [ DedicatedLaneNone
-            , DedicatedLaneBicyclePath
-            , DedicatedLaneCycleLane
-            , DedicatedLaneReservedLane
-            ]
-      , False
       )
     , ( DimensionProfile
       , maybeEqualityPartitioner .profile
@@ -157,7 +107,6 @@ initDimensions =
             , ProfileTopOfHill
             , ProfileBottomOfHill
             ]
-      , True
       )
     , ( DimensionCurvature
       , maybeEqualityPartitioner .curvature
@@ -166,7 +115,55 @@ initDimensions =
             , CurvatureRightHandCurve
             , CurvatureSCurve
             ]
-      , True
+      )
+    ]
+
+
+initDisabledDimensions : List PartitionerDimension
+initDisabledDimensions =
+    [ ( DimensionAtmosphericConditions
+      , maybeEqualityPartitioner .atmospheric_conditions
+            [ AtmosphericConditionsNormal
+            , AtmosphericConditionsLightRain
+            , AtmosphericConditionsHeavyRain
+            , AtmosphericConditionsSnowHail
+            , AtmosphericConditionsFogSmoke
+            , AtmosphericConditionsStrongWindStorm
+            , AtmosphericConditionsDazzlingWeather
+            , AtmosphericConditionsOvercastWeather
+            ]
+      )
+    , ( DimensionCollision
+      , maybeEqualityPartitioner .collision
+            [ CollisionTwoVehiclesFront
+            , CollisionTwoVehiclesFromTheRear
+            , CollisionTwoVehiclesFromTheSide
+            , CollisionThreeOrMoreVehiclesInAChain
+            , CollisionThreeOrMoreVehiclesMultipleCollisions
+            , CollisionWithoutCollision
+            ]
+      )
+    , ( DimensionLocationRegime
+      , maybeEqualityPartitioner .location
+            [ LocationRegimeOutOfTown
+            , LocationRegimeInBuiltUpAreas
+            ]
+      )
+    , ( DimensionTrafficRegime
+      , maybeEqualityPartitioner .traffic_regime
+            [ TrafficRegimeOneWay
+            , TrafficRegimeBidirectional
+            , TrafficRegimeWithSeparateLanes
+            , TrafficRegimeWithVariableAssignmentLanes
+            ]
+      )
+    , ( DimensionDedicatedLane
+      , maybeEqualityPartitioner .dedicated_lane
+            [ DedicatedLaneNone
+            , DedicatedLaneBicyclePath
+            , DedicatedLaneCycleLane
+            , DedicatedLaneReservedLane
+            ]
       )
     ]
 
@@ -174,7 +171,8 @@ initDimensions =
 init : ( Model, Cmd Msg )
 init =
     ( { treeLayout = TreeLayoutTreemap
-      , dimensions = Reorderable.fromList initDimensions
+      , enabledDimensions = Reorderable.fromList initEnabledDimensions
+      , disabledDimensions = initDisabledDimensions
       }
     , Cmd.none
     )
@@ -182,10 +180,9 @@ init =
 
 partitioners : Model -> Partitioners Accident
 partitioners model =
-    model.dimensions
+    model.enabledDimensions
         |> Reorderable.toList
-        |> List.filter (\( _, _, active ) -> active)
-        |> List.map (\( _, partitioner, _ ) -> partitioner)
+        |> List.map Tuple.second
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -199,28 +196,61 @@ update msg model =
 
         MoveDimension idx MoveDirectionUp ->
             ( { model
-                | dimensions = Reorderable.moveUp idx model.dimensions
+                | enabledDimensions = model.enabledDimensions |> Reorderable.moveUp idx
               }
             , Cmd.none
             )
 
         MoveDimension idx MoveDirectionDown ->
             ( { model
-                | dimensions = Reorderable.moveDown idx model.dimensions
+                | enabledDimensions = model.enabledDimensions |> Reorderable.moveDown idx
               }
             , Cmd.none
             )
 
         ToggleDimension idx active ->
+            let
+                dimensions =
+                    ( model.enabledDimensions, model.disabledDimensions )
+
+                ( enabled, disabled ) =
+                    toggleDimension active idx dimensions
+            in
             ( { model
-                | dimensions =
-                    Reorderable.update
-                        idx
-                        (\( dimension, partitioner, _ ) -> ( dimension, partitioner, active ))
-                        model.dimensions
+                | enabledDimensions = enabled
+                , disabledDimensions = disabled
               }
             , Cmd.none
             )
+
+
+toggleDimension : Bool -> Int -> ( Reorderable PartitionerDimension, List PartitionerDimension ) -> ( Reorderable PartitionerDimension, List PartitionerDimension )
+toggleDimension active =
+    if active then
+        enableDimension
+
+    else
+        disableDimension
+
+
+enableDimension : Int -> ( Reorderable PartitionerDimension, List PartitionerDimension ) -> ( Reorderable PartitionerDimension, List PartitionerDimension )
+enableDimension idx ( enabled, disabled ) =
+    case List.Extra.getAt idx disabled of
+        Nothing ->
+            ( enabled, disabled )
+
+        Just dimension ->
+            ( Reorderable.push dimension enabled, List.Extra.removeAt idx disabled )
+
+
+disableDimension : Int -> ( Reorderable PartitionerDimension, List PartitionerDimension ) -> ( Reorderable PartitionerDimension, List PartitionerDimension )
+disableDimension idx ( enabled, disabled ) =
+    case Reorderable.get idx enabled of
+        Nothing ->
+            ( enabled, disabled )
+
+        Just dimension ->
+            ( Reorderable.drop idx enabled, dimension :: disabled )
 
 
 {-| Represent edges as straight lines.
@@ -523,19 +553,19 @@ moveLabel direction =
             "↓"
 
 
-canMove : Reorderable a -> Int -> MoveDirection -> Bool
-canMove items index direction =
+canMove : Int -> Int -> MoveDirection -> Bool
+canMove length index direction =
     case direction of
         MoveDirectionUp ->
             index > 0
 
         MoveDirectionDown ->
-            index < Reorderable.length items - 1
+            index < length - 1
 
 
-moveDimensionButton : Reorderable a -> Int -> MoveDirection -> Maybe (Html Msg)
-moveDimensionButton dimensions index direction =
-    if canMove dimensions index direction then
+moveDimensionButton : Int -> Int -> MoveDirection -> Maybe (Html Msg)
+moveDimensionButton length index direction =
+    if canMove length index direction then
         Just
             (button
                 [ onClick (MoveDimension index direction) ]
@@ -556,24 +586,47 @@ toggleDimensionButton index active =
         []
 
 
+enabledDimensionSelectorItem : Model -> Int -> PartitionerDimension -> Html Msg
+enabledDimensionSelectorItem model index ( dimension, _ ) =
+    let
+        length =
+            Reorderable.length model.enabledDimensions
+    in
+    li
+        []
+        (List.filterMap identity
+            [ Just (text (dimensionLabel dimension ++ " "))
+            , Just (toggleDimensionButton index True)
+            , moveDimensionButton length index MoveDirectionUp
+            , moveDimensionButton length index MoveDirectionDown
+            ]
+        )
+
+
+disabledDimensionSelectorItem : Int -> PartitionerDimension -> Html Msg
+disabledDimensionSelectorItem index ( dimension, _ ) =
+    li
+        []
+        [ text (dimensionLabel dimension ++ " ")
+        , toggleDimensionButton index False
+        ]
+
+
 dimensionsSelector : Model -> Html Msg
 dimensionsSelector model =
-    ol
-        []
-        (List.indexedMap
-            (\index ( dimension, _, active ) ->
-                li
-                    []
-                    (List.filterMap identity
-                        [ Just (text (dimensionLabel dimension ++ " "))
-                        , Just (toggleDimensionButton index active)
-                        , moveDimensionButton model.dimensions index MoveDirectionUp
-                        , moveDimensionButton model.dimensions index MoveDirectionDown
-                        ]
-                    )
+    div []
+        [ ol
+            []
+            (model.enabledDimensions
+                |> Reorderable.indexedMap (enabledDimensionSelectorItem model)
+                |> Reorderable.toList
             )
-            (Reorderable.toList model.dimensions)
-        )
+        , ul
+            []
+            (model.disabledDimensions
+                |> List.indexedMap disabledDimensionSelectorItem
+            )
+        ]
 
 
 view : Model -> List Accident -> Html Msg
