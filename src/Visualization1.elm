@@ -41,15 +41,15 @@ type Dimension
     | DimensionPersons
 
 
-type GroupX
-    = GroupXNever
-    | GroupXByYear
+type Group
+    = GroupNever
+    | GroupByYear
 
 
-type AggregateX
-    = AggregateXNone
-    | AggregateXPerWeek
-    | AggregateXPerMonth
+type Aggregate
+    = AggregateNone
+    | AggregatePerWeek
+    | AggregatePerMonth
 
 
 type alias Model =
@@ -57,8 +57,8 @@ type alias Model =
     , aspectRatio : AspectRatio
     , dimension : Dimension
     , reference : Reference
-    , groupX : GroupX
-    , aggregateX : AggregateX
+    , group : Group
+    , aggregate : Aggregate
     }
 
 
@@ -68,8 +68,8 @@ type Msg
     | SelectAspectRatio AspectRatio
     | SelectDimension Dimension
     | SelectReference Reference
-    | SelectGroupX GroupX
-    | SelectAggregateX AggregateX
+    | SelectGroup Group
+    | SelectAggregate Aggregate
 
 
 label : String
@@ -83,8 +83,8 @@ init =
       , aspectRatio = AspectRatioBanking45
       , dimension = DimensionInjuredPersons
       , reference = ReferenceAbsolute
-      , groupX = GroupXByYear
-      , aggregateX = AggregateXPerWeek
+      , group = GroupByYear
+      , aggregate = AggregatePerWeek
       }
     , getTime
     )
@@ -108,11 +108,11 @@ update msg model =
         SelectReference reference ->
             ( { model | reference = reference }, Cmd.none )
 
-        SelectGroupX groupX ->
-            ( { model | groupX = groupX }, Cmd.none )
+        SelectGroup groupX ->
+            ( { model | group = groupX }, Cmd.none )
 
-        SelectAggregateX aggregateX ->
-            ( { model | aggregateX = aggregateX }, Cmd.none )
+        SelectAggregate aggregateX ->
+            ( { model | aggregate = aggregateX }, Cmd.none )
 
 
 getTime : Cmd Msg
@@ -234,34 +234,34 @@ sortByBucketTimestamp buckets =
     List.sortBy (Tuple.first >> posixToMillis) buckets
 
 
-toAggregatedTimestamp : AggregateX -> Posix -> Posix
+toAggregatedTimestamp : Aggregate -> Posix -> Posix
 toAggregatedTimestamp aggregateX timestamp =
     case aggregateX of
-        AggregateXNone ->
+        AggregateNone ->
             timestamp
 
-        AggregateXPerWeek ->
+        AggregatePerWeek ->
             retainWeek timestamp
 
-        AggregateXPerMonth ->
+        AggregatePerMonth ->
             retainMonth timestamp
 
 
-toGroupedTimestamp : GroupX -> Posix -> Posix
+toGroupedTimestamp : Group -> Posix -> Posix
 toGroupedTimestamp groupX timestamp =
     case groupX of
-        GroupXNever ->
+        GroupNever ->
             timestamp
 
-        GroupXByYear ->
+        GroupByYear ->
             removeYear timestamp
 
 
 toTimestampKey : Model -> Accident -> Posix
 toTimestampKey model accident =
     accident.timestamp
-        |> toAggregatedTimestamp model.aggregateX
-        |> toGroupedTimestamp model.groupX
+        |> toAggregatedTimestamp model.aggregate
+        |> toGroupedTimestamp model.group
 
 
 associateTimestampKey : Model -> Accident -> ( Accident, Posix )
@@ -444,96 +444,96 @@ referenceSelector model =
         ]
 
 
-groupXLabel : GroupX -> String
-groupXLabel groupX =
-    case groupX of
-        GroupXNever ->
+groupLabel : Group -> String
+groupLabel group =
+    case group of
+        GroupNever ->
             "never"
 
-        GroupXByYear ->
+        GroupByYear ->
             "by year"
 
 
-groupXSelectorOption : Model -> GroupX -> Html Msg
-groupXSelectorOption model groupX =
+groupSelectorOption : Model -> Group -> Html Msg
+groupSelectorOption model group =
     option
-        [ onClick (SelectGroupX groupX)
-        , selected (model.groupX == groupX)
+        [ onClick (SelectGroup group)
+        , selected (model.group == group)
         ]
-        [ text (groupXLabel groupX) ]
+        [ text (groupLabel group) ]
 
 
-groupXSelector : Model -> Html Msg
-groupXSelector model =
+groupSelector : Model -> Html Msg
+groupSelector model =
     let
         viewId =
             "group-x-selector"
 
         option =
-            groupXSelectorOption model
+            groupSelectorOption model
 
         options =
             List.map
                 option
-                [ GroupXNever
-                , GroupXByYear
+                [ GroupNever
+                , GroupByYear
                 ]
     in
     form
         []
         [ Html.Styled.label
             [ Html.Styled.Attributes.for viewId ]
-            [ text "Group X values: " ]
+            [ text "Group values: " ]
         , select
             [ Html.Styled.Attributes.name viewId, Html.Styled.Attributes.id viewId ]
             options
         ]
 
 
-aggregateXLabel : AggregateX -> String
-aggregateXLabel aggregateX =
-    case aggregateX of
-        AggregateXNone ->
+aggregateLabel : Aggregate -> String
+aggregateLabel aggregate =
+    case aggregate of
+        AggregateNone ->
             "no aggregation"
 
-        AggregateXPerWeek ->
+        AggregatePerWeek ->
             "per week"
 
-        AggregateXPerMonth ->
+        AggregatePerMonth ->
             "per month"
 
 
-aggregateXSelectorOption : Model -> AggregateX -> Html Msg
-aggregateXSelectorOption model aggregateX =
+aggregateSelectorOption : Model -> Aggregate -> Html Msg
+aggregateSelectorOption model aggregate =
     option
-        [ onClick (SelectAggregateX aggregateX)
-        , selected (model.aggregateX == aggregateX)
+        [ onClick (SelectAggregate aggregate)
+        , selected (model.aggregate == aggregate)
         ]
-        [ text (aggregateXLabel aggregateX) ]
+        [ text (aggregateLabel aggregate) ]
 
 
-aggregateXSelector : Model -> Html Msg
-aggregateXSelector model =
+aggregateSelector : Model -> Html Msg
+aggregateSelector model =
     let
         viewId =
             "aggregate-x-selector"
 
         option =
-            aggregateXSelectorOption model
+            aggregateSelectorOption model
 
         options =
             List.map
                 option
-                [ AggregateXNone
-                , AggregateXPerWeek
-                , AggregateXPerMonth
+                [ AggregateNone
+                , AggregatePerWeek
+                , AggregatePerMonth
                 ]
     in
     form
         []
         [ Html.Styled.label
             [ Html.Styled.Attributes.for viewId ]
-            [ text "Aggregate X values: " ]
+            [ text "Aggregate values: " ]
         , select
             [ Html.Styled.Attributes.name viewId, Html.Styled.Attributes.id viewId ]
             options
@@ -558,8 +558,8 @@ view model accidents =
         [ aspectRatioSelector model
         , dimensionSelector model
         , referenceSelector model
-        , groupXSelector model
-        , aggregateXSelector model
+        , groupSelector model
+        , aggregateSelector model
         , h3 []
             [ text ("Aspect Ratio: " ++ String.fromFloat aspectRatio)
             ]
