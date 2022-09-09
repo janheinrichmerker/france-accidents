@@ -1,4 +1,11 @@
-import { Elm } from "./Main.elm";
+import {Elm} from "./Main.elm";
+import {registerCustomElement, registerPorts} from "elm-mapbox";
+
+registerCustomElement();
 Elm.Main.init({
-  node: document.getElementById("main"),
+    node: document.getElementById("main"),
 });
+
+
+const app = Elm.MyApp.init();
+registerPorts(app);
