@@ -1,7 +1,7 @@
 module Visualization3 exposing (..)
 
 import Color exposing (black)
-import Html.Styled exposing (Html, br, button, div, form, fromUnstyled, input, li, ol, option, select, text, ul)
+import Html.Styled exposing (Html, button, div, form, fromUnstyled, input, li, ol, option, select, text, ul)
 import Html.Styled.Attributes exposing (checked, selected, type_)
 import Html.Styled.Events exposing (onClick)
 import List.Extra
@@ -633,10 +633,7 @@ view : Model -> List Accident -> Html Msg
 view model accidents =
     div
         []
-        [ text label
-        , br [] []
-        , text (String.fromInt (List.length accidents))
-        , treeLayoutSelector model
+        [ treeLayoutSelector model
         , dimensionsSelector model
         , viewTree model.treeLayout (buildTree model accidents)
         ]

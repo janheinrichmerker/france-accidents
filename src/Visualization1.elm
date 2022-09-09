@@ -3,7 +3,7 @@ module Visualization1 exposing (..)
 import Axis
 import Color exposing (black)
 import Dict exposing (Dict)
-import Html.Styled exposing (Html, br, div, form, fromUnstyled, h3, option, select, text)
+import Html.Styled exposing (Html, div, form, fromUnstyled, h3, option, select, text)
 import Html.Styled.Attributes exposing (selected)
 import Html.Styled.Events exposing (onClick)
 import Model exposing (Accident, Person, Severity(..), Vehicle)
@@ -317,7 +317,7 @@ aspectRatioSelector model =
         []
         [ Html.Styled.label
             [ Html.Styled.Attributes.for viewId ]
-            [ text "Choose an aspect ratio: " ]
+            [ text "Aspect ratio: " ]
         , select
             [ Html.Styled.Attributes.name viewId, Html.Styled.Attributes.id viewId ]
             options
@@ -375,7 +375,7 @@ dimensionYSelector model =
         []
         [ Html.Styled.label
             [ Html.Styled.Attributes.for viewId ]
-            [ text "Choose an Y dimension: " ]
+            [ text "Y dimension: " ]
         , select
             [ Html.Styled.Attributes.name viewId, Html.Styled.Attributes.id viewId ]
             options
@@ -493,10 +493,7 @@ view model accidents =
     in
     div
         []
-        [ text label
-        , br [] []
-        , text (String.fromInt (List.length accidents))
-        , aspectRatioSelector model
+        [ aspectRatioSelector model
         , dimensionYSelector model
         , groupXSelector model
         , aggregateXSelector model
