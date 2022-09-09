@@ -700,10 +700,6 @@ linePlot aspectRatio model =
         ]
 
 
-type alias Point3D =
-    { pointName : String, x : Float, y : Float, z : Float }
-
-
 type alias Point2D =
     { pointName : String, x : Float, y : Float }
 
@@ -712,12 +708,4 @@ type alias AxisData2D =
     { xDescription : String
     , yDescription : String
     , data : List Point2D
-    }
-
-
-type alias AxisData3D =
-    { xDescription : String
-    , yDescription : String
-    , zDescription : String
-    , data : List Point3D
     }
