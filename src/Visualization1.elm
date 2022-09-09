@@ -84,10 +84,10 @@ init : ( Model, Cmd Msg )
 init =
     ( { timestamp = Nothing
       , aspectRatio = AspectRatioBanking45
-      , dimension = DimensionInjuredPersons
+      , dimension = DimensionKilledPersons
       , reference = ReferenceAbsolute
       , group = GroupByYear
-      , aggregate = AggregatePerWeek
+      , aggregate = AggregatePerMonth
       }
     , getTime
     )
