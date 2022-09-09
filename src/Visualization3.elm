@@ -357,10 +357,27 @@ viewTree layout tree =
 buildTree : Model -> List Accident -> Tree Int
 buildTree model accidents =
     let
+        accidentTree : Tree (List Accident)
         accidentTree =
             partitionTree accidents (partitioners model)
+
+        treeSize : Tree (List a) -> Int
+        treeSize tree =
+            tree |> Tree.label |> List.length
+
+        sortChildrenBySize : List (Tree (List a)) -> List (Tree (List a))
+        sortChildrenBySize trees =
+            trees |> List.sortBy treeSize
+
+        reverseChildren : List (Tree (List a)) -> List (Tree (List a))
+        reverseChildren trees =
+            trees |> List.reverse
+
+        sortedTree : Tree (List Accident)
+        sortedTree =
+            accidentTree |> Tree.mapChildren (sortChildrenBySize >> reverseChildren)
     in
-    Tree.map List.length accidentTree
+    Tree.map List.length sortedTree
 
 
 treeLayoutLabel : TreeLayout -> String
