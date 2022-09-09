@@ -24,9 +24,24 @@ equalityFilter mapper reference element =
     mapper element == reference
 
 
+maybeEqualityFilter : (a -> Maybe v) -> v -> Filter a
+maybeEqualityFilter mapper reference element =
+    case mapper element of
+        Nothing ->
+            False
+
+        Just x ->
+            x == reference
+
+
 equalityPartitioner : (a -> v) -> List v -> Partitioner a
 equalityPartitioner mapper references =
     List.map (equalityFilter mapper) references
+
+
+maybeEqualityPartitioner : (a -> Maybe v) -> List v -> Partitioner a
+maybeEqualityPartitioner mapper references =
+    List.map (maybeEqualityFilter mapper) references
 
 
 partition : List a -> Partitioner a -> Partitions a
