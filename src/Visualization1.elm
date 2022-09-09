@@ -14,6 +14,7 @@ import Shape
 import Statistics
 import Task exposing (perform)
 import Time exposing (Posix, millisToPosix, now, posixToMillis)
+import Time.DateTime
 import TimeUtils exposing (removeYear, retainMonth, retainWeek)
 import TypedSvg exposing (g, line, svg, text_)
 import TypedSvg.Attributes
@@ -556,7 +557,7 @@ view model accidents =
             [ text ("Aspect Ratio: " ++ String.fromFloat aspectRatio)
             ]
         , fromUnstyled
-            (timeSeriesLinePlot aspectRatio data)
+            (timeSeriesLinePlot aspectRatio model.group data)
         ]
 
 
@@ -618,8 +619,48 @@ computeAspectRatioBanking45 data =
         rangeY
 
 
-timeSeriesLinePlot : Float -> TimeSeriesData -> Svg msg
-timeSeriesLinePlot aspectRatio model =
+intToStringLeadingZeros : Int -> Int -> String
+intToStringLeadingZeros pad int =
+    let
+        string : String
+        string =
+            String.fromInt int
+
+        stringLength : Int
+        stringLength =
+            String.length string
+
+        zeros : String
+        zeros =
+            String.repeat (pad - stringLength) "0"
+    in
+    zeros ++ string
+
+
+timeSeriesTickLabel : Group -> Float -> String
+timeSeriesTickLabel group time =
+    let
+        date : Time.DateTime.DateTime
+        date =
+            time |> round |> millisToPosix |> Time.DateTime.fromPosix
+    in
+    case group of
+        GroupNever ->
+            String.join "-"
+                [ date |> Time.DateTime.year |> intToStringLeadingZeros 4
+                , date |> Time.DateTime.month |> intToStringLeadingZeros 2
+                , date |> Time.DateTime.day |> intToStringLeadingZeros 2
+                ]
+
+        GroupByYear ->
+            String.join "-"
+                [ date |> Time.DateTime.month |> intToStringLeadingZeros 2
+                , date |> Time.DateTime.day |> intToStringLeadingZeros 2
+                ]
+
+
+timeSeriesLinePlot : Float -> Group -> TimeSeriesData -> Svg msg
+timeSeriesLinePlot aspectRatio group model =
     let
         width : Float
         width =
@@ -684,9 +725,16 @@ timeSeriesLinePlot aspectRatio model =
         , TypedSvg.Attributes.preserveAspectRatio (Align ScaleMin ScaleMin) Slice
         ]
         [ g [ TypedSvg.Attributes.transform [ Translate (padding - 1) (height + padding) ] ]
-            [ Axis.bottom [ Axis.tickCount xTicks ] xScale ]
+            [ Axis.bottom
+                [ Axis.tickCount xTicks
+                , Axis.tickFormat (timeSeriesTickLabel group)
+                ]
+                xScale
+            ]
         , g [ TypedSvg.Attributes.transform [ Translate (padding - 1) padding ] ]
-            [ Axis.left [ Axis.tickCount yTicks ] yScale
+            [ Axis.left
+                [ Axis.tickCount yTicks ]
+                yScale
             , text_
                 [ TypedSvg.Attributes.fontFamily [ "sans-serif" ]
                 , TypedSvg.Attributes.fontSize (Px 10)
