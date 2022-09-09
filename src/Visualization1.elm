@@ -16,10 +16,10 @@ import Task exposing (perform)
 import Time exposing (Posix, millisToPosix, now, posixToMillis)
 import Time.DateTime
 import TimeUtils exposing (removeYear, retainMonth, retainQuarter, retainWeek, retainYear)
-import TypedSvg exposing (g, line, svg, text_)
+import TypedSvg exposing (g, svg, text_)
 import TypedSvg.Attributes
 import TypedSvg.Core exposing (Svg)
-import TypedSvg.Types exposing (Align(..), AnchorAlignment(..), Length(..), MeetOrSlice(..), Paint(..), Scale(..), Transform(..))
+import TypedSvg.Types exposing (Align(..), AnchorAlignment(..), Length(..), MeetOrSlice(..), Opacity(..), Paint(..), Scale(..), Transform(..))
 import Utils exposing (mapConsecutive, reverseTuple, toBucketDict)
 
 
@@ -726,13 +726,31 @@ timeSeriesLinePlot aspectRatio group model =
         convertScales ( x, y ) =
             ( Scale.convert xScale x, Scale.convert yScale y )
 
-        line : Path
-        line =
+        topLineGenerator : List ( Float, Float )
+        topLineGenerator =
             data
                 |> List.map timePointCoordinates
                 |> List.map convertScales
+
+        bottomLineGeneratorLine : List ( Float, Float )
+        bottomLineGeneratorLine =
+            data
+                |> List.map (\( x, _ ) -> ( x, 0 ))
+                |> List.map timePointCoordinates
+                |> List.map convertScales
+
+        topLine : Path
+        topLine =
+            topLineGenerator
                 |> List.map Just
                 |> Shape.line Shape.monotoneInXCurve
+
+        area : Path
+        area =
+            topLineGenerator
+                |> List.Extra.zip bottomLineGeneratorLine
+                |> List.map Just
+                |> Shape.area Shape.monotoneInXCurve
     in
     svg
         [ TypedSvg.Attributes.viewBox 0 0 (width + 2 * padding) (height + 2 * padding)
@@ -763,10 +781,14 @@ timeSeriesLinePlot aspectRatio group model =
             [ TypedSvg.Attributes.transform [ Translate padding padding ]
             , TypedSvg.Attributes.class [ "series" ]
             ]
-            [ Path.element line
+            [ Path.element topLine
                 [ TypedSvg.Attributes.stroke (Paint black)
                 , TypedSvg.Attributes.strokeWidth (Px 1)
                 , TypedSvg.Attributes.fill PaintNone
+                ]
+            , Path.element area
+                [ TypedSvg.Attributes.fill (Paint black)
+                , TypedSvg.Attributes.fillOpacity (Opacity 0.1)
                 ]
             ]
         ]
