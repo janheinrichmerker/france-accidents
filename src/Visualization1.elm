@@ -692,7 +692,7 @@ timeSeriesLinePlot aspectRatio group model =
 
         xTicks : Int
         xTicks =
-            10
+            6
 
         data : List TimePoint
         data =
@@ -707,7 +707,6 @@ timeSeriesLinePlot aspectRatio group model =
                 |> Statistics.extent
                 |> Maybe.withDefault ( 0, 0 )
                 |> Scale.linear ( 0, width )
-                |> Scale.nice xTicks
 
         yTicks =
             max 2 (round (10 / aspectRatio))
