@@ -769,9 +769,9 @@ groupSelector model =
                 , GroupByRoad
                 , GroupByCommune
                 , GroupByDepartment
+                , GroupByGrid 20 20
                 , GroupByGrid 10 10
                 , GroupByGrid 5 5
-                , GroupByGrid 3 3
                 ]
     in
     form
