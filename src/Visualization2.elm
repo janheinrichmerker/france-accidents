@@ -29,25 +29,21 @@ type Display
     | DisplayXray
 
 
-type alias Coordinates =
+type alias GeoCoordinates =
     ( Float, Float )
 
 
-type alias CoordinatesRange =
-    ( Coordinates, Coordinates )
+type alias GeoCoordinatesBounds =
+    ( GeoCoordinates, GeoCoordinates )
 
 
-type alias CoordinatesPoint =
-    ( Coordinates, List Float )
-
-
-type alias CoordinatesData =
-    List ( Coordinates, List (List Float) )
+type alias GeoData =
+    List ( GeoCoordinates, List (List Float) )
 
 
 type alias Model =
     { backgroundUrl : String
-    , boundaries : CoordinatesRange
+    , bounds : GeoCoordinatesBounds
     , group : Group
     , display : Display
     }
@@ -67,7 +63,7 @@ label =
 init : ( Model, Cmd Msg )
 init =
     ( { backgroundUrl = "/france.svg"
-      , boundaries = ( ( 51.5, -5.8 ), ( 41, 10 ) )
+      , bounds = ( ( 51.5, -5.8 ), ( 41, 10 ) )
       , group = GroupNone
       , display = DisplayAverage
       }
@@ -88,17 +84,17 @@ update msg model =
             ( { model | display = display }, Cmd.none )
 
 
-toCoordinates : Accident -> Maybe Coordinates
+toCoordinates : Accident -> Maybe GeoCoordinates
 toCoordinates accident =
     Maybe.map2 Tuple.pair accident.latitude accident.longitude
 
 
-isInBounds : CoordinatesRange -> Coordinates -> Bool
+isInBounds : GeoCoordinatesBounds -> GeoCoordinates -> Bool
 isInBounds ( ( minLat, minLong ), ( maxLat, maxLong ) ) ( lat, long ) =
     isBetween minLat maxLat lat && isBetween minLong maxLong long
 
 
-filterByBounds : CoordinatesRange -> List Accident -> List Accident
+filterByBounds : GeoCoordinatesBounds -> List Accident -> List Accident
 filterByBounds range accidents =
     let
         isAccidentInBounds : Accident -> Bool
@@ -111,17 +107,17 @@ filterByBounds range accidents =
     accidents |> List.filter isAccidentInBounds
 
 
-latitudeScale : CoordinatesRange -> ( Float, Float ) -> ContinuousScale Float
+latitudeScale : GeoCoordinatesBounds -> ( Float, Float ) -> ContinuousScale Float
 latitudeScale ( ( min, _ ), ( max, _ ) ) =
     Scale.linear ( min, max )
 
 
-longitudeScale : CoordinatesRange -> ( Float, Float ) -> ContinuousScale Float
+longitudeScale : GeoCoordinatesBounds -> ( Float, Float ) -> ContinuousScale Float
 longitudeScale ( ( _, min ), ( _, max ) ) =
     Scale.linear ( min, max )
 
 
-toGridGroupKey : Int -> Int -> CoordinatesRange -> Coordinates -> Int
+toGridGroupKey : Int -> Int -> GeoCoordinatesBounds -> GeoCoordinates -> Int
 toGridGroupKey cols rows bounds ( lat, long ) =
     let
         scaleLat : ContinuousScale Float
@@ -140,10 +136,14 @@ toGridGroupKey cols rows bounds ( lat, long ) =
         col =
             Scale.convert scaleLong long |> floor
     in
-    row + col * rows
+    Debug.log "row" row
 
 
-toGroupKey : Group -> CoordinatesRange -> Accident -> Int
+
+--+ col * rows
+
+
+toGroupKey : Group -> GeoCoordinatesBounds -> Accident -> Int
 toGroupKey group bounds accident =
     case group of
         GroupNone ->
@@ -162,12 +162,12 @@ toGroupKey group bounds accident =
             accident.department ++ accident.commune |> hashString
 
 
-associateGroupKey : Group -> CoordinatesRange -> Accident -> ( Int, Accident )
+associateGroupKey : Group -> GeoCoordinatesBounds -> Accident -> ( Int, Accident )
 associateGroupKey group bounds accident =
     ( toGroupKey group bounds accident, accident )
 
 
-groupBy : Group -> CoordinatesRange -> List Accident -> List (List Accident)
+groupBy : Group -> GeoCoordinatesBounds -> List Accident -> List (List Accident)
 groupBy group bounds accidents =
     accidents
         |> List.map (associateGroupKey group bounds)
@@ -175,10 +175,10 @@ groupBy group bounds accidents =
         |> Dict.values
 
 
-groupCoordinates : List Accident -> Maybe Coordinates
+groupCoordinates : List Accident -> Maybe GeoCoordinates
 groupCoordinates group =
     let
-        coordinates : List Coordinates
+        coordinates : List GeoCoordinates
         coordinates =
             group |> List.filterMap toCoordinates
 
@@ -196,10 +196,10 @@ groupCoordinates group =
     Maybe.map2 Tuple.pair latitude longitude
 
 
-associateGroupCoordinates : List (List Accident) -> List ( List Accident, Coordinates )
+associateGroupCoordinates : List (List Accident) -> List ( List Accident, GeoCoordinates )
 associateGroupCoordinates groups =
     let
-        associate : List Accident -> Maybe ( List Accident, Coordinates )
+        associate : List Accident -> Maybe ( List Accident, GeoCoordinates )
         associate group =
             Maybe.map (Tuple.pair group) (groupCoordinates group)
     in
@@ -217,10 +217,10 @@ accidentsData accidents =
     accidents |> List.map accidentData
 
 
-groupedCoordinatePoints : Group -> CoordinatesRange -> List Accident -> List ( Coordinates, List (List Float) )
+groupedCoordinatePoints : Group -> GeoCoordinatesBounds -> List Accident -> List ( GeoCoordinates, List (List Float) )
 groupedCoordinatePoints group bounds accidents =
     let
-        mapAccidentData : ( List Accident, Coordinates ) -> ( List (List Float), Coordinates )
+        mapAccidentData : ( List Accident, GeoCoordinates ) -> ( List (List Float), GeoCoordinates )
         mapAccidentData accidentCoordinates =
             accidentCoordinates |> Tuple.mapFirst accidentsData
     in
@@ -264,7 +264,7 @@ markers data =
         )
 
 
-point : ContinuousScale Float -> ContinuousScale Float -> ( Coordinates, List (List Float) ) -> Svg msg
+point : ContinuousScale Float -> ContinuousScale Float -> ( GeoCoordinates, List (List Float) ) -> Svg msg
 point scaleX scaleY ( coordinates, data ) =
     let
         ( latitude, longitude ) =
@@ -292,7 +292,7 @@ point scaleX scaleY ( coordinates, data ) =
         ]
 
 
-scatterplot : String -> CoordinatesRange -> Display -> CoordinatesData -> Html Msg
+scatterplot : String -> GeoCoordinatesBounds -> Display -> GeoData -> Html Msg
 scatterplot backgroundUrl range display data =
     let
         width : Float
@@ -495,8 +495,8 @@ view model accidents =
     let
         points =
             accidents
-                |> filterByBounds model.boundaries
-                |> groupedCoordinatePoints model.group model.boundaries
+                |> filterByBounds model.bounds
+                |> groupedCoordinatePoints model.group model.bounds
     in
     div
         []
@@ -504,5 +504,5 @@ view model accidents =
         , displaySelector model
         , text (String.fromInt (List.length accidents))
         , points
-            |> scatterplot model.backgroundUrl model.boundaries model.display
+            |> scatterplot model.backgroundUrl model.bounds model.display
         ]
