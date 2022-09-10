@@ -308,25 +308,28 @@ type TreemapSplitAxis
 treemap : Tree Int -> Html Msg
 treemap tree =
     let
-        w =
+        width : Float
+        width =
             500
 
-        h =
+        height : Float
+        height =
             500
 
+        padding : Float
         padding =
             20
     in
     fromUnstyled
         (svg
-            [ TypedSvg.Attributes.viewBox 0 0 (w + 2 * padding) (h + 2 * padding)
+            [ TypedSvg.Attributes.viewBox 0 0 (width + 2 * padding) (height + 2 * padding)
             , TypedSvg.Attributes.width (Percent 50)
             , TypedSvg.Attributes.height (Percent 50)
             , TypedSvg.Attributes.preserveAspectRatio (Align ScaleMin ScaleMin) Slice
             ]
             [ TypedSvg.g
                 [ TypedSvg.Attributes.transform [ Translate padding padding ] ]
-                [ treemapNode SplitX w h tree ]
+                [ treemapNode SplitX width height tree ]
             ]
         )
 
@@ -334,6 +337,7 @@ treemap tree =
 treemapNode : TreemapSplitAxis -> Float -> Float -> Tree Int -> Svg Msg
 treemapNode axis w h node =
     let
+        parentWeight : Int
         parentWeight =
             Tree.label node
 
@@ -484,12 +488,15 @@ treeLayoutSelectorOption model treeLayout =
 treeLayoutSelector : Model -> Html Msg
 treeLayoutSelector model =
     let
+        viewId : String
         viewId =
             "tree-layout-selector"
 
+        option : TreeLayout -> Html Msg
         option =
             treeLayoutSelectorOption model
 
+        options : List (Html Msg)
         options =
             List.map
                 option
@@ -589,6 +596,7 @@ toggleDimensionButton index active =
 enabledDimensionSelectorItem : Model -> Int -> PartitionerDimension -> Html Msg
 enabledDimensionSelectorItem model index ( dimension, _ ) =
     let
+        length : Int
         length =
             Reorderable.length model.enabledDimensions
     in
