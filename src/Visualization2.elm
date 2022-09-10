@@ -7,7 +7,8 @@ import Html.Styled exposing (Html, div, form, fromUnstyled, option, select, text
 import Html.Styled.Attributes exposing (selected)
 import Html.Styled.Events exposing (onClick)
 import List.Statistics
-import Model exposing (Accident)
+import Maybe.Extra
+import Model exposing (Accident, Person, Vehicle)
 import Scale exposing (ContinuousScale)
 import TypedSvg exposing (circle, g, image, svg, text_)
 import TypedSvg.Attributes
@@ -192,15 +193,36 @@ associateGroupCoordinates groups =
     groups |> List.filterMap associate
 
 
-accidentData : Accident -> List Float
+personBirthYear : Accident -> Vehicle -> Person -> Maybe Float
+personBirthYear accident vehicle person =
+    Maybe.map toFloat person.birth_year
+
+
+personData : Accident -> Vehicle -> Person -> Maybe (List Float)
+personData accident vehicle person =
+    let
+        features : List (Accident -> Vehicle -> Person -> Maybe Float)
+        features =
+            [ personBirthYear ]
+    in
+    features
+        |> List.map (\feature -> feature accident vehicle person)
+        |> Maybe.Extra.combine
+
+
+vehicleData : Accident -> Vehicle -> List (List Float)
+vehicleData accident vehicle =
+    vehicle.persons |> List.filterMap (personData accident vehicle)
+
+
+accidentData : Accident -> List (List Float)
 accidentData accident =
-    -- todo
-    []
+    accident.vehicles |> List.concatMap (vehicleData accident)
 
 
 accidentsData : List Accident -> List (List Float)
 accidentsData accidents =
-    accidents |> List.map accidentData
+    accidents |> List.concatMap accidentData
 
 
 groupedCoordinatePoints : Group -> GeoCoordinatesBounds -> List Accident -> List ( GeoCoordinates, List (List Float) )
