@@ -117,11 +117,6 @@ update msg model =
             ( { model | visualization3 = model3 }, Cmd.map VisualizationMsg3 cmd3 )
 
 
-subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.none
-
-
 onUrlRequest : UrlRequest -> Msg
 onUrlRequest _ =
     NoOp
@@ -257,7 +252,7 @@ main =
         { init = init
         , view = view
         , update = update
-        , subscriptions = subscriptions
+        , subscriptions = \_ -> Sub.none
         , onUrlRequest = onUrlRequest
         , onUrlChange = onUrlChange
         }
