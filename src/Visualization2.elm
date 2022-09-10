@@ -11,7 +11,7 @@ import List.Statistics
 import Maybe.Extra
 import Model exposing (Accident, Person, Vehicle)
 import Scale exposing (ContinuousScale)
-import TypedSvg exposing (circle, g, image, svg, text_)
+import TypedSvg exposing (g, image, line, svg, text_)
 import TypedSvg.Attributes
 import TypedSvg.Core exposing (Svg)
 import TypedSvg.Types exposing (Align(..), AnchorAlignment(..), Length(..), MeetOrSlice(..), Opacity(..), Paint(..), Transform(..))
@@ -267,16 +267,120 @@ groupedCoordinatePoints group bounds accidents =
         |> List.map reverseTuple
 
 
-stickFigure : Float -> StickFigureData -> Svg msg
-stickFigure opacity _ =
-    circle
-        [ TypedSvg.Attributes.r (Px 2)
-        , TypedSvg.Attributes.fill (Paint black)
-        , TypedSvg.Attributes.fillOpacity (Opacity 0.25)
-        , TypedSvg.Attributes.stroke (Paint black)
-        , TypedSvg.Attributes.opacity (Opacity opacity)
+stickFigureHelp : Float -> Float -> Float -> Float -> Float -> Float -> Svg msg
+stickFigureHelp opacity v1 v2 v3 v4 v5 =
+    let
+        width : Float
+        width =
+            6
+
+        scaleAlpha : ContinuousScale Float
+        scaleAlpha =
+            Scale.linear ( 0, 180 ) ( 0, 1 )
+
+        alpha : Float
+        alpha =
+            Scale.convert scaleAlpha v1
+
+        scaleBeta : ContinuousScale Float
+        scaleBeta =
+            Scale.linear ( 0, 90 ) ( 0, 1 )
+
+        beta : Float
+        beta =
+            Scale.convert scaleBeta v2
+
+        scaleGamma : ContinuousScale Float
+        scaleGamma =
+            Scale.linear ( 0, -90 ) ( 0, 1 )
+
+        gamma : Float
+        gamma =
+            Scale.convert scaleGamma v3
+
+        scaleDelta : ContinuousScale Float
+        scaleDelta =
+            Scale.linear ( 0, 90 ) ( 0, 1 )
+
+        delta : Float
+        delta =
+            Scale.convert scaleDelta v4
+
+        scaleEpsilon : ContinuousScale Float
+        scaleEpsilon =
+            Scale.linear ( 0, -90 ) ( 0, 1 )
+
+        epsilon : Float
+        epsilon =
+            Scale.convert scaleEpsilon v5
+    in
+    g
+        [ TypedSvg.Attributes.opacity (Opacity opacity)
+        , TypedSvg.Attributes.transform [ Rotate alpha 0 0 ]
         ]
-        []
+        [ line
+            [ TypedSvg.Attributes.x1 (Px 0)
+            , TypedSvg.Attributes.y1 (Px -(width / 2))
+            , TypedSvg.Attributes.x2 (Px 0)
+            , TypedSvg.Attributes.y2 (Px (width / 2))
+            , TypedSvg.Attributes.stroke (Paint black)
+            , TypedSvg.Attributes.strokeWidth (Px 1)
+            ]
+            []
+        , g
+            [ TypedSvg.Attributes.transform [ Translate 0 -(width / 2) ] ]
+            [ line
+                [ TypedSvg.Attributes.x1 (Px 0)
+                , TypedSvg.Attributes.y1 (Px 0)
+                , TypedSvg.Attributes.x2 (Px 0)
+                , TypedSvg.Attributes.y2 (Px -width)
+                , TypedSvg.Attributes.stroke (Paint black)
+                , TypedSvg.Attributes.strokeWidth (Px 1)
+                , TypedSvg.Attributes.transform [ Rotate beta 0 0 ]
+                ]
+                []
+            , line
+                [ TypedSvg.Attributes.x1 (Px 0)
+                , TypedSvg.Attributes.y1 (Px 0)
+                , TypedSvg.Attributes.x2 (Px 0)
+                , TypedSvg.Attributes.y2 (Px -width)
+                , TypedSvg.Attributes.stroke (Paint black)
+                , TypedSvg.Attributes.strokeWidth (Px 1)
+                , TypedSvg.Attributes.transform [ Rotate gamma 0 0 ]
+                ]
+                []
+            ]
+        , g
+            [ TypedSvg.Attributes.transform [ Translate 0 (width / 2) ] ]
+            [ line
+                [ TypedSvg.Attributes.x1 (Px 0)
+                , TypedSvg.Attributes.y1 (Px 0)
+                , TypedSvg.Attributes.x2 (Px 0)
+                , TypedSvg.Attributes.y2 (Px width)
+                , TypedSvg.Attributes.stroke (Paint black)
+                , TypedSvg.Attributes.strokeWidth (Px 1)
+                , TypedSvg.Attributes.transform [ Rotate delta 0 0 ]
+                ]
+                []
+            , line
+                [ TypedSvg.Attributes.x1 (Px 0)
+                , TypedSvg.Attributes.y1 (Px 0)
+                , TypedSvg.Attributes.x2 (Px 0)
+                , TypedSvg.Attributes.y2 (Px width)
+                , TypedSvg.Attributes.stroke (Paint black)
+                , TypedSvg.Attributes.strokeWidth (Px 1)
+                , TypedSvg.Attributes.transform [ Rotate epsilon 0 0 ]
+                ]
+                []
+            ]
+        ]
+
+
+stickFigure : Float -> StickFigureData -> Svg msg
+stickFigure opacity data =
+    case data of
+        StickFigureData v1 v2 v3 v4 v5 ->
+            stickFigureHelp opacity v1 v2 v3 v4 v5
 
 
 stickFigureDataToList : StickFigureData -> List Float
