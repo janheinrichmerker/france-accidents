@@ -24,6 +24,7 @@ type Group
     | GroupByGrid Int Int
     | GroupByDepartment
     | GroupByCommune
+    | GroupByRoad
 
 
 type Display
@@ -152,6 +153,9 @@ toGroupKey group bounds accident =
 
         GroupByCommune ->
             accident.department ++ accident.commune |> hashString
+
+        GroupByRoad ->
+            accident.road |> hashString
 
 
 associateGroupKey : Group -> GeoCoordinatesBounds -> Accident -> ( Int, Accident )
@@ -685,6 +689,9 @@ groupLabel group =
         GroupByCommune ->
             "by communes"
 
+        GroupByRoad ->
+            "by road"
+
 
 groupSelectorOption : Model -> Group -> Html Msg
 groupSelectorOption model group =
@@ -708,6 +715,7 @@ groupSelector model =
             List.map
                 option
                 [ GroupByAccident
+                , GroupByRoad
                 , GroupByCommune
                 , GroupByDepartment
                 , GroupByGrid 10 10
