@@ -266,7 +266,7 @@ personSafetyEquipment _ _ person =
         numSafetyEquipments =
             List.length person.safety_equipment
     in
-    Just (1 / toFloat numSafetyEquipments)
+    Just (1 / (toFloat numSafetyEquipments + 1))
 
 
 vehicleLoneliness : Accident -> Vehicle -> Person -> Maybe Float
