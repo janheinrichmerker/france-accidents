@@ -45,6 +45,6 @@ toBucketDict =
         Dict.empty
 
 
-tupleMean : ( number, number ) -> number
+tupleMean : ( Float, Float ) -> Float
 tupleMean t =
     Tuple.first t + (Tuple.second t - Tuple.first t) / 2
