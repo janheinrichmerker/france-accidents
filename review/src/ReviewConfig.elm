@@ -25,8 +25,12 @@ import NoUnused.Patterns
 import NoUnused.Variables
 import NoUnusedPorts
 import NoUselessSubscriptions
-import Review.Rule exposing (Rule, ignoreErrorsForDirectories)
+import Review.Rule exposing (Rule, ignoreErrorsForDirectories, ignoreErrorsForFiles)
 import UseCamelCase
+
+
+
+--noinspection ElmUnusedSymbol
 
 
 config : List Rule
@@ -35,9 +39,8 @@ config =
     , NoDuplicatePorts.rule
     , NoUnsafePorts.rule NoUnsafePorts.any
     , NoUnusedPorts.rule
-    , NoUnused.CustomTypeConstructors.rule []
-
-    -- , NoUnused.Dependencies.rule
+    , NoUnused.CustomTypeConstructors.rule [] |> ignoreErrorsForFiles [ "src/Model.elm" ]
+    , NoUnused.Dependencies.rule
     , NoUnused.Exports.rule |> ignoreErrorsForDirectories [ "tests/" ]
     , NoUnused.Modules.rule
     , NoUnused.Parameters.rule
