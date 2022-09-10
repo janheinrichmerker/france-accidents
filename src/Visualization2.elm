@@ -472,9 +472,11 @@ groupSelector model =
             List.map
                 option
                 [ GroupNone
-                , GroupDepartments
                 , GroupCommunes
+                , GroupDepartments
                 , GroupCoordinates 10 10
+                , GroupCoordinates 5 5
+                , GroupCoordinates 3 3
                 ]
     in
     form
