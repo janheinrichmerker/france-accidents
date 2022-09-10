@@ -79,3 +79,15 @@ hashString string =
         ( 0, 1 )
         string
         |> Tuple.first
+
+
+isBetween : number -> number -> number -> Bool
+isBetween bound1 bound2 value =
+    let
+        boundMin =
+            min bound1 bound2
+
+        boundMax =
+            max bound1 bound2
+    in
+    boundMin <= value && value <= boundMax

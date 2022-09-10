@@ -13,7 +13,7 @@ import TypedSvg exposing (circle, g, image, svg, text_)
 import TypedSvg.Attributes
 import TypedSvg.Core exposing (Svg)
 import TypedSvg.Types exposing (Align(..), AnchorAlignment(..), Length(..), MeetOrSlice(..), Opacity(..), Paint(..), Transform(..))
-import Utils exposing (hashString, reverseTuple, toBucketDict, tupleMean)
+import Utils exposing (hashString, isBetween, reverseTuple, toBucketDict, tupleMean)
 
 
 type Group
@@ -95,7 +95,7 @@ toCoordinates accident =
 
 isInBounds : CoordinatesRange -> Coordinates -> Bool
 isInBounds ( ( minLat, minLong ), ( maxLat, maxLong ) ) ( lat, long ) =
-    minLat <= lat && lat <= maxLat && minLong <= long && long <= maxLong
+    isBetween minLat maxLat lat && isBetween minLong maxLong long
 
 
 filterByBounds : CoordinatesRange -> List Accident -> List Accident
