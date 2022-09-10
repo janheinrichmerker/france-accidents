@@ -66,8 +66,8 @@ init : ( Model, Cmd Msg )
 init =
     ( { backgroundUrl = "/france.svg"
       , bounds = ( ( 51.5, -5.8 ), ( 41, 10 ) )
-      , group = GroupNone
-      , display = DisplayAverage
+      , group = GroupDepartments
+      , display = DisplayXray
       }
     , Cmd.none
     )
@@ -240,33 +240,16 @@ groupedCoordinatePoints group bounds accidents =
         |> List.map reverseTuple
 
 
-stickFigure : List Float -> Svg msg
-stickFigure _ =
+stickFigure : Float -> List Float -> Svg msg
+stickFigure opacity _ =
     circle
         [ TypedSvg.Attributes.r (Px 2)
         , TypedSvg.Attributes.fill (Paint black)
         , TypedSvg.Attributes.fillOpacity (Opacity 0.25)
         , TypedSvg.Attributes.stroke (Paint black)
+        , TypedSvg.Attributes.opacity (Opacity opacity)
         ]
         []
-
-
-marker : Display -> List Float -> Svg msg
-marker display data =
-    let
-        inner : Svg msg
-        inner =
-            stickFigure data
-    in
-    case display of
-        DisplayXray ->
-            g
-                [ TypedSvg.Attributes.opacity (Opacity 0.1)
-                ]
-                [ inner ]
-
-        DisplayAverage ->
-            inner
 
 
 meanDimensions : List (List Float) -> Maybe (List Float)
@@ -291,12 +274,16 @@ markers display data =
             case display of
                 DisplayXray ->
                     data
-                        |> List.map (marker display)
+                        |> List.map (stickFigure 1)
 
                 DisplayAverage ->
+                    let
+                        opacity =
+                            1 / toFloat (List.length data)
+                    in
                     data
                         |> meanDimensions
-                        |> Maybe.map (marker display)
+                        |> Maybe.map (stickFigure opacity)
                         |> Maybe.map List.singleton
                         |> Maybe.withDefault []
     in
