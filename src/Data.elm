@@ -1,4 +1,4 @@
-module Data exposing (..)
+module Data exposing (HttpJsonError, errorToString, expectAccidentJsonLines)
 
 import Http
 import Iso8601
