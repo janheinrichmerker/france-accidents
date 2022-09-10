@@ -6,6 +6,7 @@ import Dict
 import Html.Styled exposing (Html, div, form, fromUnstyled, option, select, text)
 import Html.Styled.Attributes exposing (selected)
 import Html.Styled.Events exposing (onClick)
+import List.Extra
 import List.Statistics
 import Maybe.Extra
 import Model exposing (Accident, Person, Vehicle)
@@ -239,8 +240,8 @@ groupedCoordinatePoints group bounds accidents =
         |> List.map reverseTuple
 
 
-marker : List Float -> Svg msg
-marker _ =
+stickFigure : List Float -> Svg msg
+stickFigure _ =
     circle
         [ TypedSvg.Attributes.r (Px 2)
         , TypedSvg.Attributes.fill (Paint black)
@@ -250,12 +251,54 @@ marker _ =
         []
 
 
-markers : List (List Float) -> Svg msg
-markers data =
+marker : Display -> List Float -> Svg msg
+marker display data =
+    let
+        inner : Svg msg
+        inner =
+            stickFigure data
+    in
+    case display of
+        DisplayXray ->
+            g
+                [ TypedSvg.Attributes.opacity (Opacity 0.1)
+                ]
+                [ inner ]
+
+        DisplayAverage ->
+            inner
+
+
+meanDimensions : List (List Float) -> Maybe (List Float)
+meanDimensions points =
+    let
+        dimensionPoints : List (List Float)
+        dimensionPoints =
+            points |> List.Extra.transpose
+
+        dimensionMeans : List (Maybe Float)
+        dimensionMeans =
+            dimensionPoints |> List.map List.Statistics.mean
+    in
+    dimensionMeans |> Maybe.Extra.combine
+
+
+markers : Display -> List (List Float) -> Svg msg
+markers display data =
     let
         markersList : List (Svg msg)
         markersList =
-            data |> List.map marker
+            case display of
+                DisplayXray ->
+                    data
+                        |> List.map (marker display)
+
+                DisplayAverage ->
+                    data
+                        |> meanDimensions
+                        |> Maybe.map (marker display)
+                        |> Maybe.map List.singleton
+                        |> Maybe.withDefault []
     in
     g
         []
@@ -272,8 +315,8 @@ markers data =
         )
 
 
-point : ContinuousScale Float -> ContinuousScale Float -> ( GeoCoordinates, List (List Float) ) -> Svg msg
-point scaleX scaleY ( coordinates, data ) =
+point : ContinuousScale Float -> ContinuousScale Float -> Display -> ( GeoCoordinates, List (List Float) ) -> Svg msg
+point scaleX scaleY display ( coordinates, data ) =
     let
         ( latitude, longitude ) =
             coordinates
@@ -288,7 +331,7 @@ point scaleX scaleY ( coordinates, data ) =
                 (Scale.convert scaleY latitude)
             ]
         ]
-        [ markers data
+        [ markers display data
         , text_
             [ TypedSvg.Attributes.x (Px 0)
             , TypedSvg.Attributes.y (Px 0)
@@ -371,7 +414,7 @@ scatterplot backgroundUrl range display data =
             ]
         , g
             [ TypedSvg.Attributes.transform [ Translate padding padding ] ]
-            (data |> List.map (point xScale yScale))
+            (data |> List.map (point xScale yScale display))
         , g
             [ TypedSvg.Attributes.transform [ Translate padding (height - padding) ] ]
             [ xAxis
