@@ -139,6 +139,8 @@ gridPosition cols rows ( ( minLat, minLong ), ( maxLat, maxLong ) ) ( lat, long 
 toGridGroupKey : Int -> Int -> GeoCoordinatesBounds -> GeoCoordinates -> Int
 toGridGroupKey cols rows bounds coordinates =
     let
+        row : Float
+        col : Float
         ( row, col ) =
             gridPosition cols rows bounds coordinates
     in
@@ -205,6 +207,8 @@ gridPositionCoordinates cols rows ( ( minLat, minLong ), ( maxLat, maxLong ) ) r
 normalizeGridGroupCoordinates : Int -> Int -> GeoCoordinatesBounds -> GeoCoordinates -> GeoCoordinates
 normalizeGridGroupCoordinates cols rows bounds coordinates =
     let
+        row : Int
+        col : Int
         ( row, col ) =
             gridPosition cols rows bounds coordinates
     in
@@ -228,6 +232,8 @@ groupCoordinates group bounds accidents =
         coordinates =
             accidents |> List.filterMap toCoordinates
 
+        latitudes : List Float
+        longitudes : List Float
         ( latitudes, longitudes ) =
             coordinates |> List.unzip
 
@@ -281,6 +287,7 @@ personSex _ _ person =
 personBirthYear : Accident -> Vehicle -> Person -> Maybe Float
 personBirthYear _ _ person =
     let
+        scaleYear : ContinuousScale Float
         scaleYear =
             Scale.linear ( 0, 1 ) ( 1900, 2020 )
     in
@@ -318,6 +325,7 @@ personReason _ _ person =
 personSafetyEquipment : Accident -> Vehicle -> Person -> Maybe Float
 personSafetyEquipment _ _ person =
     let
+        numSafetyEquipments : Int
         numSafetyEquipments =
             List.length person.safety_equipment
     in
@@ -327,6 +335,7 @@ personSafetyEquipment _ _ person =
 vehicleLoneliness : Accident -> Vehicle -> Person -> Maybe Float
 vehicleLoneliness _ vehicle _ =
     let
+        numPersons : Int
         numPersons =
             List.length vehicle.persons
     in
@@ -554,6 +563,8 @@ markers display data =
 point : ContinuousScale Float -> ContinuousScale Float -> Display -> ( GeoCoordinates, List StickFigureData ) -> Svg msg
 point scaleX scaleY display ( coordinates, data ) =
     let
+        latitude : Float
+        longitude : Float
         ( latitude, longitude ) =
             coordinates
     in
@@ -701,12 +712,15 @@ displaySelectorOption model display =
 displaySelector : Model -> Html Msg
 displaySelector model =
     let
+        viewId : String
         viewId =
             "display-selector"
 
+        option : Display -> Html Msg
         option =
             displaySelectorOption model
 
+        options : List (Html Msg)
         options =
             List.map
                 option
@@ -756,12 +770,15 @@ groupSelectorOption model group =
 groupSelector : Model -> Html Msg
 groupSelector model =
     let
+        viewId : String
         viewId =
             "group-selector"
 
+        option : Group -> Html Msg
         option =
             groupSelectorOption model
 
+        options : List (Html Msg)
         options =
             List.map
                 option
@@ -788,6 +805,7 @@ groupSelector model =
 view : Model -> List Accident -> Html Msg
 view model accidents =
     let
+        points : List ( GeoCoordinates, List StickFigureData )
         points =
             accidents
                 |> filterByBounds model.bounds
