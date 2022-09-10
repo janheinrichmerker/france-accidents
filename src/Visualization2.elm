@@ -73,6 +73,45 @@ accidentWithCoordinates accident =
         |> Maybe.map (Tuple.pair accident)
 
 
+marker : Svg msg
+marker =
+    circle
+        [ TypedSvg.Attributes.r (Px 2)
+        , TypedSvg.Attributes.fill (Paint black)
+        , TypedSvg.Attributes.fillOpacity (Opacity 0.25)
+        , TypedSvg.Attributes.stroke (Paint black)
+        ]
+        []
+
+
+point : ContinuousScale Float -> ContinuousScale Float -> CoordinatesPoint -> Svg msg
+point scaleX scaleY ( coordinates, dimensions ) =
+    let
+        ( latitude, longitude ) =
+            coordinates
+    in
+    g
+        [ TypedSvg.Attributes.class [ "point" ]
+        , TypedSvg.Attributes.fontSize <| Px 10.0
+        , TypedSvg.Attributes.fontFamily [ "sans-serif" ]
+        , TypedSvg.Attributes.transform
+            [ Translate
+                (Scale.convert scaleX longitude)
+                (Scale.convert scaleY latitude)
+            ]
+        ]
+        [ marker
+        , text_
+            [ TypedSvg.Attributes.x (Px 0)
+            , TypedSvg.Attributes.y (Px 0)
+            , TypedSvg.Attributes.textAnchor AnchorMiddle
+            ]
+            [ -- todo
+              TypedSvg.Core.text "Point"
+            ]
+        ]
+
+
 view : Model -> List Accident -> Html Msg
 view model accidents =
     div
