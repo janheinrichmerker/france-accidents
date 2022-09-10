@@ -2,6 +2,7 @@ module Visualization2 exposing (..)
 
 import Axis
 import Color exposing (black)
+import Dict
 import Html.Styled exposing (Html, br, div, fromUnstyled, text)
 import Model exposing (Accident)
 import Scale exposing (ContinuousScale)
@@ -9,7 +10,7 @@ import TypedSvg exposing (circle, g, image, svg, text_)
 import TypedSvg.Attributes
 import TypedSvg.Core exposing (Svg)
 import TypedSvg.Types exposing (Align(..), AnchorAlignment(..), Length(..), MeetOrSlice(..), Opacity(..), Paint(..), Transform(..))
-import Utils exposing (tupleMean)
+import Utils exposing (hashString, toBucketDict, tupleMean)
 
 
 type Group
@@ -97,6 +98,36 @@ filterByBounds range accidents =
                 |> Maybe.withDefault False
     in
     accidents |> List.filter isAccidentInBounds
+
+
+toGroupKey : Group -> Accident -> comparable
+toGroupKey group accident =
+    case group of
+        GroupNone ->
+            accident.accident_id
+
+        GroupCoordinates cols rows ->
+            1
+
+        GroupDepartments ->
+            accident.department |> hashString
+
+        GroupCommunes ->
+            accident.department ++ accident.commune |> hashString
+
+
+associateGroupKey : Group -> Accident -> ( comparable, Accident )
+associateGroupKey group accident =
+    ( toGroupKey group accident, accident )
+
+
+bucketsByGroup : Group -> List Accident -> List (List Accident)
+bucketsByGroup group accidents =
+    accidents
+        |> List.map (associateGroupKey group)
+        |> toBucketDict
+        |> Dict.toList
+        |> List.map Tuple.second
 
 
 accidentsWithCoordinates : List Accident -> List ( Accident, Coordinates )
