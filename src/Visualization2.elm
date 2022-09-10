@@ -9,7 +9,7 @@ import Html.Styled.Events exposing (onClick)
 import List.Extra
 import List.Statistics
 import Maybe.Extra
-import Model exposing (Accident, Person, Vehicle)
+import Model exposing (Accident, Person, TravelReason(..), Vehicle)
 import Scale exposing (ContinuousScale)
 import TypedSvg exposing (g, image, line, svg, text_)
 import TypedSvg.Attributes
@@ -198,12 +198,6 @@ associateGroupCoordinates groups =
     groups |> List.filterMap associate
 
 
-personBirthYear : Accident -> Vehicle -> Person -> Maybe Float
-personBirthYear _ _ person =
-    -- todo normalize to 0-1
-    Maybe.map toFloat person.birth_year
-
-
 listToStickFigureData : List Float -> Maybe StickFigureData
 listToStickFigureData values =
     case values of
@@ -219,17 +213,76 @@ combineStickFigureData values =
     values |> Maybe.Extra.combine |> Maybe.andThen listToStickFigureData
 
 
+personSex : Accident -> Vehicle -> Person -> Maybe Float
+personSex _ _ person =
+    case person.sex of
+        Model.SexFemale ->
+            Just 1
+
+        Model.SexMale ->
+            Just 0
+
+
+personBirthYear : Accident -> Vehicle -> Person -> Maybe Float
+personBirthYear _ _ person =
+    -- todo normalize to 0-1
+    Maybe.map toFloat person.birth_year
+
+
+personReason : Accident -> Vehicle -> Person -> Maybe Float
+personReason _ _ person =
+    person.travel_reason
+        |> Maybe.map
+            (\reason ->
+                case reason of
+                    TravelReasonProfessional ->
+                        1
+
+                    TravelReasonHomeToWork ->
+                        0.8
+
+                    TravelReasonHomeToSchool ->
+                        0.6
+
+                    TravelReasonShopping ->
+                        0.4
+
+                    TravelReasonWalkingLeisure ->
+                        0.2
+
+                    TravelReasonOther ->
+                        0
+            )
+
+
+personSafetyEquipment : Accident -> Vehicle -> Person -> Maybe Float
+personSafetyEquipment _ _ person =
+    let
+        numSafetyEquipments =
+            List.length person.safety_equipment
+    in
+    Just (1 / toFloat numSafetyEquipments)
+
+
+vehicleLoneliness : Accident -> Vehicle -> Person -> Maybe Float
+vehicleLoneliness _ vehicle _ =
+    let
+        numPersons =
+            List.length vehicle.persons
+    in
+    Just (1 / toFloat numPersons)
+
+
 personToStickFigureData : Accident -> Vehicle -> Person -> Maybe StickFigureData
 personToStickFigureData accident vehicle person =
     let
         features : List (Accident -> Vehicle -> Person -> Maybe Float)
         features =
-            -- todo different features
-            [ personBirthYear
+            [ personSex
             , personBirthYear
-            , personBirthYear
-            , personBirthYear
-            , personBirthYear
+            , personReason
+            , personSafetyEquipment
+            , vehicleLoneliness
             ]
     in
     features
