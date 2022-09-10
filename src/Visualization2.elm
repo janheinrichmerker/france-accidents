@@ -16,8 +16,8 @@ type Group
     = GroupNone
       -- With the number of columns and rows to group into.
     | GroupCoordinates Int Int
-      -- todo group by political region
-    | GroupRegions
+    | GroupDepartments
+    | GroupCommunes
 
 
 type Display
