@@ -73,6 +73,13 @@ accidentWithCoordinates accident =
         |> Maybe.map (Tuple.pair accident)
 
 
+accidentsToCoordinatePoints : List Accident -> List CoordinatesPoint
+accidentsToCoordinatePoints accidents =
+    accidents
+        |> accidentsWithCoordinates
+        |> List.map (\( _, c ) -> ( c, [] ))
+
+
 marker : Svg msg
 marker =
     circle
