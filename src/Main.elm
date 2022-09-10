@@ -42,6 +42,7 @@ init _ _ _ =
         ( model3, cmd3 ) =
             Visualization3.init
 
+        loadAccidentsCmd : Cmd Msg
         loadAccidentsCmd =
             Http.get
                 { url = "/data/accidents-sample.jsonl"
@@ -80,6 +81,7 @@ update msg model =
 
         GotAccidentsData result ->
             let
+                resource : Resource (List Accident)
                 resource =
                     case result of
                         Ok data ->
@@ -172,6 +174,7 @@ visualizationLabel vis =
 selectVisualizationButton : Model -> CurrentVisualization -> Html Msg
 selectVisualizationButton model vis =
     let
+        buttonFontWeight : Css.Style
         buttonFontWeight =
             if vis == model.currentVisualization then
                 fontWeight bold
