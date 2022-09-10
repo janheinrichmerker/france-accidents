@@ -219,31 +219,37 @@ combineStickFigureData values =
     values |> Maybe.Extra.combine |> Maybe.andThen listToStickFigureData
 
 
-personData : Accident -> Vehicle -> Person -> Maybe StickFigureData
-personData accident vehicle person =
+personToStickFigureData : Accident -> Vehicle -> Person -> Maybe StickFigureData
+personToStickFigureData accident vehicle person =
     let
         features : List (Accident -> Vehicle -> Person -> Maybe Float)
         features =
-            [ personBirthYear ]
+            -- todo different features
+            [ personBirthYear
+            , personBirthYear
+            , personBirthYear
+            , personBirthYear
+            , personBirthYear
+            ]
     in
     features
         |> List.map (\feature -> feature accident vehicle person)
         |> combineStickFigureData
 
 
-vehicleData : Accident -> Vehicle -> List StickFigureData
-vehicleData accident vehicle =
-    vehicle.persons |> List.filterMap (personData accident vehicle)
+vehicleToStickFigureData : Accident -> Vehicle -> List StickFigureData
+vehicleToStickFigureData accident vehicle =
+    vehicle.persons |> List.filterMap (personToStickFigureData accident vehicle)
 
 
-accidentData : Accident -> List StickFigureData
-accidentData accident =
-    accident.vehicles |> List.concatMap (vehicleData accident)
+accidentToStickFigureData : Accident -> List StickFigureData
+accidentToStickFigureData accident =
+    accident.vehicles |> List.concatMap (vehicleToStickFigureData accident)
 
 
-accidentsData : List Accident -> List StickFigureData
-accidentsData accidents =
-    accidents |> List.concatMap accidentData
+accidentsToStickFigureData : List Accident -> List StickFigureData
+accidentsToStickFigureData accidents =
+    accidents |> List.concatMap accidentToStickFigureData
 
 
 groupedCoordinatePoints : Group -> GeoCoordinatesBounds -> List Accident -> List ( GeoCoordinates, List StickFigureData )
@@ -251,7 +257,8 @@ groupedCoordinatePoints group bounds accidents =
     let
         mapAccidentData : ( List Accident, GeoCoordinates ) -> ( List StickFigureData, GeoCoordinates )
         mapAccidentData accidentCoordinates =
-            accidentCoordinates |> Tuple.mapFirst accidentsData
+            accidentCoordinates
+                |> Tuple.mapFirst accidentsToStickFigureData
     in
     accidents
         |> groupBy group bounds
