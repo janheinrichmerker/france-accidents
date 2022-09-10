@@ -149,7 +149,7 @@ toGroupKey : Group -> GeoCoordinatesBounds -> Accident -> Int
 toGroupKey group bounds accident =
     case group of
         GroupByAccident ->
-            accident.accident_id
+            accident.id
 
         GroupByGrid cols rows ->
             accident
@@ -285,14 +285,14 @@ personBirthYear _ _ person =
         scaleYear =
             Scale.linear ( 0, 1 ) ( 1900, 2020 )
     in
-    person.birth_year
+    person.birthYear
         |> Maybe.map toFloat
         |> Maybe.map (Scale.convert scaleYear)
 
 
 personReason : Accident -> Vehicle -> Person -> Maybe Float
 personReason _ _ person =
-    person.travel_reason
+    person.travelReason
         |> Maybe.map
             (\reason ->
                 case reason of
@@ -321,7 +321,7 @@ personSafetyEquipment _ _ person =
     let
         numSafetyEquipments : Int
         numSafetyEquipments =
-            List.length person.safety_equipment
+            List.length person.safetyEquipment
     in
     Just (1 / (toFloat numSafetyEquipments + 1))
 

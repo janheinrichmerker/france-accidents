@@ -172,12 +172,12 @@ type alias Person =
     , category : Maybe PersonCategory
     , severity : Severity
     , sex : Sex
-    , birth_year : Maybe Int
-    , travel_reason : Maybe TravelReason
-    , safety_equipment : List SafetyEquipment
-    , pedestrian_location : Maybe PedestrianLocation
-    , pedestrian_action : Maybe PedestrianAction
-    , pedestrian_company : Maybe PedestrianCompany
+    , birthYear : Maybe Int
+    , travelReason : Maybe TravelReason
+    , safetyEquipment : List SafetyEquipment
+    , pedestrianLocation : Maybe PedestrianLocation
+    , pedestrianAction : Maybe PedestrianAction
+    , pedestrianCompany : Maybe PedestrianCompany
     }
 
 
@@ -308,14 +308,14 @@ type Engine
 
 
 type alias Vehicle =
-    { vehicle_name : String
-    , vehicle_id : Maybe Int
-    , traffic_direction : Maybe TrafficDirection
-    , vehicle_category : Maybe VehicleCategory
-    , fixed_obstacle : Maybe FixedObstacle
-    , mobile_obstacle : Maybe MobileObstacle
-    , shock_point : Maybe ShockPoint
-    , primary_manoeuvre : Maybe Manoeuvre
+    { name : String
+    , id : Maybe Int
+    , trafficDirection : Maybe TrafficDirection
+    , vehicleCategory : Maybe VehicleCategory
+    , fixedObstacle : Maybe FixedObstacle
+    , mobileObstacle : Maybe MobileObstacle
+    , shockPoint : Maybe ShockPoint
+    , primaryManoeuvre : Maybe Manoeuvre
     , engine : Maybe Engine
     , occupancy : Maybe Int
     , persons : List Person
@@ -323,31 +323,31 @@ type alias Vehicle =
 
 
 type alias Accident =
-    { accident_id : Int
+    { id : Int
     , timestamp : Posix
     , latitude : Maybe Float
     , longitude : Maybe Float
     , address : String
     , light : Maybe Light
     , intersection : Maybe Intersection
-    , atmospheric_conditions : Maybe AtmosphericConditions
+    , atmosphericConditions : Maybe AtmosphericConditions
     , collision : Maybe Collision
     , location : Maybe LocationRegime
     , department : String
     , commune : String
-    , road_category : RoadCategory
+    , roadCategory : RoadCategory
     , road : String
-    , road_index_number : Maybe Int
-    , road_index_alpha : Maybe String
-    , traffic_regime : Maybe TrafficRegime
-    , lanes_count : Maybe Int
-    , dedicated_lane : Maybe DedicatedLane
+    , roadIndexNumber : Maybe Int
+    , roadIndexAlpha : Maybe String
+    , trafficRegime : Maybe TrafficRegime
+    , lanesCount : Maybe Int
+    , dedicatedLane : Maybe DedicatedLane
     , profile : Maybe Profile
-    , upstream_terminal : Maybe Int
-    , upstream_terminal_distance_meters : Maybe Float
+    , upstreamTerminal : Maybe Int
+    , upstreamTerminalDistanceMeters : Maybe Float
     , curvature : Maybe Curvature
-    , central_reservation_width_meters : Float
-    , road_traffic_width_meters : Float
+    , centralReservationWidthMeters : Float
+    , roadTrafficWidthMeters : Float
     , vehicles : List Vehicle
     }
 

@@ -122,7 +122,7 @@ initEnabledDimensions =
 initDisabledDimensions : List PartitionerDimension
 initDisabledDimensions =
     [ ( DimensionAtmosphericConditions
-      , maybeEqualityPartitioner .atmospheric_conditions
+      , maybeEqualityPartitioner .atmosphericConditions
             [ AtmosphericConditionsNormal
             , AtmosphericConditionsLightRain
             , AtmosphericConditionsHeavyRain
