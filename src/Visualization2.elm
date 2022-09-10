@@ -12,6 +12,19 @@ import TypedSvg.Types exposing (Align(..), AnchorAlignment(..), Length(..), Meet
 import Utils exposing (tupleMean)
 
 
+type Group
+    = GroupNone
+      -- With the number of columns and rows to group into.
+    | GroupCoordinates Int Int
+      -- todo group by political region
+    | GroupRegions
+
+
+type Display
+    = DisplayAverage
+    | DisplayXray
+
+
 type alias Coordinates =
     ( Float, Float )
 
@@ -31,7 +44,8 @@ type alias CoordinatesData =
 type alias Model =
     { backgroundUrl : String
     , boundaries : CoordinatesRange
-    , gridCount : ( Int, Int )
+    , group : Group
+    , display : Display
     }
 
 
@@ -48,7 +62,8 @@ init : ( Model, Cmd Msg )
 init =
     ( { backgroundUrl = "/france.svg"
       , boundaries = ( ( 51.5, -5.8 ), ( 41, 10 ) )
-      , gridCount = ( 10, 10 )
+      , group = GroupCoordinates 10 10
+      , display = DisplayAverage
       }
     , Cmd.none
     )
@@ -73,10 +88,13 @@ accidentWithCoordinates accident =
         |> Maybe.map (Tuple.pair accident)
 
 
-accidentsToCoordinatePoints : List Accident -> List CoordinatesPoint
-accidentsToCoordinatePoints accidents =
-    accidents
-        |> accidentsWithCoordinates
+groupedCoordinatePoints : Group -> List Accident -> List CoordinatesPoint
+groupedCoordinatePoints group accidents =
+    let
+        withCoordinates =
+            accidents |> accidentsWithCoordinates
+    in
+    withCoordinates
         |> List.map (\( _, c ) -> ( c, [] ))
 
 
@@ -119,8 +137,8 @@ point scaleX scaleY ( coordinates, dimensions ) =
         ]
 
 
-scatterplot : String -> CoordinatesRange -> ( Int, Int ) -> CoordinatesData -> Html Msg
-scatterplot backgroundUrl range gridCount data =
+scatterplot : String -> CoordinatesRange -> Display -> CoordinatesData -> Html Msg
+scatterplot backgroundUrl range display data =
     let
         width : Float
         width =
@@ -151,16 +169,17 @@ scatterplot backgroundUrl range gridCount data =
         yScale =
             latitudeRange |> Scale.linear ( 0, height - 2 * padding )
 
-        ( gridCountLatitude, gridCountLongitude ) =
-            gridCount
+        ticks : Int
+        ticks =
+            12
 
         xAxis : Svg msg
         xAxis =
-            xScale |> Axis.bottom [ Axis.tickCount gridCountLatitude ]
+            xScale |> Axis.bottom [ Axis.tickCount ticks ]
 
         yAxis : Svg msg
         yAxis =
-            yScale |> Axis.left [ Axis.tickCount gridCountLongitude ]
+            yScale |> Axis.left [ Axis.tickCount ticks ]
 
         labelPositions : { x : Float, y : Float }
         labelPositions =
@@ -221,5 +240,6 @@ view model accidents =
         [ text label
         , br [] []
         , text (String.fromInt (List.length accidents))
-        , scatterplot model.backgroundUrl model.boundaries model.gridCount (accidentsToCoordinatePoints accidents)
+        , groupedCoordinatePoints model.group accidents
+            |> scatterplot model.backgroundUrl model.boundaries model.display
         ]
