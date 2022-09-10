@@ -225,8 +225,13 @@ personSex _ _ person =
 
 personBirthYear : Accident -> Vehicle -> Person -> Maybe Float
 personBirthYear _ _ person =
-    -- todo normalize to 0-1
-    Maybe.map toFloat person.birth_year
+    let
+        scaleYear =
+            Scale.linear ( 0, 1 ) ( 1900, 2020 )
+    in
+    person.birth_year
+        |> Maybe.map toFloat
+        |> Maybe.map (Scale.convert scaleYear)
 
 
 personReason : Accident -> Vehicle -> Person -> Maybe Float
