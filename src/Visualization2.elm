@@ -2,10 +2,35 @@ module Visualization2 exposing (..)
 
 import Html.Styled exposing (Html, br, div, text)
 import Model exposing (Accident)
+import Scale exposing (ContinuousScale)
+import TypedSvg exposing (g, svg, text_)
+import TypedSvg.Attributes
+import TypedSvg.Core exposing (Svg)
+import TypedSvg.Types exposing (AnchorAlignment(..), Length(..), Transform(..))
+import Utils exposing (tupleMean)
+
+
+type alias Coordinates =
+    ( Float, Float )
+
+
+type alias CoordinatesRange =
+    ( Coordinates, Coordinates )
+
+
+type alias CoordinatesPoint =
+    ( Coordinates, List Float )
+
+
+type alias CoordinatesData =
+    List CoordinatesPoint
 
 
 type alias Model =
-    {}
+    { backgroundUrl : String
+    , boundaries : CoordinatesRange
+    , gridSize : Coordinates
+    }
 
 
 type Msg
@@ -19,7 +44,12 @@ label =
 
 init : ( Model, Cmd Msg )
 init =
-    ( {}, Cmd.none )
+    ( { backgroundUrl = "/france.svg"
+      , boundaries = ( ( 50.69069, -6.427913 ), ( 41.072692, 9.70866 ) )
+      , gridSize = ( 1, 1 )
+      }
+    , Cmd.none
+    )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
