@@ -19,11 +19,11 @@ import Utils exposing (hashString, isBetween, reverseTuple, toBucketDict, tupleM
 
 
 type Group
-    = GroupNone
+    = GroupByAccident
       -- With the number of columns and rows to group into.
-    | GroupCoordinates Int Int
-    | GroupDepartments
-    | GroupCommunes
+    | GroupByGrid Int Int
+    | GroupByDepartment
+    | GroupByCommune
 
 
 type Display
@@ -70,7 +70,7 @@ init : ( Model, Cmd Msg )
 init =
     ( { backgroundUrl = "/france.svg"
       , bounds = ( ( 51.5, -5.8 ), ( 41, 10 ) )
-      , group = GroupDepartments
+      , group = GroupByAccident
       , display = DisplayAverage
       }
     , Cmd.none
@@ -138,19 +138,19 @@ toGridGroupKey cols rows ( ( minLat, minLong ), ( maxLat, maxLong ) ) ( lat, lon
 toGroupKey : Group -> GeoCoordinatesBounds -> Accident -> Int
 toGroupKey group bounds accident =
     case group of
-        GroupNone ->
+        GroupByAccident ->
             accident.accident_id
 
-        GroupCoordinates cols rows ->
+        GroupByGrid cols rows ->
             accident
                 |> toCoordinates
                 |> Maybe.map (toGridGroupKey cols rows bounds)
                 |> Maybe.withDefault -1
 
-        GroupDepartments ->
+        GroupByDepartment ->
             accident.department |> hashString
 
-        GroupCommunes ->
+        GroupByCommune ->
             accident.department ++ accident.commune |> hashString
 
 
@@ -673,16 +673,16 @@ displaySelector model =
 groupLabel : Group -> String
 groupLabel group =
     case group of
-        GroupNone ->
-            "no grouping"
+        GroupByAccident ->
+            "by accident"
 
-        GroupCoordinates cols rows ->
+        GroupByGrid cols rows ->
             "by grid (" ++ String.fromInt cols ++ "x" ++ String.fromInt rows ++ ")"
 
-        GroupDepartments ->
+        GroupByDepartment ->
             "by departements"
 
-        GroupCommunes ->
+        GroupByCommune ->
             "by communes"
 
 
@@ -707,12 +707,12 @@ groupSelector model =
         options =
             List.map
                 option
-                [ GroupNone
-                , GroupCommunes
-                , GroupDepartments
-                , GroupCoordinates 10 10
-                , GroupCoordinates 5 5
-                , GroupCoordinates 3 3
+                [ GroupByAccident
+                , GroupByCommune
+                , GroupByDepartment
+                , GroupByGrid 10 10
+                , GroupByGrid 5 5
+                , GroupByGrid 3 3
                 ]
     in
     form
