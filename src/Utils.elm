@@ -1,4 +1,4 @@
-module Utils exposing (hashString, isBetween, mapConsecutive, reverseTuple, sortTuple, toBucketDict, tupleMax, tupleMean)
+module Utils exposing (hashString, isBetween, mapConsecutive, reverseTuple, toBucketDict, tupleMax, tupleMean)
 
 import Char exposing (toCode)
 import Dict exposing (Dict)
@@ -51,19 +51,9 @@ tupleMean t =
     Tuple.first t + (Tuple.second t - Tuple.first t) / 2
 
 
-tupleMin : ( comparable, comparable ) -> comparable
-tupleMin ( a, b ) =
-    min a b
-
-
 tupleMax : ( comparable, comparable ) -> comparable
 tupleMax ( a, b ) =
     max a b
-
-
-sortTuple : ( Float, Float ) -> ( Float, Float )
-sortTuple t =
-    ( tupleMin t, tupleMax t )
 
 
 {-| Polynomial rolling hash function for strings,
