@@ -300,40 +300,31 @@ meanDimensions points =
     dimensionMeans |> combineStickFigureData
 
 
-markers : Display -> List StickFigureData -> Svg msg
-markers display data =
-    let
-        markersList : List (Svg msg)
-        markersList =
-            case display of
-                DisplayXray ->
-                    data
-                        |> List.map (stickFigure 1)
+stickFigureLabel : StickFigureData -> String
+stickFigureLabel data =
+    data
+        |> stickFigureDataToList
+        |> List.map String.fromFloat
+        |> String.join ", "
 
-                DisplayAverage ->
-                    let
-                        opacity =
-                            1 / toFloat (List.length data)
-                    in
-                    data
-                        |> meanDimensions
-                        |> Maybe.map (stickFigure opacity)
-                        |> Maybe.map List.singleton
-                        |> Maybe.withDefault []
-    in
-    g
-        []
-        (markersList
-            ++ [ text_
-                    [ TypedSvg.Attributes.x (Px 0)
-                    , TypedSvg.Attributes.y (Px 0)
-                    , TypedSvg.Attributes.textAnchor AnchorMiddle
-                    ]
-                    [ -- todo
-                      TypedSvg.Core.text "Point"
-                    ]
-               ]
-        )
+
+markers : Display -> List StickFigureData -> List (Svg msg)
+markers display data =
+    case display of
+        DisplayXray ->
+            data
+                |> List.map (stickFigure 1)
+
+        DisplayAverage ->
+            let
+                opacity =
+                    1 / toFloat (List.length data)
+            in
+            data
+                |> meanDimensions
+                |> Maybe.map (stickFigure opacity)
+                |> Maybe.map List.singleton
+                |> Maybe.withDefault []
 
 
 point : ContinuousScale Float -> ContinuousScale Float -> Display -> ( GeoCoordinates, List StickFigureData ) -> Svg msg
@@ -352,16 +343,20 @@ point scaleX scaleY display ( coordinates, data ) =
                 (Scale.convert scaleY latitude)
             ]
         ]
-        [ markers display data
-        , text_
-            [ TypedSvg.Attributes.x (Px 0)
-            , TypedSvg.Attributes.y (Px 0)
-            , TypedSvg.Attributes.textAnchor AnchorMiddle
-            ]
-            [ -- todo
-              TypedSvg.Core.text "Point"
-            ]
-        ]
+        (markers display data
+            ++ [ text_
+                    [ TypedSvg.Attributes.x (Px 0)
+                    , TypedSvg.Attributes.y (Px 0)
+                    , TypedSvg.Attributes.textAnchor AnchorMiddle
+                    ]
+                    [ data
+                        |> meanDimensions
+                        |> Maybe.map stickFigureLabel
+                        |> Maybe.withDefault "no data"
+                        |> TypedSvg.Core.text
+                    ]
+               ]
+        )
 
 
 scatterplot : String -> GeoCoordinatesBounds -> Display -> GeoData -> Html Msg
