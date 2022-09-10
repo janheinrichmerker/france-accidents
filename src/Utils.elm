@@ -51,6 +51,21 @@ tupleMean t =
     Tuple.first t + (Tuple.second t - Tuple.first t) / 2
 
 
+tupleMin : ( comparable, comparable ) -> comparable
+tupleMin ( a, b ) =
+    min a b
+
+
+tupleMax : ( comparable, comparable ) -> comparable
+tupleMax ( a, b ) =
+    max a b
+
+
+sortTuple : ( Float, Float ) -> ( Float, Float )
+sortTuple t =
+    ( tupleMin t, tupleMax t )
+
+
 {-| Polynomial rolling hash function for strings,
 inspired by <https://cp-algorithms.com/string/string-hashing.html#calculation-of-the-hash-of-a-string>
 -}
