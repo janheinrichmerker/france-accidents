@@ -119,6 +119,101 @@ point scaleX scaleY ( coordinates, dimensions ) =
         ]
 
 
+scatterplot : String -> CoordinatesRange -> ( Int, Int ) -> CoordinatesData -> Html Msg
+scatterplot backgroundUrl range gridCount data =
+    let
+        width : Float
+        width =
+            500
+
+        height : Float
+        height =
+            500
+
+        padding : Float
+        padding =
+            60
+
+        ( ( minLatitude, minLongitude ), ( maxLatitude, maxLongitude ) ) =
+            range
+
+        latitudeRange =
+            ( minLatitude, maxLatitude )
+
+        longitudeRange =
+            ( minLongitude, maxLongitude )
+
+        xScale : ContinuousScale Float
+        xScale =
+            longitudeRange |> Scale.linear ( 0, width - 2 * padding )
+
+        yScale : ContinuousScale Float
+        yScale =
+            latitudeRange |> Scale.linear ( 0, height - 2 * padding )
+
+        ( gridCountLatitude, gridCountLongitude ) =
+            gridCount
+
+        xAxis : Svg msg
+        xAxis =
+            xScale |> Axis.bottom [ Axis.tickCount gridCountLatitude ]
+
+        yAxis : Svg msg
+        yAxis =
+            yScale |> Axis.left [ Axis.tickCount gridCountLongitude ]
+
+        labelPositions : { x : Float, y : Float }
+        labelPositions =
+            { x = longitudeRange |> tupleMean
+            , y = latitudeRange |> Tuple.second
+            }
+    in
+    svg
+        [ TypedSvg.Attributes.viewBox 0 0 width height
+        , TypedSvg.Attributes.width (Percent 50)
+        , TypedSvg.Attributes.height (Percent 50)
+        ]
+        [ TypedSvg.style [] [ TypedSvg.Core.text """
+            .point text { display: none; }
+            .point:hover text { display: inline; }
+          """ ]
+        , g
+            [ TypedSvg.Attributes.transform [ Translate padding padding ] ]
+            [ image
+                [ TypedSvg.Attributes.href backgroundUrl
+                , TypedSvg.Attributes.width (Px (width - 2 * padding))
+                , TypedSvg.Attributes.height (Px (height - 2 * padding))
+                , TypedSvg.Attributes.preserveAspectRatio AlignNone Meet
+                ]
+                []
+            ]
+        , g
+            [ TypedSvg.Attributes.transform [ Translate padding padding ] ]
+            (data |> List.map (point xScale yScale))
+        , g
+            [ TypedSvg.Attributes.transform [ Translate padding (height - padding) ] ]
+            [ xAxis
+            , text_
+                [ TypedSvg.Attributes.x (Px (Scale.convert xScale labelPositions.x))
+                , TypedSvg.Attributes.y (Px (padding / 2))
+                , TypedSvg.Attributes.textAnchor AnchorMiddle
+                ]
+                [ TypedSvg.Core.text "latitude" ]
+            ]
+        , g
+            [ TypedSvg.Attributes.transform [ Translate padding padding ] ]
+            [ yAxis
+            , text_
+                [ TypedSvg.Attributes.x (Px 0)
+                , TypedSvg.Attributes.y (Px (Scale.convert yScale labelPositions.y - (padding / 2)))
+                , TypedSvg.Attributes.textAnchor AnchorMiddle
+                ]
+                [ TypedSvg.Core.text "longitude" ]
+            ]
+        ]
+        |> fromUnstyled
+
+
 view : Model -> List Accident -> Html Msg
 view model accidents =
     div
@@ -126,4 +221,5 @@ view model accidents =
         [ text label
         , br [] []
         , text (String.fromInt (List.length accidents))
+        , scatterplot model.backgroundUrl model.boundaries model.gridCount (accidentsToCoordinatePoints accidents)
         ]
