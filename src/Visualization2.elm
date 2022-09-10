@@ -195,7 +195,7 @@ associateGroupCoordinates groups =
 
 
 personBirthYear : Accident -> Vehicle -> Person -> Maybe Float
-personBirthYear accident vehicle person =
+personBirthYear _ _ person =
     Maybe.map toFloat person.birth_year
 
 
