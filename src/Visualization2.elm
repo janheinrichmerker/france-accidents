@@ -111,9 +111,36 @@ filterByBounds range accidents =
     accidents |> List.filter isAccidentInBounds
 
 
-toGridGroupKey : CoordinatesRange -> Coordinates -> Maybe Int
-toGridGroupKey bounds accident =
-    Just 1
+latitudeScale : CoordinatesRange -> ( Float, Float ) -> ContinuousScale Float
+latitudeScale ( ( min, _ ), ( max, _ ) ) =
+    Scale.linear ( min, max )
+
+
+longitudeScale : CoordinatesRange -> ( Float, Float ) -> ContinuousScale Float
+longitudeScale ( ( _, min ), ( _, max ) ) =
+    Scale.linear ( min, max )
+
+
+toGridGroupKey : Int -> Int -> CoordinatesRange -> Coordinates -> Int
+toGridGroupKey cols rows bounds ( lat, long ) =
+    let
+        scaleLat : ContinuousScale Float
+        scaleLat =
+            latitudeScale bounds ( 0, toFloat rows )
+
+        scaleLong : ContinuousScale Float
+        scaleLong =
+            longitudeScale bounds ( 0, toFloat cols )
+
+        row : Int
+        row =
+            Scale.convert scaleLat lat |> floor
+
+        col : Int
+        col =
+            Scale.convert scaleLong long |> floor
+    in
+    row + col * rows
 
 
 toGroupKey : Group -> CoordinatesRange -> Accident -> Int
@@ -125,7 +152,7 @@ toGroupKey group bounds accident =
         GroupCoordinates cols rows ->
             accident
                 |> toCoordinates
-                |> Maybe.andThen (toGridGroupKey bounds)
+                |> Maybe.map (toGridGroupKey cols rows bounds)
                 |> Maybe.withDefault -1
 
         GroupDepartments ->
