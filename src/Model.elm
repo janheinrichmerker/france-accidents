@@ -1,4 +1,4 @@
-module Model exposing (..)
+module Model exposing (Accident, AtmosphericConditions(..), Collision(..), Curvature(..), DedicatedLane(..), Intersection(..), Light(..), LocationRegime(..), Person, Profile(..), Resource(..), RoadCategory(..), Severity(..), TrafficRegime(..), TravelReason(..), Vehicle)
 
 import Time exposing (Posix)
 
