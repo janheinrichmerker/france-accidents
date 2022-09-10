@@ -4,6 +4,7 @@ import Axis
 import Color exposing (black)
 import Dict
 import Html.Styled exposing (Html, br, div, fromUnstyled, text)
+import List.Statistics
 import Model exposing (Accident)
 import Scale exposing (ContinuousScale)
 import TypedSvg exposing (circle, g, image, svg, text_)
@@ -109,6 +110,7 @@ toGroupKey group accident =
         GroupCoordinates cols rows ->
             1
 
+        -- todo
         GroupDepartments ->
             accident.department |> hashString
 
@@ -121,13 +123,44 @@ associateGroupKey group accident =
     ( toGroupKey group accident, accident )
 
 
-bucketsByGroup : Group -> List Accident -> List (List Accident)
-bucketsByGroup group accidents =
+groupBy : Group -> List Accident -> List (List Accident)
+groupBy group accidents =
     accidents
         |> List.map (associateGroupKey group)
         |> toBucketDict
         |> Dict.toList
         |> List.map Tuple.second
+
+
+groupCoordinates : List Accident -> Maybe Coordinates
+groupCoordinates group =
+    let
+        coordinates : List Coordinates
+        coordinates =
+            group |> List.filterMap toCoordinates
+
+        ( latitudes, longitudes ) =
+            coordinates |> List.unzip
+
+        latitude : Maybe Float
+        latitude =
+            latitudes |> List.Statistics.mean
+
+        longitude : Maybe Float
+        longitude =
+            longitudes |> List.Statistics.mean
+    in
+    Maybe.map2 Tuple.pair latitude longitude
+
+
+associateGroupCoordinates : List (List Accident) -> List ( List Accident, Coordinates )
+associateGroupCoordinates groups =
+    let
+        associate : List Accident -> Maybe ( List Accident, Coordinates )
+        associate group =
+            Maybe.map (Tuple.pair group) (groupCoordinates group)
+    in
+    groups |> List.filterMap associate
 
 
 accidentsWithCoordinates : List Accident -> List ( Accident, Coordinates )
