@@ -1,4 +1,4 @@
-module Visualization3 exposing (..)
+module Visualization3 exposing (Model, Msg, init, label, update, view)
 
 import Color exposing (black)
 import Html.Styled exposing (Html, button, div, form, fromUnstyled, input, li, ol, option, select, text, ul)

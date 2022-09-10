@@ -1,4 +1,4 @@
-module Visualization2 exposing (..)
+module Visualization2 exposing (Model, Msg, init, label, update, view)
 
 import Axis
 import Color exposing (black)
