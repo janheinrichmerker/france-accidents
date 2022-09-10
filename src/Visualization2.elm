@@ -114,8 +114,8 @@ filterByBounds range accidents =
     accidents |> List.filter isAccidentInBounds
 
 
-toGridGroupKey : Int -> Int -> GeoCoordinatesBounds -> GeoCoordinates -> Int
-toGridGroupKey cols rows ( ( minLat, minLong ), ( maxLat, maxLong ) ) ( lat, long ) =
+gridPosition : Int -> Int -> GeoCoordinatesBounds -> GeoCoordinates -> ( Int, Int )
+gridPosition cols rows ( ( minLat, minLong ), ( maxLat, maxLong ) ) ( lat, long ) =
     let
         scaleLat : ContinuousScale Float
         scaleLat =
@@ -132,6 +132,15 @@ toGridGroupKey cols rows ( ( minLat, minLong ), ( maxLat, maxLong ) ) ( lat, lon
         col : Int
         col =
             Scale.convert scaleLong long |> floor
+    in
+    ( row, col )
+
+
+toGridGroupKey : Int -> Int -> GeoCoordinatesBounds -> GeoCoordinates -> Int
+toGridGroupKey cols rows bounds coordinates =
+    let
+        ( row, col ) =
+            gridPosition cols rows bounds coordinates
     in
     row + col * rows
 
@@ -171,12 +180,53 @@ groupBy group bounds accidents =
         |> Dict.values
 
 
-groupCoordinates : List Accident -> Maybe GeoCoordinates
-groupCoordinates group =
+gridPositionCoordinates : Int -> Int -> GeoCoordinatesBounds -> Int -> Int -> GeoCoordinates
+gridPositionCoordinates cols rows ( ( minLat, minLong ), ( maxLat, maxLong ) ) row col =
+    let
+        scaleLat : ContinuousScale Float
+        scaleLat =
+            Scale.linear ( minLat, maxLat ) ( 0, toFloat rows )
+
+        scaleLong : ContinuousScale Float
+        scaleLong =
+            Scale.linear ( minLong, maxLong ) ( 0, toFloat cols )
+
+        lat : Float
+        lat =
+            Scale.convert scaleLat (toFloat row + 0.5)
+
+        long : Float
+        long =
+            Scale.convert scaleLong (toFloat col + 0.5)
+    in
+    ( lat, long )
+
+
+normalizeGridGroupCoordinates : Int -> Int -> GeoCoordinatesBounds -> GeoCoordinates -> GeoCoordinates
+normalizeGridGroupCoordinates cols rows bounds coordinates =
+    let
+        ( row, col ) =
+            gridPosition cols rows bounds coordinates
+    in
+    gridPositionCoordinates cols rows bounds row col
+
+
+normalizeGroupCoordinates : Group -> GeoCoordinatesBounds -> GeoCoordinates -> GeoCoordinates
+normalizeGroupCoordinates group bounds =
+    case group of
+        GroupByGrid cols rows ->
+            normalizeGridGroupCoordinates cols rows bounds
+
+        _ ->
+            identity
+
+
+groupCoordinates : Group -> GeoCoordinatesBounds -> List Accident -> Maybe GeoCoordinates
+groupCoordinates group bounds accidents =
     let
         coordinates : List GeoCoordinates
         coordinates =
-            group |> List.filterMap toCoordinates
+            accidents |> List.filterMap toCoordinates
 
         ( latitudes, longitudes ) =
             coordinates |> List.unzip
@@ -190,16 +240,17 @@ groupCoordinates group =
             longitudes |> List.Statistics.mean
     in
     Maybe.map2 Tuple.pair latitude longitude
+        |> Maybe.map (normalizeGroupCoordinates group bounds)
 
 
-associateGroupCoordinates : List (List Accident) -> List ( List Accident, GeoCoordinates )
-associateGroupCoordinates groups =
+associateGroupCoordinates : Group -> GeoCoordinatesBounds -> List (List Accident) -> List ( List Accident, GeoCoordinates )
+associateGroupCoordinates group bounds accidentGroups =
     let
         associate : List Accident -> Maybe ( List Accident, GeoCoordinates )
-        associate group =
-            Maybe.map (Tuple.pair group) (groupCoordinates group)
+        associate accidents =
+            Maybe.map (Tuple.pair accidents) (groupCoordinates group bounds accidents)
     in
-    groups |> List.filterMap associate
+    accidentGroups |> List.filterMap associate
 
 
 listToStickFigureData : List Float -> Maybe StickFigureData
@@ -324,7 +375,7 @@ groupedCoordinatePoints group bounds accidents =
     in
     accidents
         |> groupBy group bounds
-        |> associateGroupCoordinates
+        |> associateGroupCoordinates group bounds
         |> List.map mapAccidentData
         |> List.map reverseTuple
 
