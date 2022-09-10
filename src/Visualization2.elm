@@ -71,8 +71,8 @@ init : ( Model, Cmd Msg )
 init =
     ( { backgroundUrl = "/france.svg"
       , bounds = ( ( 51.5, -5.8 ), ( 41, 10 ) )
-      , group = GroupByAccident
-      , display = DisplayAverage
+      , group = GroupByGrid 10 10
+      , display = DisplayXray
       }
     , Cmd.none
     )
