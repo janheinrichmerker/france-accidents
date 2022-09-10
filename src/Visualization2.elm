@@ -15,7 +15,7 @@ import TypedSvg exposing (g, image, line, svg, text_)
 import TypedSvg.Attributes
 import TypedSvg.Core exposing (Svg)
 import TypedSvg.Types exposing (Align(..), AnchorAlignment(..), Length(..), MeetOrSlice(..), Opacity(..), Paint(..), Transform(..))
-import Utils exposing (hashString, isBetween, reverseTuple, toBucketDict, tupleMean)
+import Utils exposing (hashString, isBetween, reverseTuple, toBucketDict, tupleMax, tupleMean)
 
 
 type Group
@@ -630,7 +630,7 @@ scatterplot backgroundUrl range display data =
         labelPositions : { x : Float, y : Float }
         labelPositions =
             { x = longitudeRange |> tupleMean
-            , y = latitudeRange |> Tuple.second
+            , y = latitudeRange |> tupleMax
             }
     in
     svg
