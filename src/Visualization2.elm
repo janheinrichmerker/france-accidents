@@ -139,8 +139,6 @@ gridPosition cols rows ( ( minLat, minLong ), ( maxLat, maxLong ) ) ( lat, long 
 toGridGroupKey : Int -> Int -> GeoCoordinatesBounds -> GeoCoordinates -> Int
 toGridGroupKey cols rows bounds coordinates =
     let
-        row : Float
-        col : Float
         ( row, col ) =
             gridPosition cols rows bounds coordinates
     in
@@ -207,8 +205,6 @@ gridPositionCoordinates cols rows ( ( minLat, minLong ), ( maxLat, maxLong ) ) r
 normalizeGridGroupCoordinates : Int -> Int -> GeoCoordinatesBounds -> GeoCoordinates -> GeoCoordinates
 normalizeGridGroupCoordinates cols rows bounds coordinates =
     let
-        row : Int
-        col : Int
         ( row, col ) =
             gridPosition cols rows bounds coordinates
     in
@@ -232,8 +228,6 @@ groupCoordinates group bounds accidents =
         coordinates =
             accidents |> List.filterMap toCoordinates
 
-        latitudes : List Float
-        longitudes : List Float
         ( latitudes, longitudes ) =
             coordinates |> List.unzip
 
@@ -563,8 +557,6 @@ markers display data =
 point : ContinuousScale Float -> ContinuousScale Float -> Display -> ( GeoCoordinates, List StickFigureData ) -> Svg msg
 point scaleX scaleY display ( coordinates, data ) =
     let
-        latitude : Float
-        longitude : Float
         ( latitude, longitude ) =
             coordinates
     in
