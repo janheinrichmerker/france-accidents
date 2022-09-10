@@ -5,7 +5,6 @@ import Iso8601
 import Json.Decode exposing (Decoder, andThen, decodeString, fail, float, int, list, nullable, string, succeed)
 import Json.Decode.Pipeline exposing (required)
 import Model exposing (Accident, AtmosphericConditions(..), Collision(..), Curvature(..), DedicatedLane(..), Engine(..), FixedObstacle(..), Intersection(..), Light(..), LocationRegime(..), Manoeuvre(..), MobileObstacle(..), PedestrianAction(..), PedestrianCompany(..), PedestrianLocation(..), Person, PersonCategory(..), Place(..), Profile(..), RoadCategory(..), SafetyEquipment(..), Severity(..), Sex(..), ShockPoint(..), TrafficDirection(..), TrafficRegime(..), TravelReason(..), Vehicle, VehicleCategory(..))
-import Result as Http
 
 
 light : Decoder Light
