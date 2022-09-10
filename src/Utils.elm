@@ -43,3 +43,8 @@ toBucketDict =
     List.foldl
         insertIntoBucket
         Dict.empty
+
+
+tupleMean : ( number, number ) -> number
+tupleMean t =
+    Tuple.first t + (Tuple.second t - Tuple.first t) / 2
