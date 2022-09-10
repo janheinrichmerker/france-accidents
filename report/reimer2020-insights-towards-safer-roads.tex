@@ -15,6 +15,8 @@
 \usepackage{xurl}
 \usepackage{listings}
 \usepackage{listingsutf8}
+\usepackage{booktabs}
+\usepackage{tabularx}
 \addbibresource{literature.bib}
 
 % Listings
@@ -88,26 +90,37 @@
 
 \section{Introduction}
 Despite decades of developing better technology and regulations to avoid road accidents, the global number of accidents is still high~\cite{Who2015}. In~2009, 1.5\,\% of EU citizens\footnote{\url{https://ec.europa.eu/eurostat/databrowser/bookmark/55b45b50-76ac-4cbf-9493-274087bd96fe}} reported injuries caused by road accidents. And even though in recent years the number of road deaths slightly declined in the European Union\footnote{\url{https://ec.europa.eu/eurostat/web/products-eurostat-news/-/DDN-20220511-1}}, in~2020 still 4 out of 100\,000 inhabitants died of road accidents. Among personal factors such as inexperiencedness or loss of control~\cite{RolisonRMF2018}, combusted cities~\cite{AlbalateF2021} and insufficient law enforcement~\cite{Who2015} are commonly cited as reasons behind those high numbers of accidents. Those are, however, factors that are not easy to change. Neither can urbanization be stopped nor can we circumvent all personal factors. This report instead seeks to develop new ideas towards road safety by visualizing French governmental open datasets of road accidents\footnote{\url{https://data.gouv.fr/en/datasets/bases-de-donnees-annuelles-des-accidents-corporels-de-la-circulation-routiere-annees-de-2005-a-2019/}} that happend in France in the period from~2005 to~2020. We presume that given France's representativity in Europe---with a population of 68~millions it is the second largest country within the 447~million population of the European Union~\footnote{as of January 1 2022, \url{https://ec.europa.eu/eurostat/databrowser/bookmark/40fd4e5f-3ace-4618-86a5-e9ecfea67ac2}}---some of our conclusions can also be applied to other European countries as well. In our Design Study~\cite{Munzner2008}, we propose new visualizations to explore three different dimensions that could cause road accidents: \Ni date- or time-related effects, \Nii the influence of the drivers and passengers, and \Niii prevalences of different types of accidents.
-Our visualizations answer questions such as:
-\begin{itemize}
-    \item Are roads more dangerous in winter or summer?
-    \item Do older or younger people drive more safely?
-    \item Are there geographical hotspots, e.g., in cities or rural areas?
-    \item If geographical hotspots occur, which other characteristics can explain the correlations.
-    \item Do the proportion of dead and injured persons correlate?
-    \item Where are unproportionately more people killed in traffic?
-    \item Do dedicated bicycle lanes make roads safer for cyclists?
-    \item Are wider roads safer than narrow roads?
-\end{itemize}
-We deploy an interactive demo of the described visualizations online.\footnote{\url{https://heinrichreimer.github.io/france-accidents/}}
-The insights gianed from the proposed visualizations should ideally be integrated in future public infrastructure planning, and hopefully save people's lives.
 
 \subsection{Application Background}
-\todo{Sie müssen genug Hintergrund bereitstellen, sodass die Lesenden sich ein Urteil bilden können, ob ihre Lösung funktioniert. Sie sollen die Lesenden jedoch nicht mit Anwendungsdetails so überschütten, dass der Fokus auf die Fragen zur Informationsvisualisierung untergehen.}
+\begin{table}
+    \caption{Exemplary questions that should be answered by visualizions of French road accident dataset, with the typical background a person asking that question would likely have.}
+    \label{table-questions}
+    \begin{tabularx}{\linewidth}{Xp{0.3\linewidth}}
+        \toprule
+        \textbf{Question} & \textbf{Background} \\
+        \midrule
+        Are roads more dangerous in winter or summer? & citizen \\
+        Do older or younger people drive more safely? & policy maker \\
+        Are there geographical hotspots, e.g., in cities or rural areas? & citizen, policy maker \\
+        If geographical hotspots occur, which other characteristics can explain the correlations. & policy maker \\
+        Do the proportion of dead and injured persons correlate? & policy maker \\
+        Where are unproportionately more people killed in traffic? & policy maker \\
+        Do dedicated bicycle lanes make roads safer for cyclists? & citizen, policy maker, infrastructure planner \\
+        Are wider roads safer than narrow roads? & citizen, infrastructure planner \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+With unacceptably high casualties in road traffic, our vizualization addresses the international initiative towards better road safety. The vizualizations should support people in avoiding particuarly dangerous regions, times, or other patterns. It should also provide officials with insights where additional policies or infrastructure might mitigate high numbers of traffic accidents. It is therefore important that broad trends can be expolored while at the same time giving the targetted users the option to dive into visualizations to gain insights on smaller details.
+Specifically, our visualizations should answer the following exemplary questions listed in Table~\ref{table-questions}.
+
 \subsection{Target Groups}
-\todo{Beschreiben sie die Personengruppe oder Personengruppen, die das von ihnen benannte Anwendungsproblem lösen möchte. Auf welches Vorwissen können sie in dieser Gruppen von Anwenderinnen aufbauen? Welche Informationsbedürfnisse werden durch die Visualisierungen adressiert?}
+Our visualizations target citizens that commute on French roads as well as governments throughout the world. For the first group in particuar, we can not assume deep knowledge of public infrastructure or mechanical vocabulary~(e.g.,~they might not be able to intuitively distinguish between vehicles that weigh 1.5~or 3.5~tons). For policy makers on the other hand, we can assume such extended knowledge, assuming they were trained on special fields of public infrastucture. Both groups want to know where, when, and with whom accidents occur most often, that is, they want to explore patterns, citizens because they could then avoid such patterns and government officials because they could target such patterns by introducing laws or building new infrastructure~(e.g.,~a pedestrian bridge at a dangerous road crossing). 
+
 \subsection{Overview and Contributions}
-\todo{In diesem Abschnitt geben sie einen kurzen Überblick über die Daten und verwendeten Visualisierungen. Dann benennen sie die Beiträge ihres Projekts. Diese Beiträge müssen sie in den hinteren Teilen des Berichts genauer ausführen und belegen.}
+Our contributions are twofold: \Ni we make the French government's accident dataset more accessible by preprocessing, aggregating, and translating the data of 64~individual, French-named data files, and \Ni we develop an application with three interactive visualizations that help citizens as well as politicians in finding frequent dangers across French roads.
+Working with highly multidimensional data, we apply patterns such as filtering and aggregation, partitioning into tree hierarchies~\todocite\todo{treemap}, icon-based stick figure~\todocite vizualization techniques, and interacive options to select or order specific dimensions of the dataset for each visualization.
+We deploy our described visualizations as an interactive online demo\footnote{\url{https://heinrichreimer.github.io/france-accidents/}} and release the visualization code as well as code for preprocessing the French government open data on GitHub\footnote{\url{https://github.com/heinrichreimer/france-accidents}} under an open license.
+The insights gianed from the visualizations introduced in this paper can be integrated in future policies and public infrastructure planning. This way roads can be made safer and people's lives can be saved.
 
 \section{Data}
 \todo{Beschreiben Sie vorhandenen Daten. Gehen Sie kritisch darauf ein, inwieweit sich die Daten für die Bearbeitung der Fragestellungen und dem Erreichen von Lösungen für die oben beschriebene Zielgruppen eignen. Haben sie die Daten sinnvoll mit weiteren Datenquellen ergänzt? Wenn ja, wie?
