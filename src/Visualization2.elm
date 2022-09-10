@@ -29,7 +29,7 @@ type alias CoordinatesData =
 type alias Model =
     { backgroundUrl : String
     , boundaries : CoordinatesRange
-    , gridSize : Coordinates
+    , gridCount : ( Int, Int )
     }
 
 
@@ -45,8 +45,8 @@ label =
 init : ( Model, Cmd Msg )
 init =
     ( { backgroundUrl = "/france.svg"
-      , boundaries = ( ( 50.69069, -6.427913 ), ( 41.072692, 9.70866 ) )
-      , gridSize = ( 1, 1 )
+      , boundaries = ( ( 51.5, -5.8 ), ( 41, 10 ) )
+      , gridCount = ( 10, 10 )
       }
     , Cmd.none
     )
