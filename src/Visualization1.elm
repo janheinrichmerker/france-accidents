@@ -205,6 +205,7 @@ computeDimension model accidents =
 toTimePoint : Model -> ( Posix, List Accident ) -> TimePoint
 toTimePoint model ( timestamp, accidents ) =
     let
+        y : Float
         y =
             computeDimension model accidents
     in
@@ -318,12 +319,15 @@ aspectRatioSelectorOption model aspectRatio =
 aspectRatioSelector : Model -> Html Msg
 aspectRatioSelector model =
     let
+        viewId : String
         viewId =
             "aspect-ratio-selector"
 
+        option : AspectRatio -> Html Msg
         option =
             aspectRatioSelectorOption model
 
+        options : List (Html Msg)
         options =
             List.map
                 option
@@ -375,12 +379,15 @@ dimensionSelectorOption model dimension =
 dimensionSelector : Model -> Html Msg
 dimensionSelector model =
     let
+        viewId : String
         viewId =
             "dimension-selector"
 
+        option : Dimension -> Html Msg
         option =
             dimensionSelectorOption model
 
+        options : List (Html Msg)
         options =
             List.map
                 option
@@ -424,12 +431,15 @@ referenceSelectorOption model reference =
 referenceSelector : Model -> Html Msg
 referenceSelector model =
     let
+        viewId : String
         viewId =
             "reference-selector"
 
+        option : Reference -> Html Msg
         option =
             referenceSelectorOption model
 
+        options : List (Html Msg)
         options =
             List.map
                 option
@@ -470,12 +480,15 @@ groupSelectorOption model group =
 groupSelector : Model -> Html Msg
 groupSelector model =
     let
+        viewId : String
         viewId =
             "group-x-selector"
 
+        option : Group -> Html Msg
         option =
             groupSelectorOption model
 
+        options : List (Html Msg)
         options =
             List.map
                 option
@@ -525,12 +538,15 @@ aggregateSelectorOption model aggregate =
 aggregateSelector : Model -> Html Msg
 aggregateSelector model =
     let
+        viewId : String
         viewId =
             "aggregate-x-selector"
 
+        option : Aggregate -> Html Msg
         option =
             aggregateSelectorOption model
 
+        options : List (Html Msg)
         options =
             List.map
                 option
@@ -555,6 +571,7 @@ aggregateSelector model =
 view : Model -> List Accident -> Html Msg
 view model accidents =
     let
+        points : List TimePoint
         points =
             toPoints2D model accidents
 
@@ -716,6 +733,7 @@ timeSeriesLinePlot aspectRatio group model =
                 |> Maybe.withDefault ( 0, 0 )
                 |> Scale.linear ( 0, width )
 
+        yTicks : Int
         yTicks =
             max 2 (round (10 / aspectRatio))
 
