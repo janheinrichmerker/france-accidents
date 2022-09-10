@@ -40,7 +40,11 @@ type alias GeoCoordinatesBounds =
 
 
 type alias GeoData =
-    List ( GeoCoordinates, List (List Float) )
+    List ( GeoCoordinates, List StickFigureData )
+
+
+type StickFigureData
+    = StickFigureData Float Float Float Float Float
 
 
 type alias Model =
@@ -199,7 +203,22 @@ personBirthYear _ _ person =
     Maybe.map toFloat person.birth_year
 
 
-personData : Accident -> Vehicle -> Person -> Maybe (List Float)
+listToStickFigureData : List Float -> Maybe StickFigureData
+listToStickFigureData values =
+    case values of
+        m1 :: m2 :: m3 :: m4 :: m5 :: [] ->
+            StickFigureData m1 m2 m3 m4 m5 |> Just
+
+        _ ->
+            Nothing
+
+
+combineStickFigureData : List (Maybe Float) -> Maybe StickFigureData
+combineStickFigureData values =
+    values |> Maybe.Extra.combine |> Maybe.andThen listToStickFigureData
+
+
+personData : Accident -> Vehicle -> Person -> Maybe StickFigureData
 personData accident vehicle person =
     let
         features : List (Accident -> Vehicle -> Person -> Maybe Float)
@@ -208,28 +227,28 @@ personData accident vehicle person =
     in
     features
         |> List.map (\feature -> feature accident vehicle person)
-        |> Maybe.Extra.combine
+        |> combineStickFigureData
 
 
-vehicleData : Accident -> Vehicle -> List (List Float)
+vehicleData : Accident -> Vehicle -> List StickFigureData
 vehicleData accident vehicle =
     vehicle.persons |> List.filterMap (personData accident vehicle)
 
 
-accidentData : Accident -> List (List Float)
+accidentData : Accident -> List StickFigureData
 accidentData accident =
     accident.vehicles |> List.concatMap (vehicleData accident)
 
 
-accidentsData : List Accident -> List (List Float)
+accidentsData : List Accident -> List StickFigureData
 accidentsData accidents =
     accidents |> List.concatMap accidentData
 
 
-groupedCoordinatePoints : Group -> GeoCoordinatesBounds -> List Accident -> List ( GeoCoordinates, List (List Float) )
+groupedCoordinatePoints : Group -> GeoCoordinatesBounds -> List Accident -> List ( GeoCoordinates, List StickFigureData )
 groupedCoordinatePoints group bounds accidents =
     let
-        mapAccidentData : ( List Accident, GeoCoordinates ) -> ( List (List Float), GeoCoordinates )
+        mapAccidentData : ( List Accident, GeoCoordinates ) -> ( List StickFigureData, GeoCoordinates )
         mapAccidentData accidentCoordinates =
             accidentCoordinates |> Tuple.mapFirst accidentsData
     in
@@ -240,7 +259,7 @@ groupedCoordinatePoints group bounds accidents =
         |> List.map reverseTuple
 
 
-stickFigure : Float -> List Float -> Svg msg
+stickFigure : Float -> StickFigureData -> Svg msg
 stickFigure opacity _ =
     circle
         [ TypedSvg.Attributes.r (Px 2)
@@ -252,21 +271,28 @@ stickFigure opacity _ =
         []
 
 
-meanDimensions : List (List Float) -> Maybe (List Float)
+stickFigureDataToList : StickFigureData -> List Float
+stickFigureDataToList data =
+    case data of
+        StickFigureData v1 v2 v3 v4 v5 ->
+            [ v1, v2, v3, v4, v5 ]
+
+
+meanDimensions : List StickFigureData -> Maybe StickFigureData
 meanDimensions points =
     let
         dimensionPoints : List (List Float)
         dimensionPoints =
-            points |> List.Extra.transpose
+            points |> List.map stickFigureDataToList |> List.Extra.transpose
 
         dimensionMeans : List (Maybe Float)
         dimensionMeans =
             dimensionPoints |> List.map List.Statistics.mean
     in
-    dimensionMeans |> Maybe.Extra.combine
+    dimensionMeans |> combineStickFigureData
 
 
-markers : Display -> List (List Float) -> Svg msg
+markers : Display -> List StickFigureData -> Svg msg
 markers display data =
     let
         markersList : List (Svg msg)
@@ -302,7 +328,7 @@ markers display data =
         )
 
 
-point : ContinuousScale Float -> ContinuousScale Float -> Display -> ( GeoCoordinates, List (List Float) ) -> Svg msg
+point : ContinuousScale Float -> ContinuousScale Float -> Display -> ( GeoCoordinates, List StickFigureData ) -> Svg msg
 point scaleX scaleY display ( coordinates, data ) =
     let
         ( latitude, longitude ) =
