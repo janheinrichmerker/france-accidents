@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import Browser exposing (Document, UrlRequest, application)
 import Browser.Navigation exposing (Key)
-import Css exposing (FontWeight, bold, borderBottom3, displayFlex, em, ex, fontWeight, listStyle, margin2, none, normal, padding, padding2, px, rgb, solid, zero)
+import Css exposing (bold, borderBottom3, displayFlex, em, ex, fontWeight, listStyle, margin2, none, normal, padding, padding2, px, rgb, solid, zero)
 import Data exposing (HttpJsonError, errorToString, expectAccidentJsonLines)
 import Html.Styled exposing (Html, button, div, h1, h2, header, li, main_, nav, text, toUnstyled, ul)
 import Html.Styled.Attributes exposing (css)
