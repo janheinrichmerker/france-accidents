@@ -3,7 +3,9 @@ module Visualization2 exposing (..)
 import Axis
 import Color exposing (black)
 import Dict
-import Html.Styled exposing (Html, br, div, fromUnstyled, text)
+import Html.Styled exposing (Html, br, div, form, fromUnstyled, option, select, text)
+import Html.Styled.Attributes exposing (selected)
+import Html.Styled.Events exposing (onClick)
 import List.Statistics
 import Model exposing (Accident)
 import Scale exposing (ContinuousScale)
@@ -53,6 +55,8 @@ type alias Model =
 
 type Msg
     = NoOp
+    | SelectGroup Group
+    | SelectDisplay Display
 
 
 label : String
@@ -64,7 +68,7 @@ init : ( Model, Cmd Msg )
 init =
     ( { backgroundUrl = "/france.svg"
       , boundaries = ( ( 51.5, -5.8 ), ( 41, 10 ) )
-      , group = GroupCoordinates 10 10
+      , group = GroupNone
       , display = DisplayAverage
       }
     , Cmd.none
@@ -76,6 +80,12 @@ update msg model =
     case msg of
         NoOp ->
             ( model, Cmd.none )
+
+        SelectGroup group ->
+            ( { model | group = group }, Cmd.none )
+
+        SelectDisplay display ->
+            ( { model | display = display }, Cmd.none )
 
 
 toCoordinates : Accident -> Maybe Coordinates
@@ -101,16 +111,16 @@ filterByBounds range accidents =
     accidents |> List.filter isAccidentInBounds
 
 
-toGroupKey : Group -> Accident -> comparable
+toGroupKey : Group -> Accident -> Int
 toGroupKey group accident =
     case group of
         GroupNone ->
             accident.accident_id
 
         GroupCoordinates cols rows ->
+            -- todo
             1
 
-        -- todo
         GroupDepartments ->
             accident.department |> hashString
 
@@ -118,7 +128,7 @@ toGroupKey group accident =
             accident.department ++ accident.commune |> hashString
 
 
-associateGroupKey : Group -> Accident -> ( comparable, Accident )
+associateGroupKey : Group -> Accident -> ( Int, Accident )
 associateGroupKey group accident =
     ( toGroupKey group accident, accident )
 
@@ -128,8 +138,7 @@ groupBy group accidents =
     accidents
         |> List.map (associateGroupKey group)
         |> toBucketDict
-        |> Dict.toList
-        |> List.map Tuple.second
+        |> Dict.values
 
 
 groupCoordinates : List Accident -> Maybe Coordinates
@@ -345,12 +354,112 @@ scatterplot backgroundUrl range display data =
         |> fromUnstyled
 
 
+displayLabel : Display -> String
+displayLabel display =
+    case display of
+        DisplayAverage ->
+            "average values"
+
+        DisplayXray ->
+            "x-ray"
+
+
+displaySelectorOption : Model -> Display -> Html Msg
+displaySelectorOption model display =
+    option
+        [ onClick (SelectDisplay display)
+        , selected (model.display == display)
+        ]
+        [ text (displayLabel display) ]
+
+
+displaySelector : Model -> Html Msg
+displaySelector model =
+    let
+        viewId =
+            "display-selector"
+
+        option =
+            displaySelectorOption model
+
+        options =
+            List.map
+                option
+                [ DisplayAverage
+                , DisplayXray
+                ]
+    in
+    form
+        []
+        [ Html.Styled.label
+            [ Html.Styled.Attributes.for viewId ]
+            [ text "Display style: " ]
+        , select
+            [ Html.Styled.Attributes.name viewId, Html.Styled.Attributes.id viewId ]
+            options
+        ]
+
+
+groupLabel : Group -> String
+groupLabel group =
+    case group of
+        GroupNone ->
+            "no grouping"
+
+        GroupCoordinates cols rows ->
+            "by grid (" ++ String.fromInt cols ++ "x" ++ String.fromInt rows ++ ")"
+
+        GroupDepartments ->
+            "by departements"
+
+        GroupCommunes ->
+            "by communes"
+
+
+groupSelectorOption : Model -> Group -> Html Msg
+groupSelectorOption model group =
+    option
+        [ onClick (SelectGroup group)
+        , selected (model.group == group)
+        ]
+        [ text (groupLabel group) ]
+
+
+groupSelector : Model -> Html Msg
+groupSelector model =
+    let
+        viewId =
+            "group-selector"
+
+        option =
+            groupSelectorOption model
+
+        options =
+            List.map
+                option
+                [ GroupNone
+                , GroupDepartments
+                , GroupCommunes
+                , GroupCoordinates 10 10
+                ]
+    in
+    form
+        []
+        [ Html.Styled.label
+            [ Html.Styled.Attributes.for viewId ]
+            [ text "Group by: " ]
+        , select
+            [ Html.Styled.Attributes.name viewId, Html.Styled.Attributes.id viewId ]
+            options
+        ]
+
+
 view : Model -> List Accident -> Html Msg
 view model accidents =
     div
         []
-        [ text label
-        , br [] []
+        [ groupSelector model
+        , displaySelector model
         , text (String.fromInt (List.length accidents))
         , groupedCoordinatePoints model.group accidents
             |> scatterplot model.backgroundUrl model.boundaries model.display
