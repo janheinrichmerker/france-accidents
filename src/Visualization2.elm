@@ -111,15 +111,22 @@ filterByBounds range accidents =
     accidents |> List.filter isAccidentInBounds
 
 
-toGroupKey : Group -> Accident -> Int
-toGroupKey group accident =
+toGridGroupKey : CoordinatesRange -> Coordinates -> Maybe Int
+toGridGroupKey bounds accident =
+    Just 1
+
+
+toGroupKey : Group -> CoordinatesRange -> Accident -> Int
+toGroupKey group bounds accident =
     case group of
         GroupNone ->
             accident.accident_id
 
         GroupCoordinates cols rows ->
-            -- todo
-            1
+            accident
+                |> toCoordinates
+                |> Maybe.andThen (toGridGroupKey bounds)
+                |> Maybe.withDefault -1
 
         GroupDepartments ->
             accident.department |> hashString
@@ -128,15 +135,15 @@ toGroupKey group accident =
             accident.department ++ accident.commune |> hashString
 
 
-associateGroupKey : Group -> Accident -> ( Int, Accident )
-associateGroupKey group accident =
-    ( toGroupKey group accident, accident )
+associateGroupKey : Group -> CoordinatesRange -> Accident -> ( Int, Accident )
+associateGroupKey group bounds accident =
+    ( toGroupKey group bounds accident, accident )
 
 
-groupBy : Group -> List Accident -> List (List Accident)
-groupBy group accidents =
+groupBy : Group -> CoordinatesRange -> List Accident -> List (List Accident)
+groupBy group bounds accidents =
     accidents
-        |> List.map (associateGroupKey group)
+        |> List.map (associateGroupKey group bounds)
         |> toBucketDict
         |> Dict.values
 
@@ -183,15 +190,15 @@ accidentsData accidents =
     accidents |> List.map accidentData
 
 
-groupedCoordinatePoints : Group -> List Accident -> List ( Coordinates, List (List Float) )
-groupedCoordinatePoints group accidents =
+groupedCoordinatePoints : Group -> CoordinatesRange -> List Accident -> List ( Coordinates, List (List Float) )
+groupedCoordinatePoints group bounds accidents =
     let
         mapAccidentData : ( List Accident, Coordinates ) -> ( List (List Float), Coordinates )
         mapAccidentData accidentCoordinates =
             accidentCoordinates |> Tuple.mapFirst accidentsData
     in
     accidents
-        |> groupBy group
+        |> groupBy group bounds
         |> associateGroupCoordinates
         |> List.map mapAccidentData
         |> List.map reverseTuple
@@ -456,11 +463,17 @@ groupSelector model =
 
 view : Model -> List Accident -> Html Msg
 view model accidents =
+    let
+        points =
+            accidents
+                |> filterByBounds model.boundaries
+                |> groupedCoordinatePoints model.group model.boundaries
+    in
     div
         []
         [ groupSelector model
         , displaySelector model
         , text (String.fromInt (List.length accidents))
-        , groupedCoordinatePoints model.group accidents
+        , points
             |> scatterplot model.backgroundUrl model.boundaries model.display
         ]
