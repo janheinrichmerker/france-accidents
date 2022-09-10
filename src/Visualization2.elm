@@ -71,7 +71,7 @@ init =
     ( { backgroundUrl = "/france.svg"
       , bounds = ( ( 51.5, -5.8 ), ( 41, 10 ) )
       , group = GroupDepartments
-      , display = DisplayXray
+      , display = DisplayAverage
       }
     , Cmd.none
     )
