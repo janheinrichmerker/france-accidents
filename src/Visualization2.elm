@@ -76,6 +76,29 @@ update msg model =
             ( model, Cmd.none )
 
 
+toCoordinates : Accident -> Maybe Coordinates
+toCoordinates accident =
+    Maybe.map2 Tuple.pair accident.latitude accident.longitude
+
+
+isInBounds : CoordinatesRange -> Coordinates -> Bool
+isInBounds ( ( minLat, minLong ), ( maxLat, maxLong ) ) ( lat, long ) =
+    minLat <= lat && lat <= maxLat && minLong <= long && long <= maxLong
+
+
+filterByBounds : CoordinatesRange -> List Accident -> List Accident
+filterByBounds range accidents =
+    let
+        isAccidentInBounds : Accident -> Bool
+        isAccidentInBounds accident =
+            accident
+                |> toCoordinates
+                |> Maybe.map (isInBounds range)
+                |> Maybe.withDefault False
+    in
+    accidents |> List.filter isAccidentInBounds
+
+
 accidentsWithCoordinates : List Accident -> List ( Accident, Coordinates )
 accidentsWithCoordinates accidents =
     accidents
