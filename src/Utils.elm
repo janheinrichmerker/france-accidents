@@ -1,5 +1,6 @@
 module Utils exposing (..)
 
+import Char exposing (toCode)
 import Dict exposing (Dict)
 import List
 
@@ -48,3 +49,33 @@ toBucketDict =
 tupleMean : ( Float, Float ) -> Float
 tupleMean t =
     Tuple.first t + (Tuple.second t - Tuple.first t) / 2
+
+
+{-| Polynomial rolling hash function for strings,
+inspired by <https://cp-algorithms.com/string/string-hashing.html#calculation-of-the-hash-of-a-string>
+-}
+hashString : String -> Int
+hashString string =
+    let
+        p : Int
+        p =
+            31
+
+        m : Int
+        m =
+            round 1.0e9 + 9
+    in
+    String.foldl
+        (\char ( hash, pPow ) ->
+            let
+                code : Int
+                code =
+                    toCode char
+            in
+            ( (hash + code * pPow) |> modBy m
+            , (pPow * p) |> modBy m
+            )
+        )
+        ( 0, 1 )
+        string
+        |> Tuple.first
