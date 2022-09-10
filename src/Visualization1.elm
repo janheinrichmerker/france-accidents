@@ -39,6 +39,7 @@ type Dimension
     = DimensionUnharmedPersons
     | DimensionInjuredPersons
     | DimensionKilledPersons
+    | DimensionKilledOrInjuredPersons
     | DimensionPersons
 
 
@@ -84,7 +85,7 @@ init : ( Model, Cmd Msg )
 init =
     ( { timestamp = Nothing
       , aspectRatio = AspectRatioBanking45
-      , dimension = DimensionKilledPersons
+      , dimension = DimensionKilledOrInjuredPersons
       , reference = ReferenceAbsolute
       , group = GroupByYear
       , aggregate = AggregatePerMonth
@@ -178,6 +179,9 @@ computeDimension model accidents =
 
                 DimensionKilledPersons ->
                     isKilled
+
+                DimensionKilledOrInjuredPersons ->
+                    \p -> isKilled p || isInjured p
 
                 DimensionPersons ->
                     \_ -> True
@@ -355,6 +359,9 @@ dimensionLabel dimension =
         DimensionKilledPersons ->
             "killed persons"
 
+        DimensionKilledOrInjuredPersons ->
+            "killed or injured persons"
+
 
 dimensionSelectorOption : Model -> Dimension -> Html Msg
 dimensionSelectorOption model dimension =
@@ -377,7 +384,8 @@ dimensionSelector model =
         options =
             List.map
                 option
-                [ DimensionKilledPersons
+                [ DimensionKilledOrInjuredPersons
+                , DimensionKilledPersons
                 , DimensionInjuredPersons
                 , DimensionUnharmedPersons
                 , DimensionPersons
