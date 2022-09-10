@@ -197,12 +197,12 @@ type VehicleCategory
     | VehicleCategoryLightVehicleOnly
     | VehicleCategoryLightVehicleWithCaravan
     | VehicleCategoryLightVehicleWithTrailer
-    | VehicleCategoryCommercialVehicleOnlyWeightRatingAtLeast1_5TAtMost3_5T
-    | VehicleCategoryCommercialVehicleWithCaravanWeightRatingAtLeast1_5TAtMost3_5T
-    | VehicleCategoryCommercialVehicleWithTrailerWeightRatingAtLeast1_5TAtMost3_5T
-    | VehicleCategoryTruckOnlyWeightRatingMoreThan3_5TAtMost7_5T
-    | VehicleCategoryTruckOnlyWeightRatingMoreThan7_5T
-    | VehicleCategoryTruckMoreThan3_5TWithTrailer
+    | VehicleCategoryCommercialVehicleOnlyWeightRatingAtLeast1Point5TAtMost3Point5T
+    | VehicleCategoryCommercialVehicleWithCaravanWeightRatingAtLeast1Point5TAtMost3Point5T
+    | VehicleCategoryCommercialVehicleWithTrailerWeightRatingAtLeast1Point5TAtMost3Point5T
+    | VehicleCategoryTruckOnlyWeightRatingMoreThan3Point5TAtMost7Point5T
+    | VehicleCategoryTruckOnlyWeightRatingMoreThan7Point5T
+    | VehicleCategoryTruckMoreThan3Point5TWithTrailer
     | VehicleCategoryRoadTractorOnly
     | VehicleCategoryRoadTractorWithSemiTrailer
     | VehicleCategoryPublicTransport

@@ -592,22 +592,22 @@ vehicleCategory =
                         succeed VehicleCategoryLightVehicleWithTrailer
 
                     "COMMERCIAL_VEHICLE_ONLY_WEIGHT_RATING_AT_LEAST_1_5_T_AT_MOST_3_5_T" ->
-                        succeed VehicleCategoryCommercialVehicleOnlyWeightRatingAtLeast1_5TAtMost3_5T
+                        succeed VehicleCategoryCommercialVehicleOnlyWeightRatingAtLeast1Point5TAtMost3Point5T
 
                     "COMMERCIAL_VEHICLE_WITH_CARAVAN_WEIGHT_RATING_AT_LEAST_1_5_T_AT_MOST_3_5_T" ->
-                        succeed VehicleCategoryCommercialVehicleWithCaravanWeightRatingAtLeast1_5TAtMost3_5T
+                        succeed VehicleCategoryCommercialVehicleWithCaravanWeightRatingAtLeast1Point5TAtMost3Point5T
 
                     "COMMERCIAL_VEHICLE_WITH_TRAILER_WEIGHT_RATING_AT_LEAST_1_5_T_AT_MOST_3_5_T" ->
-                        succeed VehicleCategoryCommercialVehicleWithTrailerWeightRatingAtLeast1_5TAtMost3_5T
+                        succeed VehicleCategoryCommercialVehicleWithTrailerWeightRatingAtLeast1Point5TAtMost3Point5T
 
                     "TRUCK_ONLY_WEIGHT_RATING_MORE_THAN_3_5_T_AT_MOST_7_5_T" ->
-                        succeed VehicleCategoryTruckOnlyWeightRatingMoreThan3_5TAtMost7_5T
+                        succeed VehicleCategoryTruckOnlyWeightRatingMoreThan3Point5TAtMost7Point5T
 
                     "TRUCK_ONLY_WEIGHT_RATING_MORE_THAN_7_5_T" ->
-                        succeed VehicleCategoryTruckOnlyWeightRatingMoreThan7_5T
+                        succeed VehicleCategoryTruckOnlyWeightRatingMoreThan7Point5T
 
                     "TRUCK_MORE_THAN_3_5_T_WITH_TRAILER" ->
-                        succeed VehicleCategoryTruckMoreThan3_5TWithTrailer
+                        succeed VehicleCategoryTruckMoreThan3Point5TWithTrailer
 
                     "ROAD_TRACTOR_ONLY" ->
                         succeed VehicleCategoryRoadTractorOnly
