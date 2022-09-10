@@ -3,7 +3,7 @@ module Visualization2 exposing (..)
 import Axis
 import Color exposing (black)
 import Dict
-import Html.Styled exposing (Html, br, div, form, fromUnstyled, option, select, text)
+import Html.Styled exposing (Html, div, form, fromUnstyled, option, select, text)
 import Html.Styled.Attributes exposing (selected)
 import Html.Styled.Events exposing (onClick)
 import List.Statistics
