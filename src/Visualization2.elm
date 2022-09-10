@@ -107,26 +107,16 @@ filterByBounds range accidents =
     accidents |> List.filter isAccidentInBounds
 
 
-latitudeScale : GeoCoordinatesBounds -> ( Float, Float ) -> ContinuousScale Float
-latitudeScale ( ( min, _ ), ( max, _ ) ) =
-    Scale.linear ( min, max )
-
-
-longitudeScale : GeoCoordinatesBounds -> ( Float, Float ) -> ContinuousScale Float
-longitudeScale ( ( _, min ), ( _, max ) ) =
-    Scale.linear ( min, max )
-
-
 toGridGroupKey : Int -> Int -> GeoCoordinatesBounds -> GeoCoordinates -> Int
-toGridGroupKey cols rows bounds ( lat, long ) =
+toGridGroupKey cols rows ( ( minLat, minLong ), ( maxLat, maxLong ) ) ( lat, long ) =
     let
         scaleLat : ContinuousScale Float
         scaleLat =
-            latitudeScale bounds ( 0, toFloat rows )
+            Scale.linear ( 0, toFloat rows ) ( minLat, maxLat )
 
         scaleLong : ContinuousScale Float
         scaleLong =
-            longitudeScale bounds ( 0, toFloat cols )
+            Scale.linear ( 0, toFloat cols ) ( minLong, maxLong )
 
         row : Int
         row =
@@ -136,11 +126,7 @@ toGridGroupKey cols rows bounds ( lat, long ) =
         col =
             Scale.convert scaleLong long |> floor
     in
-    Debug.log "row" row
-
-
-
---+ col * rows
+    row + col * rows
 
 
 toGroupKey : Group -> GeoCoordinatesBounds -> Accident -> Int
