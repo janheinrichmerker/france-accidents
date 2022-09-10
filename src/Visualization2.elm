@@ -188,8 +188,8 @@ groupedCoordinatePoints group accidents =
         |> List.map reverseTuple
 
 
-marker : Svg msg
-marker =
+marker : List Float -> Svg msg
+marker _ =
     circle
         [ TypedSvg.Attributes.r (Px 2)
         , TypedSvg.Attributes.fill (Paint black)
@@ -199,8 +199,30 @@ marker =
         []
 
 
-point : ContinuousScale Float -> ContinuousScale Float -> CoordinatesPoint -> Svg msg
-point scaleX scaleY ( coordinates, dimensions ) =
+markers : List (List Float) -> Svg msg
+markers data =
+    let
+        markersList : List (Svg msg)
+        markersList =
+            data |> List.map marker
+    in
+    g
+        []
+        (markersList
+            ++ [ text_
+                    [ TypedSvg.Attributes.x (Px 0)
+                    , TypedSvg.Attributes.y (Px 0)
+                    , TypedSvg.Attributes.textAnchor AnchorMiddle
+                    ]
+                    [ -- todo
+                      TypedSvg.Core.text "Point"
+                    ]
+               ]
+        )
+
+
+point : ContinuousScale Float -> ContinuousScale Float -> ( Coordinates, List (List Float) ) -> Svg msg
+point scaleX scaleY ( coordinates, data ) =
     let
         ( latitude, longitude ) =
             coordinates
@@ -215,7 +237,7 @@ point scaleX scaleY ( coordinates, dimensions ) =
                 (Scale.convert scaleY latitude)
             ]
         ]
-        [ marker
+        [ markers data
         , text_
             [ TypedSvg.Attributes.x (Px 0)
             , TypedSvg.Attributes.y (Px 0)
