@@ -312,17 +312,17 @@ markers : Display -> List StickFigureData -> List (Svg msg)
 markers display data =
     case display of
         DisplayXray ->
-            data
-                |> List.map (stickFigure 1)
-
-        DisplayAverage ->
             let
                 opacity =
                     1 / toFloat (List.length data)
             in
             data
+                |> List.map (stickFigure opacity)
+
+        DisplayAverage ->
+            data
                 |> meanDimensions
-                |> Maybe.map (stickFigure opacity)
+                |> Maybe.map (stickFigure 1)
                 |> Maybe.map List.singleton
                 |> Maybe.withDefault []
 
