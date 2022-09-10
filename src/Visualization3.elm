@@ -210,6 +210,7 @@ update msg model =
 
         ToggleDimension idx active ->
             let
+                dimensions : ( Reorderable PartitionerDimension, List PartitionerDimension )
                 dimensions =
                     ( model.enabledDimensions, model.disabledDimensions )
 
@@ -350,9 +351,11 @@ treemapNode axis w h node =
             List.map
                 (\tree ->
                     let
+                        weight : Int
                         weight =
                             Tree.label tree
 
+                        relativeWeight : Float
                         relativeWeight =
                             toFloat weight / toFloat parentWeight
                     in
@@ -371,6 +374,7 @@ treemapNode axis w h node =
                 ( 0, [] )
                 expandedChildTrees
 
+        groups : List (Svg Msg)
         groups =
             List.map
                 (\( offset, weight, tree ) ->

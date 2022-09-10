@@ -99,9 +99,11 @@ hashString string =
 isBetween : number -> number -> number -> Bool
 isBetween bound1 bound2 value =
     let
+        boundMin : number
         boundMin =
             min bound1 bound2
 
+        boundMax : number
         boundMax =
             max bound1 bound2
     in

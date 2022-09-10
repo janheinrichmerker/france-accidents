@@ -2,7 +2,7 @@ module Visualization1 exposing (..)
 
 import Axis
 import Color exposing (black)
-import Dict exposing (Dict)
+import Dict
 import Html.Styled exposing (Html, div, form, fromUnstyled, h3, option, select, text)
 import Html.Styled.Attributes exposing (selected)
 import Html.Styled.Events exposing (onClick)
@@ -19,14 +19,14 @@ import TimeUtils exposing (removeYear, retainMonth, retainQuarter, retainWeek, r
 import TypedSvg exposing (g, svg, text_)
 import TypedSvg.Attributes
 import TypedSvg.Core exposing (Svg)
-import TypedSvg.Types exposing (Align(..), AnchorAlignment(..), Length(..), MeetOrSlice(..), Opacity(..), Paint(..), Scale(..), Transform(..))
+import TypedSvg.Types exposing (Align(..), Length(..), MeetOrSlice(..), Opacity(..), Paint(..), Scale(..), Transform(..))
 import Utils exposing (mapConsecutive, reverseTuple, toBucketDict)
 
 
 type AspectRatio
     = AspectRatioSquare
-    | AspectRatio2to1
-    | AspectRatio16to9
+    | AspectRatio2To1
+    | AspectRatio16To9
     | AspectRatioBanking45
 
 
@@ -295,15 +295,16 @@ toPoints2D model accidents =
 aspectRatioSelectorOption : Model -> AspectRatio -> Html Msg
 aspectRatioSelectorOption model aspectRatio =
     let
+        name : String
         name =
             case aspectRatio of
                 AspectRatioBanking45 ->
                     "Banking to 45 degrees"
 
-                AspectRatio16to9 ->
+                AspectRatio16To9 ->
                     "16:9"
 
-                AspectRatio2to1 ->
+                AspectRatio2To1 ->
                     "2:1"
 
                 AspectRatioSquare ->
@@ -333,8 +334,8 @@ aspectRatioSelector model =
                 option
                 [ AspectRatioBanking45
                 , AspectRatioSquare
-                , AspectRatio2to1
-                , AspectRatio16to9
+                , AspectRatio2To1
+                , AspectRatio16To9
                 ]
     in
     form
@@ -608,10 +609,10 @@ computeAspectRatio model data =
         AspectRatioSquare ->
             1 / 1
 
-        AspectRatio2to1 ->
+        AspectRatio2To1 ->
             2 / 1
 
-        AspectRatio16to9 ->
+        AspectRatio16To9 ->
             16 / 9
 
         AspectRatioBanking45 ->

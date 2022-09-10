@@ -15,6 +15,7 @@ type Quarter
 quarter : DateTime -> Quarter
 quarter date =
     let
+        mon : Int
         mon =
             month date
     in
@@ -34,6 +35,7 @@ quarter date =
 setQuarterMonth : Int -> DateTime -> DateTime
 setQuarterMonth quarterMonth date =
     let
+        offset : number
         offset =
             case quarter date of
                 FirstQuarter ->

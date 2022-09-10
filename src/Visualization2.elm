@@ -533,9 +533,11 @@ markers display data =
     case display of
         DisplayXray ->
             let
+                opacityScale : ContinuousScale Float
                 opacityScale =
                     Scale.linear ( 0.05, 1 ) ( 0, 1 )
 
+                opacity : Float
                 opacity =
                     data
                         |> List.length
@@ -604,9 +606,11 @@ scatterplot backgroundUrl range display data =
         ( ( minLatitude, minLongitude ), ( maxLatitude, maxLongitude ) ) =
             range
 
+        latitudeRange : ( Float, Float )
         latitudeRange =
             ( minLatitude, maxLatitude )
 
+        longitudeRange : ( Float, Float )
         longitudeRange =
             ( minLongitude, maxLongitude )
 
