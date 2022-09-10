@@ -5,17 +5,59 @@
 \usepackage[utf8]{inputenc}
 \usepackage{hyperref}
 \usepackage{amssymb}
-% Don't change dimensions.
-\usepackage[left=2cm, right=2cm, top=2cm, bottom=2cm, bindingoffset=1cm, includeheadfoot]{geometry}
-% Don't change spacing.
-\usepackage[onehalfspacing]{setspace}
+\usepackage[left=2cm, right=2cm, top=2cm, bottom=2cm, bindingoffset=1cm, includeheadfoot]{geometry} % Don't change dimensions.
+\usepackage[onehalfspacing]{setspace} % Don't change spacing.
 \usepackage[backend=biber,style=numeric]{biblatex}
 \usepackage{csquotes}
 \usepackage{relsize}
 \usepackage{xcolor}
 \usepackage{xspace}
 \usepackage{xurl}
+\usepackage{listings}
+\usepackage{listingsutf8}
 \addbibresource{literature.bib}
+
+% Listings
+\definecolor{mediumgray}{gray}{0.60}
+\definecolor{webiscodebasic}{rgb}{0.2,0.2,0.2}
+\definecolor{webiscodekeyword}{rgb}{0.0,0.5,0.0}
+\definecolor{webiscodekeywordself}{rgb}{0.7,0.4,0.6}
+\definecolor{webiscodeidentifier}{rgb}{0.0,0.0,0.0}
+\definecolor{webiscodecomment}{rgb}{0.25,0.5,0.5}
+\definecolor{webiscodestring}{rgb}{0.75,0.12,0.12}
+\definecolor{webiscodedecorator}{rgb}{0.6,0.3,0.0}
+\lstdefinestyle{webisstyle}{
+  basicstyle=\ttfamily\color{webiscodebasic},
+  keywordstyle=\color{webiscodekeyword},
+  identifierstyle=\color{webiscodeidentifier},
+  commentstyle=\color{webiscodecomment},
+  stringstyle=\color{webiscodestring},
+  showstringspaces=false,
+  frame=lines,
+  framesep=0.7em,
+  rulesep=0.5em,
+  framerule=0.1em,
+  keepspaces=true,
+  tabsize=2,
+  showtabs=false,
+  numbers=none,
+  literate=
+    {->}{{\textrightarrow}}{2}
+    {>=}{{\(\geq\)}}{2}
+    {<=}{{\(\leq\)}}{2}
+    {!=}{{\(\neq\)}}{2},
+}
+\lstloadlanguages{Haskell}
+\lstset{
+  style=webisstyle,
+  language=Haskell,
+  emph={[1]def,class},
+  emphstyle={[1]\color{webiscodekeyword}\bfseries},
+  emph={[2]self,cls},
+  emphstyle={[2]\color{webiscodekeywordself}},
+  emph={[3]@dataclass},
+  emphstyle={[3]\color{webiscodedecorator}},
+}
 
 % Itemization:
 \newcommand{\Ni}{(1)~}
@@ -123,6 +165,8 @@ Fassen sie die Beiträge ihre Visualisierungs-Anwendung zusammen. Wo bietet sie 
 Was wären mögliche sinnvolle Erweiterungen, entweder auf der Ebene der Visualisierungen und/oder auf der Datenebene?
 
 \section*{Appendix: Git History}
+% Generate with: git --no-pager log --all --graph --no-color --date=short --pretty='format:%h%d (%s, %ad)'
+% \lstinputlisting[language=,basicstyle=\ttfamily\tiny]{git-log.txt}
 
 \printbibliography
 
