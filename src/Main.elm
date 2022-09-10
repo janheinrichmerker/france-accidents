@@ -45,7 +45,7 @@ init _ _ _ =
         loadAccidentsCmd : Cmd Msg
         loadAccidentsCmd =
             Http.get
-                { url = "/data/accidents-sample.jsonl"
+                { url = "./data/accidents-sample.jsonl"
                 , expect = expectAccidentJsonLines GotAccidentsData
                 }
     in
