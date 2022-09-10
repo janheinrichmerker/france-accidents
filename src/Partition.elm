@@ -1,4 +1,4 @@
-module Partition exposing (..)
+module Partition exposing (Filter, Partitioner, Partitioners, Partitions, equalityPartitioner, maybeEqualityPartitioner, partitionTree)
 
 import Tree exposing (Tree)
 

@@ -1,4 +1,4 @@
-module TreeUtils exposing (..)
+module TreeUtils exposing (toTreeDiagram)
 
 import Tree exposing (Tree)
 import TreeDiagram

@@ -1,4 +1,4 @@
-module Utils exposing (..)
+module Utils exposing (hashString, isBetween, mapConsecutive, reverseTuple, sortTuple, toBucketDict, tupleMax, tupleMean)
 
 import Char exposing (toCode)
 import Dict exposing (Dict)

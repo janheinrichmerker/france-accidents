@@ -1,4 +1,4 @@
-module TimeUtils exposing (..)
+module TimeUtils exposing (Quarter, removeYear, retainMonth, retainQuarter, retainWeek, retainYear)
 
 import Time exposing (Posix)
 import Time.Date exposing (Weekday(..))
