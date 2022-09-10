@@ -475,8 +475,15 @@ markers display data =
     case display of
         DisplayXray ->
             let
+                opacityScale =
+                    Scale.linear ( 0.05, 1 ) ( 0, 1 )
+
                 opacity =
-                    1 / toFloat (List.length data)
+                    data
+                        |> List.length
+                        |> toFloat
+                        |> (\x -> 1 / x)
+                        |> Scale.convert opacityScale
             in
             data
                 |> List.map (stickFigure opacity)
