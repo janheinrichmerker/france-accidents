@@ -89,7 +89,7 @@ initEnabledDimensions =
             ]
       )
     , ( DimensionRoadCategory
-      , equalityPartitioner .road_category
+      , equalityPartitioner .roadCategory
             [ RoadCategoryHighway
             , RoadCategoryNationalRoad
             , RoadCategoryDepartmentalRoad
@@ -149,7 +149,7 @@ initDisabledDimensions =
             ]
       )
     , ( DimensionTrafficRegime
-      , maybeEqualityPartitioner .traffic_regime
+      , maybeEqualityPartitioner .trafficRegime
             [ TrafficRegimeOneWay
             , TrafficRegimeBidirectional
             , TrafficRegimeWithSeparateLanes
@@ -157,7 +157,7 @@ initDisabledDimensions =
             ]
       )
     , ( DimensionDedicatedLane
-      , maybeEqualityPartitioner .dedicated_lane
+      , maybeEqualityPartitioner .dedicatedLane
             [ DedicatedLaneNone
             , DedicatedLaneBicyclePath
             , DedicatedLaneCycleLane
