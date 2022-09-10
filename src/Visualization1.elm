@@ -67,8 +67,7 @@ type alias Model =
 
 
 type Msg
-    = NoOp
-    | GotTime Posix
+    = GotTime Posix
     | SelectAspectRatio AspectRatio
     | SelectDimension Dimension
     | SelectReference Reference
@@ -97,9 +96,6 @@ init =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NoOp ->
-            ( model, Cmd.none )
-
         GotTime posix ->
             ( { model | timestamp = Just posix }, Cmd.none )
 

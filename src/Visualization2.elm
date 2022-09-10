@@ -57,8 +57,7 @@ type alias Model =
 
 
 type Msg
-    = NoOp
-    | SelectGroup Group
+    = SelectGroup Group
     | SelectDisplay Display
 
 
@@ -81,9 +80,6 @@ init =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NoOp ->
-            ( model, Cmd.none )
-
         SelectGroup group ->
             ( { model | group = group }, Cmd.none )
 

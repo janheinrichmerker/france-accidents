@@ -54,8 +54,7 @@ type MoveDirection
 
 
 type Msg
-    = NoOp
-    | SelectTreeLayout TreeLayout
+    = SelectTreeLayout TreeLayout
     | MoveDimension Int MoveDirection
     | ToggleDimension Int Bool
 
@@ -188,9 +187,6 @@ partitioners model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NoOp ->
-            ( model, Cmd.none )
-
         SelectTreeLayout layout ->
             ( { model | treeLayout = layout }, Cmd.none )
 
