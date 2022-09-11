@@ -1,6 +1,12 @@
 \section{Data}
+\label{data}
+% Preprocessing with Python
 \todo{Beschreiben Sie vorhandenen Daten. Gehen Sie kritisch darauf ein, inwieweit sich die Daten für die Bearbeitung der Fragestellungen und dem Erreichen von Lösungen für die oben beschriebene Zielgruppen eignen. Haben sie die Daten sinnvoll mit weiteren Datenquellen ergänzt? Wenn ja, wie?
 Erklären Sie die technische Bereitstellung der Daten.
 Wie sind die Daten zugänglich? Welche Formate werden genutzt. Gibt es Besonderheiten beim Lesen der Formate?
 Beschreiben Sie die Datenvorverarbeitung.
-Welche Datenvorverarbeitungsschritte sind notwendig? Beschreiben Sie die einzelnen Schritte und begründen Sie sie, zum Beispiel warum werden manche Daten weggelassen, über welche Mengen werden Durchschnitte berechnet, warum sind die so berechneten Werte aussagekräftiger als andere Werte. Wenn möglich sollen sie die Datenvorverarbeitung in Elm programmieren, sodass ihre Anwendung auf eine Änderung der Rohdaten reagieren kan.}
+Welche Datenvorverarbeitungsschritte sind notwendig? Beschreiben Sie die einzelnen Schritte und begründen Sie sie, zum Beispiel warum werden manche Daten weggelassen, über welche Mengen werden Durchschnitte berechnet, warum sind die so berechneten Werte aussagekräftiger als andere Werte. Wenn möglich sollen sie die Datenvorverarbeitung in Elm programmieren, sodass ihre Anwendung auf eine Änderung der Rohdaten reagieren kann.}
+% Export JSONL
+After preprocessing the data once, we bundle the accident dataset as static resource. Because of the large size of the aggregated dataset~(1065053~accidents/lines or 2~GB disk size), we derive a smaller subset of the dataset by uniformly sampling 10\,000 random accidents from the whole dataset~(19~MB disk space). This way we extract a dataset that can be used with regular web browsers on common consumer hardware.
+To account for sampling biases, we have tested the visualizations with 3~different samples and found that the samples an well represent the whole dataset.
+In our visualization application implementation in the Elm language, we then model and parse the exported JSON data structures~(cf.~Section~\ref{implementation}).
