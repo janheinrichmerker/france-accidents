@@ -19,6 +19,7 @@ We propose three interactive visualizations by first analysing a set of tasks ou
         6 & Where are unproportionately more people killed in traffic? & policy maker \\
         7 & Do dedicated bicycle lanes make roads safer for cyclists? & citizen, policy maker, infrastructure planner \\
         8 & Are wider roads safer than narrow roads? & citizen, infrastructure planner \\
+        9 & Do women drive more carefully? & policy maker \\
         \bottomrule
     \end{tabularx}
 \end{table}
@@ -63,12 +64,6 @@ When users choose to aggregate the accidents across all years, it would also see
 \subsubsection{Geographical Map with Person Characteristics Stick Figures}
 \begin{figure}
     \centering
-    \includegraphics[width=0.6\linewidth]{figures/stick-figures-by-grid-20-20-average.png}
-    \caption{Stick figure icons of average person characteristics on a map of France after partitioning the map into a \(20 \times 20\)~grid.}
-    \label{figure-stick-figures-grid-average}
-\end{figure}
-\begin{figure}
-    \centering
     \includegraphics[width=0.6\linewidth]{figures/stick-figures-by-grid-10-10-xray.png}
     \caption{Stick figure icons of person characteristics on a map of France after partitioning the map into a \(10 \times 10\)~grid. Each group's stick figures are overlayed in x-ray style.}
     \label{figure-stick-figures-grid-xray}
@@ -81,7 +76,7 @@ When users choose to aggregate the accidents across all years, it would also see
 \end{figure}
 To visualize geographical characteristics of involved persons, we display stick figure icons~\cite{PickettG1988} of aggregated person groups on an equirectanguular geographical map projection of France\footnote{\url{https://commons.wikimedia.org/wiki/File:France_location_map-Regions_and_departements-2016.svg}}.
 Users can either choose to display one single stick figure per group, visualizing the average values of that group, or to display each instance within a group as a separate stick figure, following the x-ray design pattern.
-Figures~\ref{figure-stick-figures-grid-average}, \ref{figure-stick-figures-grid-xray}, and~\ref{figure-stick-figures-departments-average} illustrate this visualization.
+Figures~\ref{figure-stick-figures-grid-xray} and~\ref{figure-stick-figures-departments-average} illustrate this visualization.
 In this second visualization, the dominating mental model is geographical position, which is commonly associated with maps. Hence, we map the geographical position to coordinates on the map. As we want users to quickly spot patterns in the displayed data, i.e., differences across regions of the map, textures are a good visualizions technique.
 By plotting stick figures on a grid of the map, such a texture can emerge. We map the following 5~characteristics to the 5~angles of each stick figure:
 \begin{description}
