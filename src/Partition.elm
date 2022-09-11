@@ -89,5 +89,5 @@ partitionTreeHelp partitioners labels elements =
                     partitions |> List.map mapPartition
             in
             Tree.tree
-                ( elements, [] )
+                ( elements, labels )
                 (mapPartitions firstPartitions)
