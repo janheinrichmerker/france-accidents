@@ -50,7 +50,7 @@ init _ _ _ =
                 }
     in
     ( { accidents = Loading
-      , currentVisualization = CurrentVisualization2
+      , currentVisualization = CurrentVisualization1
       , visualization1 = model1
       , visualization2 = model2
       , visualization3 = model3
