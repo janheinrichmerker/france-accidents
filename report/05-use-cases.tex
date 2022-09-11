@@ -31,5 +31,16 @@ In contrast to other visualization techniques such as Chernoff faces, the stick 
 However, other icon-based techniques might work better to emphasize differences in the other 4~plotted dimensions, because with stick figures smaller differences only result in barely noticable angular changes in the stick figure.
 In our visualization application this limitation can be avoided by selecting the x-ray stick figure style as then the individual stick figures differ more than with averaging, resulting in greater differences of the stick figure angles.
 
-\subsection{Third Visualization Use Case}
-\todo{Präsentieren sie für jede der drei Visualisierungen einen sinnvollen Anwendungsfall in dem ein bestimmter Fakt, ein Muster oder die Abwesenheit eines Musters visuell festgestellt wird. Begründen Sie, warum dieser Anwendungsfall wichtig für die Zielgruppe der Anwenderinnen ist. Diskutieren Sie weiterhin, ob die oben beschriebene Information auch mit anderen Visualisierungstechniken hätte gefunden werden können. Falls dies möglich wäre, vergleichen sie die den Aufwand und die Schwierigkeiten ihres Ansatzes und möglicher Alternativen.}
+\subsection{Rainy Nights}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\linewidth]{figures/tree-treemap-weather-light-condition.png}
+    \caption{Tree map of accidents by weather and light condition.}
+    \label{figure-treemap-weather-light-condition}
+\end{figure}
+Our last use case is a public infrastudture planner wondering where the current infrastrucure might not suffice in mitigating road accidents. Because they are aware that the majority of accidents occurs under normal conditions~(i.e., with normal weather and in daylight), they would like to identify unexpectedly high numbers of accidents, specifically targetting the public lighting.
+This use case is relevant because after decades of development in public infrastructure planning, good starting points for infrastructure projects are not always obvious to find. 
+In the treemap visualization they therefore select the weather dimension followed by the light condition dimension.
+The resulting treemap is shown in Figure~\ref{figure-treemap-weather-light-condition} and indicates that indeed the majority~(5769~accidents) occur in daylight when the weather conditions are normal.
+However, by comparing the number of accidents with public lighting enabled, the treemap indicates that when it rains disproportionately many accidents occur with enabled public lighting. Hence, it would make sense to investigate whether the lights are either too dimmed, leading to limited visibility, or too bright, blinding drivers that pass public lighting.
+Even though in this case only three dimensions~(weather, light condition, number of accidents) are visualized, the treemap visualizaiton is still inferior to a scatterplot, because in a scatterplot the number of accidents~(clusters of points in the plot) would not be as easy to interpret as with a treemap node's area.

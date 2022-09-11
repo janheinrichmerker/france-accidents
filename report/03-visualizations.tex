@@ -96,9 +96,9 @@ This technique still allows for visualizing trends but, for example, we can now 
 \subsubsection{Accident Type Treemap}
 \begin{figure}
     \centering
-    \includegraphics[width=0.6\linewidth]{figures/tree-treemap-weather-light-condition.png}
-    \caption{Tree map of accidents by weather and light condition.}
-    \label{figure-treemap-weather-light-condition}
+    \includegraphics[width=0.6\linewidth]{figures/tree-treemap-road-category-road-profile-road-curvature.png}
+    \caption{Tree map of accidents by road category, provile, and curvature.}
+    \label{figure-treemap-road-category-profile-curvature}
 \end{figure}
 \begin{figure}
     \centering
@@ -108,7 +108,7 @@ This technique still allows for visualizing trends but, for example, we can now 
 \end{figure}
 Our third visualizaiton focuses on the task of identifying categories in which road accidents most often happen. We implement this task by first clustering the accident dataset hierarchically by multiple categorical dimensions where the number of accidents that fall into each set of categories represents a weight. The resulting weighted tree can then be displayed in three different ways: \Ni as a nested list, \Nii as a graph, and \Niii as a treemap~\cite{Shneiderman1992}.
 Users can also reorder the dimensions across which the tree is partitioned, and they can enable or disable partitioning for specific dimensions.
-Figures~\ref{figure-treemap-weather-light-condition} and~\ref{figure-treemap-many} illustrate the treemap visualization.
+Figures~\ref{figure-treemap-road-category-profile-curvature} and~\ref{figure-treemap-many} illustrate the treemap visualization.
 Because the dataset contains many nominal dimensions~(cf. Section~\ref{data}) visually mapping accidents to length or angles would make the visualization less effective. Instead, for nominal data mapping to areas where similar areas are close together is more effective.
 In the graph view this mental connection is supported by connecting the graph's nodes with a line. On a treemap, this connection is achieved by placing the rectangles of child categories inside the rectangle of their parent category, satisfying the mapping methodology of surrounding.
 It is easier for users to read an individual category's description in the graph and list views. By showing category names of node in the treemap when a user hovers their mouse cursor above the corresponding rectangle, we circumvent this limitation.
