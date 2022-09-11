@@ -8,7 +8,6 @@ import Html.Styled.Attributes exposing (selected)
 import Html.Styled.Events exposing (onClick)
 import List.Extra
 import Model exposing (Accident, Person, Severity(..), Vehicle)
-import Partition exposing (Filter)
 import Path exposing (Path)
 import Scale exposing (ContinuousScale)
 import Shape
@@ -68,7 +67,7 @@ type alias Model =
 
 
 type Msg
-    = SetGlobalFilter (Filter Accident String)
+    = SetGlobalFilteredAccidents (List Accident) String
     | GotTime Posix
     | SelectAspectRatio AspectRatio
     | SelectDimension Dimension
@@ -116,7 +115,7 @@ update msg model =
         SelectAggregate aggregateX ->
             ( { model | aggregate = aggregateX }, Cmd.none )
 
-        SetGlobalFilter _ ->
+        SetGlobalFilteredAccidents _ _ ->
             -- Handled in Main module.
             ( model, Cmd.none )
 

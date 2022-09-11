@@ -9,7 +9,6 @@ import Html.Styled.Attributes exposing (css)
 import Html.Styled.Events exposing (onClick)
 import Http
 import Model exposing (Accident, Resource(..))
-import Partition exposing (Filter)
 import Url exposing (Url)
 import Visualization1
 import Visualization2
@@ -24,7 +23,8 @@ type CurrentVisualization
 
 type alias Model =
     { accidents : Resource (List Accident)
-    , filter : Filter Accident String
+    , filteredAccidents : Resource (List Accident)
+    , filterName : String
     , currentVisualization : CurrentVisualization
     , visualization1 : Visualization1.Model
     , visualization2 : Visualization2.Model
@@ -52,7 +52,8 @@ init _ _ _ =
                 }
     in
     ( { accidents = Loading
-      , filter = ( \_ -> True, "all accidents" )
+      , filteredAccidents = Loading
+      , filterName = "no filter"
       , currentVisualization = CurrentVisualization1
       , visualization1 = model1
       , visualization2 = model2
@@ -70,7 +71,8 @@ init _ _ _ =
 type Msg
     = NoOp
     | GotAccidentsData (Result HttpJsonError (List Accident))
-    | SetFilter (Filter Accident String)
+    | SetFilteredAccidents (List Accident) String
+    | ResetFilter
     | SelectVisualization CurrentVisualization
     | VisualizationMsg1 Visualization1.Msg
     | VisualizationMsg2 Visualization2.Msg
@@ -80,8 +82,8 @@ type Msg
 mapVisualizationMsg1 : Visualization1.Msg -> Msg
 mapVisualizationMsg1 msg =
     case msg of
-        Visualization1.SetGlobalFilter filter ->
-            SetFilter filter
+        Visualization1.SetGlobalFilteredAccidents accidents name ->
+            SetFilteredAccidents accidents name
 
         _ ->
             VisualizationMsg1 msg
@@ -90,8 +92,8 @@ mapVisualizationMsg1 msg =
 mapVisualizationMsg2 : Visualization2.Msg -> Msg
 mapVisualizationMsg2 msg =
     case msg of
-        Visualization2.SetGlobalFilter filter ->
-            SetFilter filter
+        Visualization2.SetGlobalFilteredAccidents accidents name ->
+            SetFilteredAccidents accidents name
 
         _ ->
             VisualizationMsg2 msg
@@ -100,8 +102,8 @@ mapVisualizationMsg2 msg =
 mapVisualizationMsg3 : Visualization3.Msg -> Msg
 mapVisualizationMsg3 msg =
     case msg of
-        Visualization3.SetGlobalFilter filter ->
-            SetFilter filter
+        Visualization3.SetGlobalFilteredAccidents accidents name ->
+            SetFilteredAccidents accidents name
 
         _ ->
             VisualizationMsg3 msg
@@ -124,10 +126,13 @@ update msg model =
                         Err err ->
                             Failure (errorToString err)
             in
-            ( { model | accidents = resource }, Cmd.none )
+            ( { model | accidents = resource, filteredAccidents = resource }, Cmd.none )
 
-        SetFilter filter ->
-            ( { model | filter = filter }, Cmd.none )
+        SetFilteredAccidents accidents name ->
+            ( { model | filteredAccidents = Success accidents, filterName = name }, Cmd.none )
+
+        ResetFilter ->
+            ( { model | filteredAccidents = model.accidents, filterName = "no filter" }, Cmd.none )
 
         SelectVisualization vis ->
             ( { model | currentVisualization = vis }, Cmd.none )
@@ -166,7 +171,7 @@ onUrlChange _ =
 
 visualization : Model -> Html Msg
 visualization model =
-    case model.accidents of
+    case model.filteredAccidents of
         Failure message ->
             text ("Unable to load accidents: " ++ message)
 
@@ -174,29 +179,19 @@ visualization model =
             text "Loading accidents..."
 
         Success accidents ->
-            let
-                ( filterPredicate, filterName ) =
-                    model.filter
-
-                filtered : List Accident
-                filtered =
-                    accidents |> List.filter filterPredicate
-            in
             div []
-                [ text ("Current global filter: " ++ filterName)
-                , hr [] []
-                , case model.currentVisualization of
+                [ case model.currentVisualization of
                     CurrentVisualization1 ->
                         Html.Styled.map mapVisualizationMsg1
-                            (Visualization1.view model.visualization1 filtered)
+                            (Visualization1.view model.visualization1 accidents)
 
                     CurrentVisualization2 ->
                         Html.Styled.map mapVisualizationMsg2
-                            (Visualization2.view model.visualization2 filtered)
+                            (Visualization2.view model.visualization2 accidents)
 
                     CurrentVisualization3 ->
                         Html.Styled.map mapVisualizationMsg3
-                            (Visualization3.view model.visualization3 filtered)
+                            (Visualization3.view model.visualization3 accidents)
                 ]
 
 
@@ -245,6 +240,8 @@ siteHeader model =
             [ borderBottom3 (px 1) solid (rgb 0 0 0) ]
         ]
         [ h1 [] [ text "Accidents" ]
+        , text ("Current global filter: " ++ model.filterName)
+        , hr [] []
         , h2 [] [ text (visualizationLabel model.currentVisualization) ]
         ]
 

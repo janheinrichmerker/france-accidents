@@ -6,7 +6,7 @@ import Html.Styled.Attributes exposing (checked, selected, type_)
 import Html.Styled.Events exposing (onClick)
 import List.Extra
 import Model exposing (Accident, AtmosphericConditions(..), Collision(..), Curvature(..), DedicatedLane(..), Intersection(..), Light(..), LocationRegime(..), Profile(..), RoadCategory(..), TrafficRegime(..))
-import Partition exposing (Filter, Partitioner, Partitioners, equalityPartitioner, maybeEqualityPartitioner, partitionTree)
+import Partition exposing (Partitioner, Partitioners, equalityPartitioner, maybeEqualityPartitioner, partitionTree)
 import Reorderable exposing (Reorderable)
 import Tree exposing (Tree)
 import TreeDiagram
@@ -54,7 +54,7 @@ type MoveDirection
 
 
 type Msg
-    = SetGlobalFilter (Filter Accident String)
+    = SetGlobalFilteredAccidents (List Accident) String
     | SelectTreeLayout TreeLayout
     | MoveDimension Int MoveDirection
     | ToggleDimension Int Bool
@@ -218,7 +218,7 @@ update msg model =
             , Cmd.none
             )
 
-        SetGlobalFilter _ ->
+        SetGlobalFilteredAccidents _ _ ->
             -- Handled in Main module.
             ( model, Cmd.none )
 

@@ -10,7 +10,6 @@ import List.Extra
 import List.Statistics
 import Maybe.Extra
 import Model exposing (Accident, Person, TravelReason(..), Vehicle)
-import Partition exposing (Filter)
 import Round
 import Scale exposing (ContinuousScale)
 import TypedSvg exposing (g, image, line, svg, text_)
@@ -59,7 +58,7 @@ type alias Model =
 
 
 type Msg
-    = SetGlobalFilter (Filter Accident String)
+    = SetGlobalFilteredAccidents (List Accident) String
     | SelectGroup Group
     | SelectDisplay Display
 
@@ -89,7 +88,7 @@ update msg model =
         SelectDisplay display ->
             ( { model | display = display }, Cmd.none )
 
-        SetGlobalFilter _ ->
+        SetGlobalFilteredAccidents _ _ ->
             -- Handled in Main module.
             ( model, Cmd.none )
 
