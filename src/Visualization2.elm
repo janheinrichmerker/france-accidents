@@ -404,7 +404,7 @@ stickFigureHelp opacity v1 v2 v3 v4 v5 =
 
         scaleGamma : ContinuousScale Float
         scaleGamma =
-            Scale.linear ( 15, -45 ) ( 0, 1 )
+            Scale.linear ( -15, -45 ) ( 0, 1 )
 
         gamma : Float
         gamma =
@@ -420,7 +420,7 @@ stickFigureHelp opacity v1 v2 v3 v4 v5 =
 
         scaleEpsilon : ContinuousScale Float
         scaleEpsilon =
-            Scale.linear ( 15, -45 ) ( 0, 1 )
+            Scale.linear ( -15, -45 ) ( 0, 1 )
 
         epsilon : Float
         epsilon =
