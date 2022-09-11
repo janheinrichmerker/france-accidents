@@ -15,6 +15,7 @@ import Scale exposing (ContinuousScale)
 import TypedSvg exposing (g, image, line, svg, text_)
 import TypedSvg.Attributes
 import TypedSvg.Core exposing (Svg)
+import TypedSvg.Events
 import TypedSvg.Types exposing (Align(..), AnchorAlignment(..), Length(..), MeetOrSlice(..), Opacity(..), Paint(..), Transform(..))
 import Utils exposing (hashString, isBetween, reverseTuple, toBucketDict, tupleMax, tupleMean)
 
@@ -42,7 +43,7 @@ type alias GeoCoordinatesBounds =
 
 
 type alias GeoData =
-    List ( GeoCoordinates, List StickFigureData )
+    List ( GeoCoordinates, List Accident )
 
 
 type StickFigureData
@@ -370,18 +371,11 @@ accidentsToStickFigureData accidents =
     accidents |> List.concatMap accidentToStickFigureData
 
 
-groupedCoordinatePoints : Group -> GeoCoordinatesBounds -> List Accident -> List ( GeoCoordinates, List StickFigureData )
-groupedCoordinatePoints group bounds accidents =
-    let
-        mapAccidentData : ( List Accident, GeoCoordinates ) -> ( List StickFigureData, GeoCoordinates )
-        mapAccidentData accidentCoordinates =
-            accidentCoordinates
-                |> Tuple.mapFirst accidentsToStickFigureData
-    in
+groupedAccidents : Group -> GeoCoordinatesBounds -> List Accident -> List ( GeoCoordinates, List Accident )
+groupedAccidents group bounds accidents =
     accidents
         |> groupBy group bounds
         |> associateGroupCoordinates group bounds
-        |> List.map mapAccidentData
         |> List.map reverseTuple
 
 
@@ -558,15 +552,19 @@ markers display data =
                 |> Maybe.withDefault []
 
 
-point : ContinuousScale Float -> ContinuousScale Float -> Display -> ( GeoCoordinates, List StickFigureData ) -> Svg msg
+point : ContinuousScale Float -> ContinuousScale Float -> Display -> ( GeoCoordinates, List Accident ) -> Svg Msg
 point scaleX scaleY display ( coordinates, data ) =
     let
         ( latitude, longitude ) =
             coordinates
 
+        stickFigures : List StickFigureData
+        stickFigures =
+            accidentsToStickFigureData data
+
         pointLabel : String
         pointLabel =
-            data
+            stickFigures
                 |> meanDimensions
                 |> Maybe.map stickFigureLabel
                 |> Maybe.map (String.append ((data |> List.length |> String.fromInt) ++ " accidents: "))
@@ -581,8 +579,13 @@ point scaleX scaleY display ( coordinates, data ) =
                 (Scale.convert scaleX longitude)
                 (Scale.convert scaleY latitude)
             ]
+        , TypedSvg.Events.onClick
+            (SetGlobalFilteredAccidents
+                data
+                ("group from coordinates (" ++ Round.round 1 latitude ++ "," ++ Round.round 1 longitude ++ ")")
+            )
         ]
-        (markers display data
+        (markers display stickFigures
             ++ [ text_
                     [ TypedSvg.Attributes.x (Px 0)
                     , TypedSvg.Attributes.y (Px 0)
@@ -817,11 +820,11 @@ groupSelector model =
 view : Model -> List Accident -> Html Msg
 view model accidents =
     let
-        points : List ( GeoCoordinates, List StickFigureData )
+        points : List ( GeoCoordinates, List Accident )
         points =
             accidents
                 |> filterByBounds model.bounds
-                |> groupedCoordinatePoints model.group model.bounds
+                |> groupedAccidents model.group model.bounds
     in
     div
         []
