@@ -15,7 +15,7 @@ import TreeUtils exposing (toTreeDiagram)
 import TypedSvg exposing (svg)
 import TypedSvg.Attributes
 import TypedSvg.Core exposing (Svg)
-import TypedSvg.Types exposing (Align(..), AnchorAlignment(..), Length(..), MeetOrSlice(..), Paint(..), Scale(..), Transform(..))
+import TypedSvg.Types exposing (Align(..), AnchorAlignment(..), Length(..), MeetOrSlice(..), Opacity(..), Paint(..), Scale(..), Transform(..))
 
 
 type TreeLayout
@@ -38,7 +38,7 @@ type Dimension
 
 
 type alias PartitionerDimension =
-    ( Dimension, Partitioner Accident )
+    ( Dimension, Partitioner Accident String )
 
 
 type alias Model =
@@ -66,53 +66,31 @@ label =
 
 initEnabledDimensions : List PartitionerDimension
 initEnabledDimensions =
-    [ ( DimensionLight
-      , maybeEqualityPartitioner .light
-            [ LightDaylight
-            , LightDuskOrDawn
-            , LightNightWithoutPublicLighting
-            , LightNightWithPublicLightingOff
-            , LightNightWithPublicLightingOn
-            ]
-      )
-    , ( DimensionIntersection
-      , maybeEqualityPartitioner .intersection
-            [ IntersectionOutOfIntersection
-            , IntersectionXIntersection
-            , IntersectionTIntersection
-            , IntersectionYIntersection
-            , IntersectionIntersectionWithMoreThan4Branches
-            , IntersectionRoundabout
-            , IntersectionPlace
-            , IntersectionLevelCrossing
-            , IntersectionOtherIntersection
-            ]
-      )
-    , ( DimensionRoadCategory
+    [ ( DimensionRoadCategory
       , equalityPartitioner .roadCategory
-            [ RoadCategoryHighway
-            , RoadCategoryNationalRoad
-            , RoadCategoryDepartmentalRoad
-            , RoadCategoryMunicipalRoads
-            , RoadCategoryOffThePublicNetwork
-            , RoadCategoryParkingLotOpenToPublicTraffic
-            , RoadCategoryUrbanMetropolitanRoads
+            [ ( RoadCategoryHighway, "highway" )
+            , ( RoadCategoryNationalRoad, "national road" )
+            , ( RoadCategoryDepartmentalRoad, "departmental road" )
+            , ( RoadCategoryMunicipalRoads, "municipal road" )
+            , ( RoadCategoryOffThePublicNetwork, "off network" )
+            , ( RoadCategoryParkingLotOpenToPublicTraffic, "parking lot" )
+            , ( RoadCategoryUrbanMetropolitanRoads, "urban road" )
             ]
       )
     , ( DimensionProfile
       , maybeEqualityPartitioner .profile
-            [ ProfileFlat
-            , ProfileSlope
-            , ProfileTopOfHill
-            , ProfileBottomOfHill
+            [ ( ProfileFlat, "flat" )
+            , ( ProfileSlope, "slope" )
+            , ( ProfileTopOfHill, "top of hill" )
+            , ( ProfileBottomOfHill, "bottom of hill" )
             ]
       )
     , ( DimensionCurvature
       , maybeEqualityPartitioner .curvature
-            [ CurvatureStraight
-            , CurvatureLeftHandCurve
-            , CurvatureRightHandCurve
-            , CurvatureSCurve
+            [ ( CurvatureStraight, "straight" )
+            , ( CurvatureLeftHandCurve, "left" )
+            , ( CurvatureRightHandCurve, "right" )
+            , ( CurvatureSCurve, "s-curve" )
             ]
       )
     ]
@@ -120,48 +98,67 @@ initEnabledDimensions =
 
 initDisabledDimensions : List PartitionerDimension
 initDisabledDimensions =
-    [ ( DimensionAtmosphericConditions
+    [ ( DimensionLight
+      , maybeEqualityPartitioner .light
+            [ ( LightDaylight, "daylight" )
+            , ( LightDuskOrDawn, "dusk/dawn" )
+            , ( LightNightWithoutPublicLighting, "night no lighting" )
+            , ( LightNightWithPublicLightingOff, "night lighting off" )
+            , ( LightNightWithPublicLightingOn, "night lighting on" )
+            ]
+      )
+    , ( DimensionIntersection
+      , maybeEqualityPartitioner .intersection
+            [ ( IntersectionOutOfIntersection, "no intersection" )
+            , ( IntersectionXIntersection, "X" )
+            , ( IntersectionTIntersection, "T" )
+            , ( IntersectionYIntersection, "Y" )
+            , ( IntersectionIntersectionWithMoreThan4Branches, "> 4 branches" )
+            , ( IntersectionRoundabout, "roundabout" )
+            , ( IntersectionLevelCrossing, "level crossing" )
+            ]
+      )
+    , ( DimensionAtmosphericConditions
       , maybeEqualityPartitioner .atmosphericConditions
-            [ AtmosphericConditionsNormal
-            , AtmosphericConditionsLightRain
-            , AtmosphericConditionsHeavyRain
-            , AtmosphericConditionsSnowHail
-            , AtmosphericConditionsFogSmoke
-            , AtmosphericConditionsStrongWindStorm
-            , AtmosphericConditionsDazzlingWeather
-            , AtmosphericConditionsOvercastWeather
+            [ ( AtmosphericConditionsNormal, "normal" )
+            , ( AtmosphericConditionsLightRain, "light rain" )
+            , ( AtmosphericConditionsHeavyRain, "heavy rain" )
+            , ( AtmosphericConditionsSnowHail, "snow/hail" )
+            , ( AtmosphericConditionsFogSmoke, "fog/smoke" )
+            , ( AtmosphericConditionsStrongWindStorm, "strong wind/storm" )
+            , ( AtmosphericConditionsDazzlingWeather, "dazzling" )
+            , ( AtmosphericConditionsOvercastWeather, "overcast" )
             ]
       )
     , ( DimensionCollision
       , maybeEqualityPartitioner .collision
-            [ CollisionTwoVehiclesFront
-            , CollisionTwoVehiclesFromTheRear
-            , CollisionTwoVehiclesFromTheSide
-            , CollisionThreeOrMoreVehiclesInAChain
-            , CollisionThreeOrMoreVehiclesMultipleCollisions
-            , CollisionWithoutCollision
+            [ ( CollisionTwoVehiclesFront, "2 vehicles front" )
+            , ( CollisionTwoVehiclesFromTheRear, "2 vehicles rear" )
+            , ( CollisionTwoVehiclesFromTheSide, "2 vehicles side" )
+            , ( CollisionThreeOrMoreVehiclesInAChain, ">2 vehicles chain" )
+            , ( CollisionThreeOrMoreVehiclesMultipleCollisions, ">2 vehicles multiple" )
+            , ( CollisionWithoutCollision, "no collision" )
             ]
       )
     , ( DimensionLocationRegime
       , maybeEqualityPartitioner .location
-            [ LocationRegimeOutOfTown
-            , LocationRegimeInBuiltUpAreas
+            [ ( LocationRegimeOutOfTown, "out of town" )
+            , ( LocationRegimeInBuiltUpAreas, "built-up area" )
             ]
       )
     , ( DimensionTrafficRegime
       , maybeEqualityPartitioner .trafficRegime
-            [ TrafficRegimeOneWay
-            , TrafficRegimeBidirectional
-            , TrafficRegimeWithSeparateLanes
-            , TrafficRegimeWithVariableAssignmentLanes
+            [ ( TrafficRegimeOneWay, "one way" )
+            , ( TrafficRegimeBidirectional, "bidirectional" )
+            , ( TrafficRegimeWithSeparateLanes, "separate lanes" )
             ]
       )
     , ( DimensionDedicatedLane
       , maybeEqualityPartitioner .dedicatedLane
-            [ DedicatedLaneNone
-            , DedicatedLaneBicyclePath
-            , DedicatedLaneCycleLane
-            , DedicatedLaneReservedLane
+            [ ( DedicatedLaneNone, "no dedicated lane" )
+            , ( DedicatedLaneBicyclePath, "bike path" )
+            , ( DedicatedLaneCycleLane, "cycle lane" )
+            , ( DedicatedLaneReservedLane, "reserved lane" )
             ]
       )
     ]
@@ -177,7 +174,7 @@ init =
     )
 
 
-partitioners : Model -> Partitioners Accident
+partitioners : Model -> Partitioners Accident String
 partitioners model =
     model.enabledDimensions
         |> Reorderable.toList
@@ -266,8 +263,8 @@ drawLine ( targetX, targetY ) =
 
 {-| Represent nodes as circles with the node value inside.
 -}
-drawNode : Int -> Svg Msg
-drawNode name =
+drawNode : ( Int, String ) -> Svg Msg
+drawNode ( num, name ) =
     TypedSvg.g
         []
         [ TypedSvg.circle
@@ -282,14 +279,14 @@ drawNode name =
             [ TypedSvg.Attributes.textAnchor AnchorMiddle
             , TypedSvg.Attributes.transform [ Translate 0 5, Rotate 90 0 0 ]
             ]
-            [ TypedSvg.Core.text (String.fromInt name) ]
+            [ TypedSvg.Core.text (name ++ ": " ++ String.fromInt num) ]
         ]
 
 
-treeGraph : Tree Int -> Html Msg
+treeGraph : Tree ( Int, String ) -> Html Msg
 treeGraph tree =
     let
-        treeDiagram : TreeDiagram.Tree Int
+        treeDiagram : TreeDiagram.Tree ( Int, String )
         treeDiagram =
             toTreeDiagram tree
     in
@@ -302,7 +299,7 @@ type TreemapSplitAxis
     | SplitY
 
 
-treemap : Tree Int -> Html Msg
+treemap : Tree ( Int, String ) -> Html Msg
 treemap tree =
     let
         width : Float
@@ -324,32 +321,50 @@ treemap tree =
             , TypedSvg.Attributes.height (Percent 50)
             , TypedSvg.Attributes.preserveAspectRatio (Align ScaleMin ScaleMin) Slice
             ]
-            [ TypedSvg.g
+            [ TypedSvg.style [] [ TypedSvg.Core.text """
+                          .node > text { display: none; }
+                          .node:hover > text { display: inline; }
+                        """ ]
+            , TypedSvg.g
                 [ TypedSvg.Attributes.transform [ Translate padding padding ] ]
                 [ treemapNode SplitX width height tree ]
             ]
         )
 
 
-treemapNode : TreemapSplitAxis -> Float -> Float -> Tree Int -> Svg Msg
+treemapNode : TreemapSplitAxis -> Float -> Float -> Tree ( Int, String ) -> Svg Msg
 treemapNode axis w h node =
     let
-        parentWeight : Int
-        parentWeight =
+        parentLabel : ( Int, String )
+        parentLabel =
             Tree.label node
 
-        childTrees : List (Tree Int)
-        childTrees =
-            Tree.children node
+        parentWeight : Int
+        parentWeight =
+            Tuple.first parentLabel
 
-        expandedChildTrees : List ( Float, Tree Int )
+        parentName : String
+        parentName =
+            Tuple.second parentLabel
+
+        mapChildTree : Tree ( Int, String ) -> Tree ( Int, String )
+        mapChildTree tree =
+            Tree.mapLabel (\( num, name ) -> ( num, parentName ++ ", " ++ name )) tree
+
+        childTrees : List (Tree ( Int, String ))
+        childTrees =
+            node
+                |> Tree.mapChildren (List.map mapChildTree)
+                |> Tree.children
+
+        expandedChildTrees : List ( Float, Tree ( Int, String ) )
         expandedChildTrees =
             List.map
                 (\tree ->
                     let
                         weight : Int
                         weight =
-                            Tree.label tree
+                            Tuple.first (Tree.label tree)
 
                         relativeWeight : Float
                         relativeWeight =
@@ -359,7 +374,7 @@ treemapNode axis w h node =
                 )
                 childTrees
 
-        offsetChildTrees : ( Float, List ( Float, Float, Tree Int ) )
+        offsetChildTrees : ( Float, List ( Float, Float, Tree ( Int, String ) ) )
         offsetChildTrees =
             List.foldl
                 (\( weight, tree ) ( offset, trees ) ->
@@ -386,28 +401,48 @@ treemapNode axis w h node =
                                 [ treemapNode SplitX w (h * weight) tree ]
                 )
                 (Tuple.second offsetChildTrees)
+
+        nodeLabel : List (Svg Msg)
+        nodeLabel =
+            case groups of
+                [] ->
+                    [ TypedSvg.text_
+                        [ TypedSvg.Attributes.textAnchor AnchorMiddle
+                        , TypedSvg.Attributes.fontSize (Px 8)
+                        , TypedSvg.Attributes.transform
+                            [ Translate (w * 0.5) (h * 0.5)
+                            ]
+                        ]
+                        [ TypedSvg.Core.text (parentName ++ ": " ++ String.fromInt parentWeight) ]
+                    ]
+
+                _ ->
+                    []
     in
     TypedSvg.g
-        []
-        (TypedSvg.rect
+        [ TypedSvg.Attributes.class [ "node" ] ]
+        ([ TypedSvg.rect
             [ TypedSvg.Attributes.x (Px 0)
             , TypedSvg.Attributes.y (Px 0)
             , TypedSvg.Attributes.width (Px w)
             , TypedSvg.Attributes.height (Px h)
             , TypedSvg.Attributes.stroke (Paint black)
-            , TypedSvg.Attributes.fill PaintNone
+            , TypedSvg.Attributes.fill (Paint black)
+            , TypedSvg.Attributes.fillOpacity (Opacity 0)
             ]
             []
-            :: groups
+         ]
+            ++ groups
+            ++ nodeLabel
         )
 
 
-treeList : Tree Int -> Html Msg
+treeList : Tree ( Int, String ) -> Html Msg
 treeList tree =
     let
-        convertLabel : Int -> Html Msg
-        convertLabel nodeLabel =
-            text (String.fromInt nodeLabel)
+        convertLabel : ( Int, String ) -> Html Msg
+        convertLabel ( num, names ) =
+            text (names ++ ": " ++ String.fromInt num)
 
         convertTree : Html Msg -> List (Html Msg) -> Html Msg
         convertTree nodeLabel children =
@@ -424,7 +459,7 @@ treeList tree =
     ul [] [ Tree.restructure convertLabel convertTree tree ]
 
 
-viewTree : TreeLayout -> Tree Int -> Html Msg
+viewTree : TreeLayout -> Tree ( Int, String ) -> Html Msg
 viewTree layout =
     case layout of
         TreeLayoutGraph ->
@@ -437,30 +472,34 @@ viewTree layout =
             treeList
 
 
-buildTree : Model -> List Accident -> Tree Int
+buildTree : Model -> List Accident -> Tree ( Int, String )
 buildTree model accidents =
     let
-        accidentTree : Tree (List Accident)
+        accidentTree : Tree ( List Accident, List String )
         accidentTree =
-            partitionTree accidents (partitioners model)
+            partitionTree (partitioners model) accidents
 
-        treeSize : Tree (List a) -> Int
+        treeSize : Tree ( List a, b ) -> Int
         treeSize tree =
-            tree |> Tree.label |> List.length
+            tree |> Tree.label |> Tuple.first |> List.length
 
-        sortChildrenBySize : List (Tree (List a)) -> List (Tree (List a))
+        sortChildrenBySize : List (Tree ( List a, b )) -> List (Tree ( List a, b ))
         sortChildrenBySize trees =
             trees |> List.sortBy treeSize
 
-        reverseChildren : List (Tree (List a)) -> List (Tree (List a))
+        reverseChildren : List (Tree a) -> List (Tree a)
         reverseChildren trees =
             trees |> List.reverse
 
-        sortedTree : Tree (List Accident)
+        selectLabel : String -> ( a, List String ) -> ( a, String )
+        selectLabel default ( num, labels ) =
+            ( num, labels |> List.Extra.last |> Maybe.withDefault default )
+
+        sortedTree : Tree ( List Accident, String )
         sortedTree =
-            accidentTree |> Tree.mapChildren (sortChildrenBySize >> reverseChildren)
+            accidentTree |> Tree.mapChildren (sortChildrenBySize >> reverseChildren) |> Tree.map (selectLabel "all")
     in
-    Tree.map List.length sortedTree
+    Tree.map (Tuple.mapFirst List.length) sortedTree
 
 
 treeLayoutLabel : TreeLayout -> String
