@@ -86,17 +86,20 @@ When users choose to aggregate the accidents across all years, it would also see
 \end{figure}
 To visualize geographical characteristics of involved persons, we display stick figure icons~\cite{PickettG1988} of aggregated person groups on an equirectanguular geographical map projection of France\footnote{\url{https://commons.wikimedia.org/wiki/File:France_location_map-Regions_and_departements-2016.svg}}.
 Users can either choose to display one single stick figure per group, visualizing the average values of that group, or to display each instance within a group as a separate stick figure, following the x-ray design pattern.
-\todo{which dimensions}
 Figures~\ref{figure-stick-figures-grid-average}, \ref{figure-stick-figures-grid-xray}, and~\ref{figure-stick-figures-departments-average} illustrate this visualization.
-\todo{Präsentieren sie die visuellen Abbildungen und Kodierungen der Daten und Interaktionsmöglichkeiten.
-Sie müssen begründen, warum und wie gut ihre Designentscheidungen die erstellten Anforderungen erfüllen.
-Weiterhin müssen sie begründen, warum die gewählte visuelle Kodierung der Daten für das zu lösenden Problem passend ist.
-Typische Argumente würden hier auf Wahrnehmungsprinzipien und Theorie über Informationsvisualisierung verweisen. 
-Die besten Begründungen diskutieren explizit die konkrete Auswahl der Visualisierungen im Kontext von mehreren verschiedenen Alternativen. 
-Machen Sie hier nicht den Fehler, einfach nur Visualisierung aus den vorgegebenen Bereichen zu diskutieren, weil das in der Regel nicht sinnvoll ist.
-Wenn sie sich für einen Scatterplot entschieden haben, ist ein Zeitreihendiagramm in der Regel keine Alternative.
-Diskutieren Sie also nicht einfach Zeitreihendiagramme, weil sie in den Anforderungen an das Projekt neben Scatterplots stehen, sondern suchen sie nach echten alternativen Visualisierungen, die zum Aufbau eines vergleichbaren mentalen Modells führen.
-Diskutieren Sie die Expressivität und die Effektivität der einzelnen Visualisierungen.}
+In this second visualization, the dominating mental model is geographical position, which is commonly associated with maps. Hence, we map the geographical position to coordinates on the map. As we want users to quickly spot patterns in the displayed data, i.e., differences across regions of the map, textures are a good visualizions technique.
+By plotting stick figures on a grid of the map, such a texture can emerge. We map the following 5~characteristics to the 5~angles of each stick figure:
+\begin{description}
+    \setlength{\itemsep}{1pt}
+    \item[\(\alpha\)] sex, either \(-45^\circ\)~(female) or \(45^\circ\)~(male)
+    \item[\(\beta\)] birth year, inverted, mapped to  \([105^\circ; 135^\circ]\)
+    \item[\(\gamma\)] travel reason, ordered~(professional, home\(\to\)work, home\(\to\)school, shopping, walking/leisure), mapped to  \([105^\circ; 135^\circ]\)
+    \item[\(\delta\)] safety equipment count, inverted, mapped to  \([105^\circ; 135^\circ]\)
+    \item[\(\epsilon\)] number of persons in vehile, inverted, mapped to  \([105^\circ; 135^\circ]\)
+\end{description}
+Mapping the nominal dimension of the person's sex to the stick figure's angle makes it particularly easy to spot differences between female and male drivers. For example, in Figure~\ref{figure-stick-figures-grid-average} one can clearly identify that the average person involved in an accident is male.
+Apart from other icon-based visualization techniques which we did not use due to the large number of data points~(e.g., Chernoff faces~\cite{Chernoff1973}---otherwise more expressive---would clutter the available space on the map too much, making it more difficult to distinguish individual icons), we also discourage heatmaps for this dataset, because they can only visualize one dimension other than the geoposition and would suffer from issues when decoding ordinal values from their color.
+We argue that therefore stick figure icons are the most effective technique to visualize multi-dimensional characteristics of persons involved in accidents.
 
 \subsubsection{Accident Type Treemap}
 \begin{figure}
