@@ -4,11 +4,12 @@ import Browser exposing (Document, UrlRequest, application)
 import Browser.Navigation exposing (Key)
 import Css exposing (bold, borderBottom3, displayFlex, em, ex, fontWeight, listStyle, margin2, none, normal, padding, padding2, px, rgb, solid, zero)
 import Data exposing (HttpJsonError, errorToString, expectAccidentJsonLines)
-import Html.Styled exposing (Html, button, div, h1, h2, header, li, main_, nav, text, toUnstyled, ul)
+import Html.Styled exposing (Html, button, div, h1, h2, header, hr, li, main_, nav, text, toUnstyled, ul)
 import Html.Styled.Attributes exposing (css)
 import Html.Styled.Events exposing (onClick)
 import Http
 import Model exposing (Accident, Resource(..))
+import Partition exposing (Filter)
 import Url exposing (Url)
 import Visualization1
 import Visualization2
@@ -23,6 +24,7 @@ type CurrentVisualization
 
 type alias Model =
     { accidents : Resource (List Accident)
+    , filter : Filter Accident String
     , currentVisualization : CurrentVisualization
     , visualization1 : Visualization1.Model
     , visualization2 : Visualization2.Model
@@ -50,6 +52,7 @@ init _ _ _ =
                 }
     in
     ( { accidents = Loading
+      , filter = ( \_ -> True, "all accidents" )
       , currentVisualization = CurrentVisualization1
       , visualization1 = model1
       , visualization2 = model2
@@ -57,9 +60,9 @@ init _ _ _ =
       }
     , Cmd.batch
         [ loadAccidentsCmd
-        , Cmd.map VisualizationMsg1 cmd1
-        , Cmd.map VisualizationMsg2 cmd2
-        , Cmd.map VisualizationMsg3 cmd3
+        , Cmd.map mapVisualizationMsg1 cmd1
+        , Cmd.map mapVisualizationMsg2 cmd2
+        , Cmd.map mapVisualizationMsg3 cmd3
         ]
     )
 
@@ -67,10 +70,41 @@ init _ _ _ =
 type Msg
     = NoOp
     | GotAccidentsData (Result HttpJsonError (List Accident))
+    | SetFilter (Filter Accident String)
     | SelectVisualization CurrentVisualization
     | VisualizationMsg1 Visualization1.Msg
     | VisualizationMsg2 Visualization2.Msg
     | VisualizationMsg3 Visualization3.Msg
+
+
+mapVisualizationMsg1 : Visualization1.Msg -> Msg
+mapVisualizationMsg1 msg =
+    case msg of
+        Visualization1.SetGlobalFilter filter ->
+            SetFilter filter
+
+        _ ->
+            VisualizationMsg1 msg
+
+
+mapVisualizationMsg2 : Visualization2.Msg -> Msg
+mapVisualizationMsg2 msg =
+    case msg of
+        Visualization2.SetGlobalFilter filter ->
+            SetFilter filter
+
+        _ ->
+            VisualizationMsg2 msg
+
+
+mapVisualizationMsg3 : Visualization3.Msg -> Msg
+mapVisualizationMsg3 msg =
+    case msg of
+        Visualization3.SetGlobalFilter filter ->
+            SetFilter filter
+
+        _ ->
+            VisualizationMsg3 msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -92,6 +126,9 @@ update msg model =
             in
             ( { model | accidents = resource }, Cmd.none )
 
+        SetFilter filter ->
+            ( { model | filter = filter }, Cmd.none )
+
         SelectVisualization vis ->
             ( { model | currentVisualization = vis }, Cmd.none )
 
@@ -100,21 +137,21 @@ update msg model =
                 ( model1, cmd1 ) =
                     Visualization1.update msg1 model.visualization1
             in
-            ( { model | visualization1 = model1 }, Cmd.map VisualizationMsg1 cmd1 )
+            ( { model | visualization1 = model1 }, Cmd.map mapVisualizationMsg1 cmd1 )
 
         VisualizationMsg2 msg2 ->
             let
                 ( model2, cmd2 ) =
                     Visualization2.update msg2 model.visualization2
             in
-            ( { model | visualization2 = model2 }, Cmd.map VisualizationMsg2 cmd2 )
+            ( { model | visualization2 = model2 }, Cmd.map mapVisualizationMsg2 cmd2 )
 
         VisualizationMsg3 msg3 ->
             let
                 ( model3, cmd3 ) =
                     Visualization3.update msg3 model.visualization3
             in
-            ( { model | visualization3 = model3 }, Cmd.map VisualizationMsg3 cmd3 )
+            ( { model | visualization3 = model3 }, Cmd.map mapVisualizationMsg3 cmd3 )
 
 
 onUrlRequest : UrlRequest -> Msg
@@ -137,19 +174,29 @@ visualization model =
             text "Loading accidents..."
 
         Success accidents ->
+            let
+                ( filterPredicate, filterName ) =
+                    model.filter
+
+                filtered : List Accident
+                filtered =
+                    accidents |> List.filter filterPredicate
+            in
             div []
-                [ case model.currentVisualization of
+                [ text ("Current global filter: " ++ filterName)
+                , hr [] []
+                , case model.currentVisualization of
                     CurrentVisualization1 ->
-                        Html.Styled.map VisualizationMsg1
-                            (Visualization1.view model.visualization1 accidents)
+                        Html.Styled.map mapVisualizationMsg1
+                            (Visualization1.view model.visualization1 filtered)
 
                     CurrentVisualization2 ->
-                        Html.Styled.map VisualizationMsg2
-                            (Visualization2.view model.visualization2 accidents)
+                        Html.Styled.map mapVisualizationMsg2
+                            (Visualization2.view model.visualization2 filtered)
 
                     CurrentVisualization3 ->
-                        Html.Styled.map VisualizationMsg3
-                            (Visualization3.view model.visualization3 accidents)
+                        Html.Styled.map mapVisualizationMsg3
+                            (Visualization3.view model.visualization3 filtered)
                 ]
 
 

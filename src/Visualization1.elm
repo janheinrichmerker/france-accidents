@@ -1,4 +1,4 @@
-module Visualization1 exposing (Model, Msg, init, label, update, view)
+module Visualization1 exposing (Model, Msg(..), init, label, update, view)
 
 import Axis
 import Color exposing (black)
@@ -8,6 +8,7 @@ import Html.Styled.Attributes exposing (selected)
 import Html.Styled.Events exposing (onClick)
 import List.Extra
 import Model exposing (Accident, Person, Severity(..), Vehicle)
+import Partition exposing (Filter)
 import Path exposing (Path)
 import Scale exposing (ContinuousScale)
 import Shape
@@ -67,7 +68,8 @@ type alias Model =
 
 
 type Msg
-    = GotTime Posix
+    = SetGlobalFilter (Filter Accident String)
+    | GotTime Posix
     | SelectAspectRatio AspectRatio
     | SelectDimension Dimension
     | SelectReference Reference
@@ -113,6 +115,10 @@ update msg model =
 
         SelectAggregate aggregateX ->
             ( { model | aggregate = aggregateX }, Cmd.none )
+
+        SetGlobalFilter _ ->
+            -- Handled in Main module.
+            ( model, Cmd.none )
 
 
 getTime : Cmd Msg

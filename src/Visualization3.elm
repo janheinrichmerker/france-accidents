@@ -1,4 +1,4 @@
-module Visualization3 exposing (Model, Msg, init, label, update, view)
+module Visualization3 exposing (Model, Msg(..), init, label, update, view)
 
 import Color exposing (black)
 import Html.Styled exposing (Html, button, div, form, fromUnstyled, input, li, ol, option, select, text, ul)
@@ -6,7 +6,7 @@ import Html.Styled.Attributes exposing (checked, selected, type_)
 import Html.Styled.Events exposing (onClick)
 import List.Extra
 import Model exposing (Accident, AtmosphericConditions(..), Collision(..), Curvature(..), DedicatedLane(..), Intersection(..), Light(..), LocationRegime(..), Profile(..), RoadCategory(..), TrafficRegime(..))
-import Partition exposing (Partitioner, Partitioners, equalityPartitioner, maybeEqualityPartitioner, partitionTree)
+import Partition exposing (Filter, Partitioner, Partitioners, equalityPartitioner, maybeEqualityPartitioner, partitionTree)
 import Reorderable exposing (Reorderable)
 import Tree exposing (Tree)
 import TreeDiagram
@@ -54,7 +54,8 @@ type MoveDirection
 
 
 type Msg
-    = SelectTreeLayout TreeLayout
+    = SetGlobalFilter (Filter Accident String)
+    | SelectTreeLayout TreeLayout
     | MoveDimension Int MoveDirection
     | ToggleDimension Int Bool
 
@@ -216,6 +217,10 @@ update msg model =
               }
             , Cmd.none
             )
+
+        SetGlobalFilter _ ->
+            -- Handled in Main module.
+            ( model, Cmd.none )
 
 
 toggleDimension : Bool -> Int -> ( Reorderable PartitionerDimension, List PartitionerDimension ) -> ( Reorderable PartitionerDimension, List PartitionerDimension )
