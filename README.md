@@ -55,7 +55,7 @@ Here are the steps required:
 
 To randomly sample a smaller test dataset for testing purposes, run the following:
 ```shell
-shuf -n 100000 static/data/accidents.jsonl > static/data/accidents-sample.jsonl
+shuf -n 10000 static/data/accidents.jsonl > static/data/accidents-sample.jsonl
 ```
 
 ## Ideas
