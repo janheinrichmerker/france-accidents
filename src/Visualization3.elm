@@ -421,7 +421,7 @@ treemapNode axis w h node =
     in
     TypedSvg.g
         [ TypedSvg.Attributes.class [ "node" ] ]
-        ([ TypedSvg.rect
+        (TypedSvg.rect
             [ TypedSvg.Attributes.x (Px 0)
             , TypedSvg.Attributes.y (Px 0)
             , TypedSvg.Attributes.width (Px w)
@@ -431,8 +431,7 @@ treemapNode axis w h node =
             , TypedSvg.Attributes.fillOpacity (Opacity 0)
             ]
             []
-         ]
-            ++ groups
+            :: groups
             ++ nodeLabel
         )
 
