@@ -1,7 +1,7 @@
 module Visualization2 exposing (Model, Msg, init, label, update, view)
 
 import Axis
-import Color exposing (black)
+import Color exposing (black, white)
 import Dict
 import Html.Styled exposing (Html, div, form, fromUnstyled, option, select, text)
 import Html.Styled.Attributes exposing (selected)
@@ -558,6 +558,14 @@ point scaleX scaleY display ( coordinates, data ) =
     let
         ( latitude, longitude ) =
             coordinates
+
+        pointLabel : String
+        pointLabel =
+            data
+                |> meanDimensions
+                |> Maybe.map stickFigureLabel
+                |> Maybe.map (String.append ((data |> List.length |> String.fromInt) ++ " accidents: "))
+                |> Maybe.withDefault "no data"
     in
     g
         [ TypedSvg.Attributes.class [ "point" ]
@@ -574,13 +582,18 @@ point scaleX scaleY display ( coordinates, data ) =
                     [ TypedSvg.Attributes.x (Px 0)
                     , TypedSvg.Attributes.y (Px 0)
                     , TypedSvg.Attributes.textAnchor AnchorMiddle
+                    , TypedSvg.Attributes.stroke (Paint white)
+                    , TypedSvg.Attributes.strokeWidth (Em 0.6)
+                    , TypedSvg.Attributes.strokeOpacity (Opacity 0.5)
                     ]
-                    [ data
-                        |> meanDimensions
-                        |> Maybe.map stickFigureLabel
-                        |> Maybe.map (String.append ((data |> List.length |> String.fromInt) ++ " accidents: "))
-                        |> Maybe.withDefault "no data"
-                        |> TypedSvg.Core.text
+                    [ TypedSvg.Core.text pointLabel
+                    ]
+               , text_
+                    [ TypedSvg.Attributes.x (Px 0)
+                    , TypedSvg.Attributes.y (Px 0)
+                    , TypedSvg.Attributes.textAnchor AnchorMiddle
+                    ]
+                    [ TypedSvg.Core.text pointLabel
                     ]
                ]
         )
