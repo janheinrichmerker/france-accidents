@@ -39,7 +39,7 @@ And to avoid losing important details such as outliers, the visualizations shoul
 \label{presentation}
 The visualization application proposed to solve the aforementioned tasks~(cf. Section~\ref{tasks}) consists of three interatively combined visualization pages: \Ni a time series plot to compare the number of accidents or casualties, \Nii a geographical map of icon-based stick figure visualizations, and \Niii a treemap view of hierarchically categorized accidents.
 
-\subsubsection{First Visualization}
+\subsubsection{Severity Time Series}
 \todo{Präsentieren sie die visuellen Abbildungen und Kodierungen der Daten und Interaktionsmöglichkeiten.
 Sie müssen begründen, warum und wie gut ihre Designentscheidungen die erstellten Anforderungen erfüllen.
 Weiterhin müssen sie begründen, warum die gewählte visuelle Kodierung der Daten für das zu lösenden Problem passend ist.
@@ -50,7 +50,7 @@ Wenn sie sich für einen Scatterplot entschieden haben, ist ein Zeitreihendiagra
 Diskutieren Sie also nicht einfach Zeitreihendiagramme, weil sie in den Anforderungen an das Projekt neben Scatterplots stehen, sondern suchen sie nach echten alternativen Visualisierungen, die zum Aufbau eines vergleichbaren mentalen Modells führen.
 Diskutieren Sie die Expressivität und die Effektivität der einzelnen Visualisierungen.}
 
-\subsubsection{Second Visualization}
+\subsubsection{Geographical Map with Person Characteristics Stick Figures}
 We use a equirectanguular map projection of france\footnote{\url{https://commons.wikimedia.org/wiki/File:France_location_map-Regions_and_departements-2016.svg}} as the background to the second visualization.
 \todo{Präsentieren sie die visuellen Abbildungen und Kodierungen der Daten und Interaktionsmöglichkeiten.
 Sie müssen begründen, warum und wie gut ihre Designentscheidungen die erstellten Anforderungen erfüllen.
@@ -62,7 +62,7 @@ Wenn sie sich für einen Scatterplot entschieden haben, ist ein Zeitreihendiagra
 Diskutieren Sie also nicht einfach Zeitreihendiagramme, weil sie in den Anforderungen an das Projekt neben Scatterplots stehen, sondern suchen sie nach echten alternativen Visualisierungen, die zum Aufbau eines vergleichbaren mentalen Modells führen.
 Diskutieren Sie die Expressivität und die Effektivität der einzelnen Visualisierungen.}
 
-\subsubsection{Third Visualization}
+\subsubsection{Accident Type Treemap}
 \todo{Präsentieren sie die visuellen Abbildungen und Kodierungen der Daten und Interaktionsmöglichkeiten.
 Sie müssen begründen, warum und wie gut ihre Designentscheidungen die erstellten Anforderungen erfüllen.
 Weiterhin müssen sie begründen, warum die gewählte visuelle Kodierung der Daten für das zu lösenden Problem passend ist.
@@ -75,6 +75,10 @@ Diskutieren Sie die Expressivität und die Effektivität der einzelnen Visualisi
 
 \subsection{Interaction}
 \label{interaction}
-\todo{Die präsentierten Visualisierungstechniken müssen interaktiv zu einer Anwendung verknüpft werden.
-Die Interaktion mit einer Visualisierung soll in den anderen Visualisierungen zu einer Änderung führen. 
-Erklären Sie die möglichen Interaktionen mit den einzelnen Visualisierungen und die möglichen Verknüpfungen zwischen ihnen. Begründen Sie, warum die konkreten Interaktionen umgesetzt wurden und welche Zwecke für die Anwenderinnen mit ihnen unterstützt werden. Begründen Sie ebenfalls, warum sie andere Interaktionsmöglichkeiten nicht umgesetzt haben. Wenn sie keine der geforderten Interaktionen umsetzen, erhalten Sie im gesamten Projekt deutlichen Punktabzug.}
+One of the requirements we formulated~(cf. Section~\ref{requirements}) is to be able to explore details. 
+We see an interaction between the three proposed visualizations as an oportunity to fulfil that goal and to encourage viewers to explore differences for groups of similar accidents~(both in terms of geographical region as well as for characteristics).
+Therefore viewers are given the option to select filtered subsets of the accidents to explore them in a different visualization.
+This filtering is possible in two places: \Ni by selecting geographical clusters from the stick figure visualization map and \Nii by selecting nodes from the tree visualized in the accident characteristics treemap.
+The first case is especially useful for citizens who want to focus their exploration on just their home town~(shown in Figure~\todo{example screenshot}). They can then, for example, switch to the severity time series to find out when to avoid driving specifically in their home town or find out what the most common accident types are by switching to the tree visualization. The second case is most useful for policy makers or public infrastructure planners because they can first identify a target problem they want to mitigate in the treemap visualization. Then they could, for example, explore where that type of accident occurs most often~(e.g., to plan an infrastructure project, as exemplified in Figure~\todo{example screenshot}) or what persons are often involved~(e.g., to educate or regulate that group of persons). Filtering by local characteristics such as road curvature or slopes can also be useful for identifying periodical patterns with the time series visualization, for example to apply measures only in summer or winter.
+As the three visualizations are already complex and feature high-dimensional data, we refrain from embedding individual visualizations into others as pop-up.
+We also planned to implement a time range selector to filter accidents by time or season, but had to omit that filter due to the time constraints.
