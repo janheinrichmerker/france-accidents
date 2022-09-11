@@ -240,7 +240,10 @@ siteHeader model =
             [ borderBottom3 (px 1) solid (rgb 0 0 0) ]
         ]
         [ h1 [] [ text "Accidents" ]
-        , text ("Current global filter: " ++ model.filterName)
+        , text ("Current global filter: " ++ model.filterName ++ " ")
+        , button
+            [ onClick ResetFilter ]
+            [ text "Reset" ]
         , hr [] []
         , h2 [] [ text (visualizationLabel model.currentVisualization) ]
         ]
