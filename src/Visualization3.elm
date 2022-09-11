@@ -1,7 +1,7 @@
 module Visualization3 exposing (Model, Msg(..), init, label, update, view)
 
 import Color exposing (black)
-import Html.Styled exposing (Html, button, div, form, fromUnstyled, input, li, ol, option, select, text, ul)
+import Html.Styled exposing (Html, button, div, form, fromUnstyled, input, li, ol, option, select, span, text, ul)
 import Html.Styled.Attributes exposing (checked, selected, type_)
 import Html.Styled.Events exposing (onClick)
 import List.Extra
@@ -15,6 +15,7 @@ import TreeUtils exposing (toTreeDiagram)
 import TypedSvg exposing (svg)
 import TypedSvg.Attributes
 import TypedSvg.Core exposing (Svg)
+import TypedSvg.Events
 import TypedSvg.Types exposing (Align(..), AnchorAlignment(..), Length(..), MeetOrSlice(..), Opacity(..), Paint(..), Scale(..), Transform(..))
 
 
@@ -268,8 +269,8 @@ drawLine ( targetX, targetY ) =
 
 {-| Represent nodes as circles with the node value inside.
 -}
-drawNode : ( Int, String ) -> Svg Msg
-drawNode ( num, name ) =
+drawNode : ( List Accident, String ) -> Svg Msg
+drawNode ( accidents, name ) =
     TypedSvg.g
         []
         [ TypedSvg.circle
@@ -283,15 +284,16 @@ drawNode ( num, name ) =
         , TypedSvg.text_
             [ TypedSvg.Attributes.textAnchor AnchorMiddle
             , TypedSvg.Attributes.transform [ Translate 0 5, Rotate 90 0 0 ]
+            , TypedSvg.Events.onClick (SetGlobalFilteredAccidents accidents name)
             ]
-            [ TypedSvg.Core.text (name ++ ": " ++ String.fromInt num) ]
+            [ TypedSvg.Core.text (name ++ ": " ++ String.fromInt (List.length accidents)) ]
         ]
 
 
-treeGraph : Tree ( Int, String ) -> Html Msg
+treeGraph : Tree ( List Accident, String ) -> Html Msg
 treeGraph tree =
     let
-        treeDiagram : TreeDiagram.Tree ( Int, String )
+        treeDiagram : TreeDiagram.Tree ( List Accident, String )
         treeDiagram =
             toTreeDiagram tree
     in
@@ -304,7 +306,7 @@ type TreemapSplitAxis
     | SplitY
 
 
-treemap : Tree ( Int, String ) -> Html Msg
+treemap : Tree ( List Accident, String ) -> Html Msg
 treemap tree =
     let
         width : Float
@@ -337,39 +339,43 @@ treemap tree =
         )
 
 
-treemapNode : TreemapSplitAxis -> Float -> Float -> Tree ( Int, String ) -> Svg Msg
+treemapNode : TreemapSplitAxis -> Float -> Float -> Tree ( List Accident, String ) -> Svg Msg
 treemapNode axis w h node =
     let
-        parentLabel : ( Int, String )
+        parentLabel : ( List Accident, String )
         parentLabel =
             Tree.label node
 
+        parentAccidents : List Accident
+        parentAccidents =
+            Tuple.first parentLabel
+
         parentWeight : Int
         parentWeight =
-            Tuple.first parentLabel
+            List.length parentAccidents
 
         parentName : String
         parentName =
             Tuple.second parentLabel
 
-        mapChildTree : Tree ( Int, String ) -> Tree ( Int, String )
+        mapChildTree : Tree ( List Accident, String ) -> Tree ( List Accident, String )
         mapChildTree tree =
             Tree.mapLabel (\( num, name ) -> ( num, parentName ++ ", " ++ name )) tree
 
-        childTrees : List (Tree ( Int, String ))
+        childTrees : List (Tree ( List Accident, String ))
         childTrees =
             node
                 |> Tree.mapChildren (List.map mapChildTree)
                 |> Tree.children
 
-        expandedChildTrees : List ( Float, Tree ( Int, String ) )
+        expandedChildTrees : List ( Float, Tree ( List Accident, String ) )
         expandedChildTrees =
             List.map
                 (\tree ->
                     let
                         weight : Int
                         weight =
-                            Tuple.first (Tree.label tree)
+                            List.length (Tuple.first (Tree.label tree))
 
                         relativeWeight : Float
                         relativeWeight =
@@ -379,7 +385,7 @@ treemapNode axis w h node =
                 )
                 childTrees
 
-        offsetChildTrees : ( Float, List ( Float, Float, Tree ( Int, String ) ) )
+        offsetChildTrees : ( Float, List ( Float, Float, Tree ( List Accident, String ) ) )
         offsetChildTrees =
             List.foldl
                 (\( weight, tree ) ( offset, trees ) ->
@@ -425,7 +431,9 @@ treemapNode axis w h node =
                     []
     in
     TypedSvg.g
-        [ TypedSvg.Attributes.class [ "node" ] ]
+        [ TypedSvg.Attributes.class [ "node" ]
+        , TypedSvg.Events.onClick (SetGlobalFilteredAccidents parentAccidents parentName)
+        ]
         (TypedSvg.rect
             [ TypedSvg.Attributes.x (Px 0)
             , TypedSvg.Attributes.y (Px 0)
@@ -441,12 +449,14 @@ treemapNode axis w h node =
         )
 
 
-treeList : Tree ( Int, String ) -> Html Msg
+treeList : Tree ( List Accident, String ) -> Html Msg
 treeList tree =
     let
-        convertLabel : ( Int, String ) -> Html Msg
-        convertLabel ( num, names ) =
-            text (names ++ ": " ++ String.fromInt num)
+        convertLabel : ( List Accident, String ) -> Html Msg
+        convertLabel ( accidents, name ) =
+            span
+                [ onClick (SetGlobalFilteredAccidents accidents name) ]
+                [ text (name ++ ": " ++ String.fromInt (List.length accidents)) ]
 
         convertTree : Html Msg -> List (Html Msg) -> Html Msg
         convertTree nodeLabel children =
@@ -455,15 +465,12 @@ treeList tree =
                     li [] [ nodeLabel ]
 
                 _ ->
-                    li []
-                        [ nodeLabel
-                        , ul [] children
-                        ]
+                    li [] [ nodeLabel, ul [] children ]
     in
     ul [] [ Tree.restructure convertLabel convertTree tree ]
 
 
-viewTree : TreeLayout -> Tree ( Int, String ) -> Html Msg
+viewTree : TreeLayout -> Tree ( List Accident, String ) -> Html Msg
 viewTree layout =
     case layout of
         TreeLayoutGraph ->
@@ -476,7 +483,7 @@ viewTree layout =
             treeList
 
 
-buildTree : Model -> List Accident -> Tree ( Int, String )
+buildTree : Model -> List Accident -> Tree ( List Accident, String )
 buildTree model accidents =
     let
         accidentTree : Tree ( List Accident, List String )
@@ -503,7 +510,7 @@ buildTree model accidents =
         sortedTree =
             accidentTree |> Tree.mapChildren (sortChildrenBySize >> reverseChildren) |> Tree.map (selectLabel "all")
     in
-    Tree.map (Tuple.mapFirst List.length) sortedTree
+    sortedTree
 
 
 treeLayoutLabel : TreeLayout -> String
