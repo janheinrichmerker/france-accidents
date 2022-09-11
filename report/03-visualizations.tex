@@ -22,7 +22,7 @@ We propose three interactive visualizations by first analysing a set of tasks ou
     \end{tabularx}
 \end{table}
 Because of the diverse application background and target groups described in Section~\ref{introduction}, many tasks can be formulated to be answered by data visualizations. To narrow down the tasks, in this report, we propose a set of exemplary questions our visualizations should answer. The questions listed in Table~\ref{table-questions} also specify the most likely background a person asking that question would have. This additional context allows us to fine-tune individual visualizations by assuming background knowledge from the respective target group.
-We identify \todo{X} mental models as most important to help people answer the abovementioned questions: \Ni times and dates, \Nii geographical position, \Niii clustering or categorization.
+We identify 3~mental models as most important to help people answer the abovementioned questions: \Ni times and dates, \Nii geographical position, \Niii clustering or categorization.
 Time and date, for example, are important to identify periodical trends, as required in question~1 in Table~\ref{table-questions}. A time series plot is able to capture the continuity of time and express a single data dimension in relation to time, which is enough for identifying the dangerousness of specific time periods.
 Geographical position is crucial for understanding local patterns, as required in questions~3 or~6. While most people are very familiar with using maps as visualization for geographically positioned data, it is often not obvious how to visualize the multiple dimensions of the data points that are displayed on that map. We argue that given the space constraints of a map, the stick figures technique~\cite{PickettG1988} is appropriate because it can display a fixed number of dimensions in small space while observers can still detect patterns across the maps geographical dimensions.
 And clustering accident occasions with respect to different categories is needed for comparing how different characteristics might influence road safety, as required in question~7. When working with multidimensional data, like we do with accidents, trees and treemaps~\cite{Shneiderman1992} can be a good visualization to present different, hierarchical categories.
@@ -30,7 +30,10 @@ And clustering accident occasions with respect to different categories is needed
 \subsection{Visualization Requirements}
 \label{requirements}
 We derive 3~main goals that our visualization application should implement: \Ni to identify dangerous regions, times, and situations, \Nii to summarize trends with respect to time and location, and \Niii to offer detailed views where data is aggregated.
-\todo{Leiten sie Anforderungen an das Design der Visualisierungen ab, die sich durch ihre Analyse des Zielproblems ergeben.}
+Identifying dangerous patterns should be supported by emphasizing road injuries or road deaths at first glance or by showing differences of accidents' characteristics with respect to visual reference points.
+Accidents that follow a specific pattern should be distinguishable from other accidents.
+Time-based trends should be made visible both in the long term and in the short term. Geographical trends must also include the geographical position but should not over-emphasize it to be effective.
+And to avoid losing important details such as outliers, the visualizations should always feature a way to show the data with as little aggregation~(e.g., average, minimum, maximum) as possible, while still not overwhelming observers of the visualization.
 
 \subsection{Visualization Presentation}
 \label{presentation}
