@@ -1,5 +1,25 @@
 \section{Data}
 \label{data}
+\begin{table}
+    \caption{Files with accident data, released by the French government each year~(denoted by \textit{YYYY}), with description of its contents.}
+    \label{table-files}
+    \begin{tabularx}{\linewidth}{lX}
+        \toprule
+        \textbf{File Name} & \textbf{Contents} \\
+        \midrule
+        \textit{caracteristiques-YYYY.csv} & accident characteristics, time, place, etc. \\
+        \textit{lieux-YYYY.csv} & accident location, road numbers, road characteristics, lanes etc. \\
+        \textit{usagers-YYYY.csv} & persons involved, sex, birth, equipment, etc. \\
+        \textit{vehicules-YYYY.csv} & vehicle type, maneuver, hit obstacles \\
+        \textit{vehicules-immatricules-baac-YYYY.csv} & not used in this report \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+The French government publicly releases the metadata of road accidents.\footnote{\url{https://data.gouv.fr/en/datasets/bases-de-donnees-annuelles-des-accidents-corporels-de-la-circulation-routiere-annees-de-2005-a-2019/}}
+This data is released yearly and consist of 4~files per year in CSV format~(cf. Table~\ref{table-files}).
+
+
+
 % Preprocessing with Python
 \todo{Beschreiben Sie vorhandenen Daten. Gehen Sie kritisch darauf ein, inwieweit sich die Daten für die Bearbeitung der Fragestellungen und dem Erreichen von Lösungen für die oben beschriebene Zielgruppen eignen. Haben sie die Daten sinnvoll mit weiteren Datenquellen ergänzt? Wenn ja, wie?
 Erklären Sie die technische Bereitstellung der Daten.
