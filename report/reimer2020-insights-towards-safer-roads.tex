@@ -17,6 +17,7 @@
 \usepackage{listingsutf8}
 \usepackage{booktabs}
 \usepackage{tabularx}
+\usepackage{float}
 \addbibresource{literature.bib}
 
 % Listings
@@ -29,7 +30,7 @@
 \definecolor{webiscodestring}{rgb}{0.75,0.12,0.12}
 \definecolor{webiscodedecorator}{rgb}{0.6,0.3,0.0}
 \lstdefinestyle{webisstyle}{
-  basicstyle=\ttfamily\color{webiscodebasic},
+  basicstyle=\ttfamily\footnotesize\color{webiscodebasic},
   keywordstyle=\color{webiscodekeyword},
   identifierstyle=\color{webiscodeidentifier},
   commentstyle=\color{webiscodecomment},
@@ -42,6 +43,9 @@
   keepspaces=true,
   tabsize=2,
   showtabs=false,
+  breakatwhitespace=false,
+  breaklines=true,
+  prebreak={\mbox{\(\hookleftarrow\)}},
   numbers=none,
   literate=
     {->}{{\textrightarrow}}{2}
@@ -60,6 +64,9 @@
   emph={[3]@dataclass},
   emphstyle={[3]\color{webiscodedecorator}},
 }
+\newfloat{listing}{htbp}{lop}
+\floatname{listing}{Listing}
+\renewcommand{\listingautorefname}{Listing}
 
 % Itemization:
 \newcommand{\Ni}{(1)~}
