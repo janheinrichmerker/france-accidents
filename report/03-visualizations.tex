@@ -59,16 +59,11 @@ The visualization application proposed to solve the aforementioned tasks~(cf. Se
     \label{figure-time-series-banking-unharmed-relative-per-quarter}
 \end{figure}
 The first visualization we introduce is a time series plot of the prevalence and severity of accidents across time.
+Users can optionally choose to aggregate accidents across years~(to find seasonal patterns) and can count the number of persons per week, month, or year. They can also choose whether killed, injured, killed and injured, unharmed, or all persons should be counted. Additionally one can choose to display the absolute number or relative proportion of persons that fit the above criteria, and adjust the plot's aspect ratio.
 Figures~\ref{figure-time-series-killed-injured-per-year}, \ref{figure-time-series-killed-injured-by-year-per-month}, and~\ref{figure-time-series-banking-unharmed-relative-per-quarter} illustrate this visualization.
-\todo{Präsentieren sie die visuellen Abbildungen und Kodierungen der Daten und Interaktionsmöglichkeiten.
-Sie müssen begründen, warum und wie gut ihre Designentscheidungen die erstellten Anforderungen erfüllen.
-Weiterhin müssen sie begründen, warum die gewählte visuelle Kodierung der Daten für das zu lösenden Problem passend ist.
-Typische Argumente würden hier auf Wahrnehmungsprinzipien und Theorie über Informationsvisualisierung verweisen. 
-Die besten Begründungen diskutieren explizit die konkrete Auswahl der Visualisierungen im Kontext von mehreren verschiedenen Alternativen. 
-Machen Sie hier nicht den Fehler, einfach nur Visualisierung aus den vorgegebenen Bereichen zu diskutieren, weil das in der Regel nicht sinnvoll ist.
-Wenn sie sich für einen Scatterplot entschieden haben, ist ein Zeitreihendiagramm in der Regel keine Alternative.
-Diskutieren Sie also nicht einfach Zeitreihendiagramme, weil sie in den Anforderungen an das Projekt neben Scatterplots stehen, sondern suchen sie nach echten alternativen Visualisierungen, die zum Aufbau eines vergleichbaren mentalen Modells führen.
-Diskutieren Sie die Expressivität und die Effektivität der einzelnen Visualisierungen.}
+To support users in distinguishing different slopes in the plot, we allow users to automatically compute the optimal aspect ratio by banking to~45\(^\circ\).
+As the number or proportion of persons is quantitative data, it is visually the easiest to map the data to a position, in this case the height of the plotted line. It is also easy for humans to distinguish slopes in lines. This way in the time series line users can, for example, easily spot periods where the number of injured persons increases, decreases, or stagnates.
+When users choose to aggregate the accidents across all years, it would also seem intuitive to visualize that periodical data in a radial plot. However, in such plot the slope differences are more difficult to spot, limiting that approach's expressiveness. The recursive pattern technique is also a good choice for periodical data, but we argue that the difficulty of mapping a color to quantitative data, as would be the case with a recursive pattern visualization, is cognitively more difficult than mapping from a position, making the visualization more effective but less expressive. Therefore, we choose a line plot in the cartographic coordinate system.
 
 \subsubsection{Geographical Map with Person Characteristics Stick Figures}
 \begin{figure}
