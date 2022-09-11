@@ -477,7 +477,7 @@ buildTree model accidents =
     let
         accidentTree : Tree ( List Accident, List String )
         accidentTree =
-            partitionTree (partitioners model) accidents
+            partitionTree (partitioners model) True accidents
 
         treeSize : Tree ( List a, b ) -> Int
         treeSize tree =

@@ -60,13 +60,13 @@ partition elements partitioner =
     List.map (\( filter, name ) -> ( List.filter filter elements, name )) partitioner
 
 
-partitionTree : Partitioners a comparable -> List a -> PartitionTree a comparable
-partitionTree partitioners =
-    partitionTreeHelp partitioners []
+partitionTree : Partitioners a comparable -> Bool -> List a -> PartitionTree a comparable
+partitionTree partitioners filterByChildren =
+    partitionTreeHelp partitioners filterByChildren []
 
 
-partitionTreeHelp : Partitioners a comparable -> List comparable -> List a -> PartitionTree a comparable
-partitionTreeHelp partitioners labels elements =
+partitionTreeHelp : Partitioners a comparable -> Bool -> List comparable -> List a -> PartitionTree a comparable
+partitionTreeHelp partitioners filterByChildren labels elements =
     case partitioners of
         [] ->
             -- No partitioner left, so we cannot partition the elements further.
@@ -82,12 +82,31 @@ partitionTreeHelp partitioners labels elements =
 
                 mapPartition : Partition a comparable -> PartitionTree a comparable
                 mapPartition ( singePartition, singleLabel ) =
-                    partitionTreeHelp remainingPartitioners (labels ++ [ singleLabel ]) singePartition
+                    partitionTreeHelp remainingPartitioners filterByChildren (labels ++ [ singleLabel ]) singePartition
 
                 mapPartitions : Partitions a comparable -> List (PartitionTree a comparable)
                 mapPartitions partitions =
                     partitions |> List.map mapPartition
+
+                remainingPartitions : List (PartitionTree a comparable)
+                remainingPartitions =
+                    mapPartitions firstPartitions
+
+                treeElements : PartitionTree a comparable -> List a
+                treeElements tree =
+                    tree
+                        |> Tree.label
+                        |> Tuple.first
+
+                filteredElements : List a
+                filteredElements =
+                    if filterByChildren then
+                        remainingPartitions
+                            |> List.concatMap treeElements
+
+                    else
+                        elements
             in
             Tree.tree
-                ( elements, labels )
-                (mapPartitions firstPartitions)
+                ( filteredElements, labels )
+                remainingPartitions
