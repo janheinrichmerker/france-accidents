@@ -10,6 +10,7 @@ import List.Extra
 import List.Statistics
 import Maybe.Extra
 import Model exposing (Accident, Person, TravelReason(..), Vehicle)
+import Round
 import Scale exposing (ContinuousScale)
 import TypedSvg exposing (g, image, line, svg, text_)
 import TypedSvg.Attributes
@@ -520,7 +521,7 @@ stickFigureLabel : StickFigureData -> String
 stickFigureLabel data =
     data
         |> stickFigureDataToList
-        |> List.map String.fromFloat
+        |> List.map (Round.round 2)
         |> String.join ", "
 
 
@@ -577,6 +578,7 @@ point scaleX scaleY display ( coordinates, data ) =
                     [ data
                         |> meanDimensions
                         |> Maybe.map stickFigureLabel
+                        |> Maybe.map (String.append ((data |> List.length |> String.fromInt) ++ " accidents: "))
                         |> Maybe.withDefault "no data"
                         |> TypedSvg.Core.text
                     ]
