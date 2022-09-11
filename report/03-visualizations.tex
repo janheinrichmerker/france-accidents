@@ -40,6 +40,26 @@ And to avoid losing important details such as outliers, the visualizations shoul
 The visualization application proposed to solve the aforementioned tasks~(cf. Section~\ref{tasks}) consists of three interatively combined visualization pages: \Ni a time series plot to compare the number of accidents or casualties, \Nii a geographical map of icon-based stick figure visualizations, and \Niii a treemap view of hierarchically categorized accidents.
 
 \subsubsection{Severity Time Series}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/time-series-2-to-1-killed-or-injured-absolute-never-per-year.png}
+    \caption{Time series of the number of killed or injured persons per year from~2005 to~2020 with a 2:1~aspect ratio.}
+    \label{figure-time-series-killed-injured-per-year}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/time-series-2-to-1-killed-or-injured-absolute-by-year-per-month.png}
+    \caption{Time series of the number of killed or injured persons per month with a 2:1~aspect ratio, by aggregating across all years~2005--2010.}
+    \label{figure-time-series-killed-injured-by-year-per-month}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/time-series-banking-45-unharmed-relative-never-per-quarter.png}
+    \caption{Time series of the proportion of unharmed persons of all persons involved in accidents per quarter with banking to~45\(^\circ\).}
+    \label{figure-time-series-banking-unharmed-relative-per-quarter}
+\end{figure}
+The first visualization we introduce is a time series plot of the prevalence and severity of accidents across time.
+Figures~\ref{figure-time-series-killed-injured-per-year}, \ref{figure-time-series-killed-injured-by-year-per-month}, and~\ref{figure-time-series-banking-unharmed-relative-per-quarter} illustrate this visualization.
 \todo{Präsentieren sie die visuellen Abbildungen und Kodierungen der Daten und Interaktionsmöglichkeiten.
 Sie müssen begründen, warum und wie gut ihre Designentscheidungen die erstellten Anforderungen erfüllen.
 Weiterhin müssen sie begründen, warum die gewählte visuelle Kodierung der Daten für das zu lösenden Problem passend ist.
@@ -51,7 +71,28 @@ Diskutieren Sie also nicht einfach Zeitreihendiagramme, weil sie in den Anforder
 Diskutieren Sie die Expressivität und die Effektivität der einzelnen Visualisierungen.}
 
 \subsubsection{Geographical Map with Person Characteristics Stick Figures}
-We use a equirectanguular map projection of france\footnote{\url{https://commons.wikimedia.org/wiki/File:France_location_map-Regions_and_departements-2016.svg}} as the background to the second visualization.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\linewidth]{figures/stick-figures-by-grid-20-20-average.png}
+    \caption{Stick figure icons of average person characteristics on a map of France after partitioning the map into a \(20 \times 20\)~grid.}
+    \label{figure-stick-figures-grid-average}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\linewidth]{figures/stick-figures-by-grid-10-10-xray.png}
+    \caption{Stick figure icons of person characteristics on a map of France after partitioning the map into a \(10 \times 10\)~grid. Each group's stick figures are overlayed in x-ray style.}
+    \label{figure-stick-figures-grid-xray}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\linewidth]{figures/stick-figures-by-department-average.png}
+    \caption{Stick figure icons of average person characteristics on a map of France after partitioning the map into France's official Departements.}
+    \label{figure-stick-figures-departments-average}
+\end{figure}
+To visualize geographical characteristics of involved persons, we display stick figure icons~\cite{PickettG1988} of aggregated person groups on an equirectanguular geographical map projection of France\footnote{\url{https://commons.wikimedia.org/wiki/File:France_location_map-Regions_and_departements-2016.svg}}.
+Users can either choose to display one single stick figure per group, visualizing the average values of that group, or to display each instance within a group as a separate stick figure, following the x-ray design pattern.
+\todo{which dimensions}
+Figures~\ref{figure-stick-figures-grid-average}, \ref{figure-stick-figures-grid-xray}, and~\ref{figure-stick-figures-departments-average} illustrate this visualization.
 \todo{Präsentieren sie die visuellen Abbildungen und Kodierungen der Daten und Interaktionsmöglichkeiten.
 Sie müssen begründen, warum und wie gut ihre Designentscheidungen die erstellten Anforderungen erfüllen.
 Weiterhin müssen sie begründen, warum die gewählte visuelle Kodierung der Daten für das zu lösenden Problem passend ist.
@@ -63,6 +104,19 @@ Diskutieren Sie also nicht einfach Zeitreihendiagramme, weil sie in den Anforder
 Diskutieren Sie die Expressivität und die Effektivität der einzelnen Visualisierungen.}
 
 \subsubsection{Accident Type Treemap}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\linewidth]{figures/tree-treemap-weather-light-condition.png}
+    \caption{Tree map of accidents by weather and light condition.}
+    \label{figure-treemap-weather-light-condition}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\linewidth]{figures/tree-treemap-location-type-traffic-regime-intersection-type-road-curvature-road-profile-dedicated-line-road-category.png}
+    \caption{Tree map of accidents by location type, traffic regime, intersection type, road curvature, road profile, dedicated lines, and road category.}
+    \label{figure-treemap-many}
+\end{figure}
+Figures~\ref{figure-treemap-weather-light-condition} and~\ref{figure-treemap-many} illustrate this visualization.
 \todo{Präsentieren sie die visuellen Abbildungen und Kodierungen der Daten und Interaktionsmöglichkeiten.
 Sie müssen begründen, warum und wie gut ihre Designentscheidungen die erstellten Anforderungen erfüllen.
 Weiterhin müssen sie begründen, warum die gewählte visuelle Kodierung der Daten für das zu lösenden Problem passend ist.
