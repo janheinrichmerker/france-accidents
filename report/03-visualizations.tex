@@ -100,6 +100,8 @@ By plotting stick figures on a grid of the map, such a texture can emerge. We ma
 Mapping the nominal dimension of the person's sex to the stick figure's angle makes it particularly easy to spot differences between female and male drivers. For example, in Figure~\ref{figure-stick-figures-grid-average} one can clearly identify that the average person involved in an accident is male.
 Apart from other icon-based visualization techniques which we did not use due to the large number of data points~(e.g., Chernoff faces~\cite{Chernoff1973}---otherwise more expressive---would clutter the available space on the map too much, making it more difficult to distinguish individual icons), we also discourage heatmaps for this dataset, because they can only visualize one dimension other than the geoposition and would suffer from issues when decoding ordinal values from their color.
 We argue that therefore stick figure icons are the most effective technique to visualize multi-dimensional characteristics of persons involved in accidents.
+To fulfil the third visualizaiton requirement, not hiding details behind averages, each person involved in an accident can also be shown as an individual stick figure. Here we make the stick figure translucent so that multiple stick figures can be overlayed and produce a density plot as is commonly used in parallel coordinates plots~\cite{Wegman1990}.
+This technique still allows for visualizing trends but, for example, we can now distinguish characteristics of female and male persons, where the sex information would otherwise be lost in aggregation by average.
 
 \subsubsection{Accident Type Treemap}
 \begin{figure}
@@ -114,16 +116,14 @@ We argue that therefore stick figure icons are the most effective technique to v
     \caption{Tree map of accidents by location type, traffic regime, intersection type, road curvature, road profile, dedicated lines, and road category.}
     \label{figure-treemap-many}
 \end{figure}
-Figures~\ref{figure-treemap-weather-light-condition} and~\ref{figure-treemap-many} illustrate this visualization.
-\todo{Präsentieren sie die visuellen Abbildungen und Kodierungen der Daten und Interaktionsmöglichkeiten.
-Sie müssen begründen, warum und wie gut ihre Designentscheidungen die erstellten Anforderungen erfüllen.
-Weiterhin müssen sie begründen, warum die gewählte visuelle Kodierung der Daten für das zu lösenden Problem passend ist.
-Typische Argumente würden hier auf Wahrnehmungsprinzipien und Theorie über Informationsvisualisierung verweisen. 
-Die besten Begründungen diskutieren explizit die konkrete Auswahl der Visualisierungen im Kontext von mehreren verschiedenen Alternativen. 
-Machen Sie hier nicht den Fehler, einfach nur Visualisierung aus den vorgegebenen Bereichen zu diskutieren, weil das in der Regel nicht sinnvoll ist.
-Wenn sie sich für einen Scatterplot entschieden haben, ist ein Zeitreihendiagramm in der Regel keine Alternative.
-Diskutieren Sie also nicht einfach Zeitreihendiagramme, weil sie in den Anforderungen an das Projekt neben Scatterplots stehen, sondern suchen sie nach echten alternativen Visualisierungen, die zum Aufbau eines vergleichbaren mentalen Modells führen.
-Diskutieren Sie die Expressivität und die Effektivität der einzelnen Visualisierungen.}
+Our third visualizaiton focuses on the task of identifying categories in which road accidents most often happen. We implement this task by first clustering the accident dataset hierarchically by multiple categorical dimensions where the number of accidents that fall into each set of categories represents a weight. The resulting weighted tree can then be displayed in three different ways: \Ni as a nested list, \Nii as a graph, and \Niii as a treemap~\cite{Shneiderman1992}.
+Users can also reorder the dimensions across which the tree is partitioned, and they can enable or disable partitioning for specific dimensions.
+Figures~\ref{figure-treemap-weather-light-condition} and~\ref{figure-treemap-many} illustrate the treemap visualization.
+Because the dataset contains many nominal dimensions~(cf. Section~\ref{data}) visually mapping accidents to length or angles would make the visualization less effective. Instead, for nominal data mapping to areas where similar areas are close together is more effective.
+In the graph view this mental connection is supported by connecting the graph's nodes with a line. On a treemap, this connection is achieved by placing the rectangles of child categories inside the rectangle of their parent category, satisfying the mapping methodology of surrounding.
+It is easier for users to read an individual category's description in the graph and list views. By showing category names of node in the treemap when a user hovers their mouse cursor above the corresponding rectangle, we circumvent this limitation.
+Nonetheless, we keep the list and graph visualizations to allow users to traverse the tree's hierarchy more effectively, once they have found a category of interest.
+The treemap visualization also gives an intuitive way to identify majority categories of accidents because viewers can easily spot the largest rectangles of the treemap even in cluttered treemaps as illustrated in Figure~\ref{figure-treemap-many}. The rectangle's size effectively expresses the number of accidents.
 
 \subsection{Interaction}
 \label{interaction}
