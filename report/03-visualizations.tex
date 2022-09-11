@@ -1,4 +1,5 @@
 \section{Visualizations}
+\label{visualizations}
 We propose three interactive visualizations by first analysing a set of tasks our application should solve~(cf. Section~\ref{tasks}), and then deriving specific requirements for the included visualizations~(cf. Section~\ref{requirements}). Furhtermore, we discus expressiveness, effectiveness, and appropriateness for each of the three implemented visualizations~(cf. Section~\ref{presentation}) and explain the interactivity of the visualization application~(cf. Section~\ref{interaction}).
 
 \subsection{Analysis of Application Tasks}
@@ -48,19 +49,13 @@ The visualization application proposed to solve the aforementioned tasks~(cf. Se
 \end{figure}
 \begin{figure}
     \centering
-    \includegraphics[width=0.9\linewidth]{figures/time-series-2-to-1-killed-or-injured-absolute-by-year-per-month.png}
-    \caption{Time series of the number of killed or injured persons per month with a 2:1~aspect ratio, by aggregating across all years~2005--2010.}
-    \label{figure-time-series-killed-injured-by-year-per-month}
-\end{figure}
-\begin{figure}
-    \centering
     \includegraphics[width=0.9\linewidth]{figures/time-series-banking-45-unharmed-relative-never-per-quarter.png}
     \caption{Time series of the proportion of unharmed persons of all persons involved in accidents per quarter with banking to~45\(^\circ\).}
     \label{figure-time-series-banking-unharmed-relative-per-quarter}
 \end{figure}
 The first visualization we introduce is a time series plot of the prevalence and severity of accidents across time.
 Users can optionally choose to aggregate accidents across years~(to find seasonal patterns) and can count the number of persons per week, month, or year. They can also choose whether killed, injured, killed and injured, unharmed, or all persons should be counted. Additionally one can choose to display the absolute number or relative proportion of persons that fit the above criteria, and adjust the plot's aspect ratio.
-Figures~\ref{figure-time-series-killed-injured-per-year}, \ref{figure-time-series-killed-injured-by-year-per-month}, and~\ref{figure-time-series-banking-unharmed-relative-per-quarter} illustrate this visualization.
+Figures~\ref{figure-time-series-killed-injured-per-year} and~\ref{figure-time-series-banking-unharmed-relative-per-quarter} illustrate this visualization.
 To support users in distinguishing different slopes in the plot, we allow users to automatically compute the optimal aspect ratio by banking to~45\(^\circ\).
 As the number or proportion of persons is quantitative data, it is visually the easiest to map the data to a position, in this case the height of the plotted line. It is also easy for humans to distinguish slopes in lines. This way in the time series line users can, for example, easily spot periods where the number of injured persons increases, decreases, or stagnates.
 When users choose to aggregate the accidents across all years, it would also seem intuitive to visualize that periodical data in a radial plot. However, in such plot the slope differences are more difficult to spot, limiting that approach's expressiveness. The recursive pattern technique is also a good choice for periodical data, but we argue that the difficulty of mapping a color to quantitative data, as would be the case with a recursive pattern visualization, is cognitively more difficult than mapping from a position, making the visualization more effective but less expressive. Therefore, we choose a line plot in the cartographic coordinate system.
