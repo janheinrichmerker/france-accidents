@@ -1,11 +1,21 @@
 \section{Implementation}
-Our demo application is developed in the Elm programming language\footnote{\url{https://elm-lang.org/}} following the functional proramming paradigm.
+\label{implementation}
 \begin{listing}
     \lstinputlisting[linerange={76-78,98-103}]{../src/Main.elm}
     \caption{Example of wrapping the \lstinline{update} function from \lstinline{Visualization1} inside the \lstinline{Main} module's \lstinline{update} function. Commands sent from \lstinline{Visualization1} are then mapped to the \lstinline{Main} modules types.}
     \label{listing-map-model}
 \end{listing}
-We implement each visualization as a sub-application in a separate Elm module that only exposes the functions required in the Elm application architecture~(i.e., \lstinline{Model}, \lstinline{Msg}, \lstinline{init}, \lstinline{update}, \lstinline{view}) as well as a visualization name~(i.e., \lstinline{label}). The \lstinline{Main} module is then responsible for switching visualizations and any bundling messages sent from either of the sub-applications, by mapping and wrapping each visuzlization's model, messages, and view as illustrated in Listing~\ref{listing-map-model}.
+Our demo application is developed in the Elm programming language\footnote{\url{https://elm-lang.org/}} following the functional proramming paradigm. We implement each visualization as a sub-application in a separate Elm module~(\lstinline{Visualization1}, \lstinline{Visualization2}, \lstinline{Visualization3}) that only exposes the functions required in the Elm application architecture~(i.e., \lstinline{Model}, \lstinline{Msg}, \lstinline{init}, \lstinline{update}, \lstinline{view}) as well as a visualization name~(i.e., \lstinline{label}). The \lstinline{Main} module is then responsible for switching visualizations and any bundling messages sent from either of the sub-applications, by mapping and wrapping each visuzlization's model, messages, and view as illustrated in Listing~\ref{listing-map-model}. In addition to the modules used for displaying the application, additional modules are implemented for defining the accident model~(\lstinline{Model}), parsing accidents from the JSONL~files described in Section~\ref{data}~(\lstinline{Data}), and for utility functions and data structures~(\lstinline{Utils}, \lstinline{TimeUtils}, \lstinline{TreeUtils}, \lstinline{Partition}).
+
+% Model & Data
+
+% Visualization1
+
+% Visualization2
+
+% Visualization3
+
+% Utils
 \todo{Beschreiben Sie die Implementierung ihrer Visualisierungs-Anwendung in Elm. Stellen die Gliederung ihres Quellcodes vor. Haben Sie verschiedene Elm-Module erstellt. Was war aufwändig umzusetzen, was ließ sich mit dem vorhanden Code aus den Übungen relativ einfach umsetzen?}
 
 \todo{Wie sieht die Elm-Datenstruktur für das Model aus, in dem die verschiedenen Zustände der Interaktion gespeichert werden können.}
