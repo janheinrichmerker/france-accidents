@@ -18,6 +18,8 @@
 The French government publicly releases the metadata of road accidents.\footnote{\url{https://data.gouv.fr/en/datasets/bases-de-donnees-annuelles-des-accidents-corporels-de-la-circulation-routiere-annees-de-2005-a-2019/}}
 This data is released yearly and consist of 4~files per year in CSV format~(cf. Table~\ref{table-files}).
 
+After first attempts to parse and merge the CSV files directly inside the Elm application we decided to implement the data preprocessing in Python instead, as the type safety in Elm makes it complicated to correct errors in the goverment open data files. For example, CSV files from some years use different separators and even different file encodings. Also some fields are named differently or use different number formats. In Python such errors are easier to debug and work around. By preprocessing the CSV files we also group persons by their vehicle and vehicles by the accident, in order to make parsing a single accident record easier. Our Python preprocessing is structured in three parsers, for accidents, vehicles, and persons.
+
 
 
 % Preprocessing with Python
