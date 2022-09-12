@@ -26,11 +26,6 @@ Parsing the categorical dimensions requires a substantial amount of boilerplate 
 
 \paragraph{Utilities and Additional Data Structures}
 \begin{listing}
-    \lstinputlisting[linerange={6-27}]{../src/Partition.elm}
-    \caption{Type definitions for the \lstinline{Partition} module to partition lists based on named filters.}
-    \label{listing-types-partition}
-\end{listing}
-\begin{listing}
     \lstinputlisting[linerange={143-155}]{../src/TimeUtils.elm}
     \caption{Helper function for stripping the year field represented in a \lstinline{Posix} timestamp.}
     \label{listing-util-remove-year}
@@ -43,16 +38,17 @@ And the \lstinline{Utils} module contains various functions that simplify workin
 
 \paragraph{Severity Time Series}
 \begin{listing}
-    \lstinputlisting[linerange={161-203}]{../src/Visualization1.elm}
-    \caption{Compute the y-axis value for a group of accidents.}
-    \label{listing-vis1-compute-dim}
-\end{listing}
-\begin{listing}
     \lstinputlisting[linerange={276-284}]{../src/Visualization1.elm}
     \caption{Function to group accidents into buckets based on their \lstinline{Posix} timestamps.}
     \label{listing-vis1-buckets-timestamp}
 \end{listing}
-\todo{Beschreiben Sie die Implementierung ihrer Visualisierungs-Anwendung in Elm. Was war aufwändig umzusetzen, was ließ sich mit dem vorhanden Code aus den Übungen relativ einfach umsetzen? Wie sieht die Elm-Datenstruktur für das Model aus, in dem die verschiedenen Zustände der Interaktion gespeichert werden können.}
+\begin{listing}
+    \lstinputlisting[linerange={161-203}]{../src/Visualization1.elm}
+    \caption{Compute the y-axis value for a group of accidents.}
+    \label{listing-vis1-compute-dim}
+\end{listing}
+The sever time series is implemented by \Ni filtering accidents that contain a timestamp, \Nii associating a timestamp key used to group and aggregate by and across month or years, \Niii grouping the tagged accidents into buckets~(cf. Listing~\ref{listing-vis1-buckets-timestamp}), \Niv sorting the buckets, \Nv mapping buckets to points on the x-y-plane~(cf. Listing~\ref{listing-vis1-compute-dim}), and finally displaying a monotone line plot of the timed data points.
+To implement key-based grouping of accidents into buckets, we implement utilities for working with \lstinline{Dict}s containing buckets. By sending messages on HTML click events, we implement selectors for grouping and aggregation. The selected options are stored in the visualization module's \lstinline{Model} structure.
 
 \paragraph{Geographical Map with Person Characteristics Stick Figures}
 \begin{listing}
@@ -65,7 +61,8 @@ And the \lstinline{Utils} module contains various functions that simplify workin
     \caption{Function for drawing a single stick figure as SVG node. Dimensions~\(\gamma\) to~\(\epsilon\) omitted for readability.}
     \label{listing-vis2-stick-figure}
 \end{listing}
-\todo{Beschreiben Sie die Implementierung ihrer Visualisierungs-Anwendung in Elm. Was war aufwändig umzusetzen, was ließ sich mit dem vorhanden Code aus den Übungen relativ einfach umsetzen? Wie sieht die Elm-Datenstruktur für das Model aus, in dem die verschiedenen Zustände der Interaktion gespeichert werden können.}
+Implementing the map of stick figures was more difficult as we had to integrate icon-based markers into a scatterplot. We also needed to ensure that the plot's bounds match the map background's geographical bounds.
+Hence, accidents are \Ni filtered by bounds and \Nii grouped by the user-selected grouping method~(as specified by group key, cf. Listing~\ref{listing-vis2-group-key}). Each group is then plotted onto the map background by drawing either one average stick figure or multiple overlayed stick figures as illustrated in Listing~\ref{listing-vis2-stick-figure}. Because a majority of the grouping utility functions could be re-used from the first visualization, we were able to focus on the geo-coding and stick figure markers for this visualization. Similar to the time series visualization, we implement selectors for the grouping and display style by sending messages on click events and storing the typed options to the visualization's \lstinline{Model}.
 
 \paragraph{Accident Type Treemap}
 \begin{listing}
@@ -73,4 +70,19 @@ And the \lstinline{Utils} module contains various functions that simplify workin
     \caption{Basic model types for the accident type tree visualization.}
     \label{listing-vis3-model-types}
 \end{listing}
-\todo{Beschreiben Sie die Implementierung ihrer Visualisierungs-Anwendung in Elm. Was war aufwändig umzusetzen, was ließ sich mit dem vorhanden Code aus den Übungen relativ einfach umsetzen? Wie sieht die Elm-Datenstruktur für das Model aus, in dem die verschiedenen Zustände der Interaktion gespeichert werden können.}
+\begin{listing}
+    \lstinputlisting[linerange={63-69}]{../src/Partition.elm}
+    \caption{Function to partition lists into a hierarchical tree of sub-lists based on named filters and internal recursive helper function.}
+    \label{listing-partition-tree}
+\end{listing}
+Because the tree-based visualization offers users to change the number and order of displayed categorical dimensions, here one of the two major challenges was to maintain a list of dimensions that can at the same time act as partitioners to partition a list into sub-lists.
+We therefore store a \lstinline{Reorderable} list of active dimensions~(i.e., dimensions that are currently used for filtering) and a not necessarily ordered \lstinline{List} of inactive dimensions~(cf. Listing~\ref{listing-vis3-model-types}).
+By sending messages on click events we either modify the active dimensions' order~(e.g., \lstinline{MoveDimension 3 MoveDirectionUp}), move an active dimension to the list of inactive dimensions~(e.g., \lstinline{ToggleDimension 1 False}), or move an inactive dimension to the list of active dimensions~(e.g., \lstinline{ToggleDimension 2 True}).
+The second challenge in implementing the accident type tree was to hierarchically partition the global list of accidents into increasingly smaller subsets while also keeping track of a label describing each subset's filters.
+Using an Elm package, we implement this tree partitioning in the \lstinline{Partition} module~(cf. Listing~\ref{listing-partition-tree})
+
+The interaction between the three visualizations introduced in Section~\ref{interaction} is implemented by sending a special \lstinline{SetGlobalFilteredAccidents} message with the desired subset of accidents and a descriptive filter name. This special message is ignored in the individual visualization's \lstinline{update} function but instead catched in the \lstinline{Main} module in order to re-distribute the updated accident list to each of the three visualizations.
+Once the accidents are partitioned into a tree, we display the tree either using the \lstinline{treemap}, \lstinline{treeGraph}, or \lstinline{treeList} function which all recursively restructure the tree into HTML and SVG nodes.
+
+Together with the static data files~(cf. Section~\ref{data}), we compile and bundle the Elm source code in a WebPack\footnote{\url{https://webpack.js.org/}} module. To improve the code quality, a continuous integration pipeline enforcea the default Elm source code formatting and reviewa our code against a set of common mistakes as specified in the \lstinline{ReviewConfig} module.
+The reviewed bundle is then deployed to GitHub Pages.\footnote{\url{https://heinrichreimer.github.io/france-accidents/}}
