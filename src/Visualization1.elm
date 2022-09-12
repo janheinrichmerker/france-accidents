@@ -3,7 +3,7 @@ module Visualization1 exposing (Model, Msg(..), init, label, update, view)
 import Axis
 import Color exposing (black)
 import Dict
-import Html.Styled exposing (Html, div, form, fromUnstyled, h3, option, select, text)
+import Html.Styled exposing (Html, button, div, form, fromUnstyled, h3, option, select, text)
 import Html.Styled.Attributes exposing (selected)
 import Html.Styled.Events exposing (onClick)
 import List.Extra
@@ -284,13 +284,27 @@ bucketsByTimestamp model accidents =
         |> List.map (Tuple.mapFirst millisToPosix)
 
 
-toPoints2D : Model -> List Accident -> List TimePoint
-toPoints2D model accidents =
+toBuckets : Model -> List Accident -> List ( Posix, List Accident )
+toBuckets model accidents =
     accidents
         |> filterByTimestamp model
         |> bucketsByTimestamp model
         |> sortByBucketTimestamp
+
+
+toPoints2D : Model -> List Accident -> List TimePoint
+toPoints2D model accidents =
+    accidents
+        |> toBuckets model
         |> List.map (toTimePoint model)
+
+
+filteredAccidents : Model -> List Accident -> List Accident
+filteredAccidents model accidents =
+    accidents
+        |> toBuckets model
+        |> List.map Tuple.second
+        |> List.concat
 
 
 aspectRatioSelectorOption : Model -> AspectRatio -> Html Msg
@@ -573,6 +587,10 @@ aggregateSelector model =
 view : Model -> List Accident -> Html Msg
 view model accidents =
     let
+        filtered : List Accident
+        filtered =
+            filteredAccidents model accidents
+
         points : List TimePoint
         points =
             toPoints2D model accidents
@@ -596,6 +614,9 @@ view model accidents =
         , referenceSelector model
         , groupSelector model
         , aggregateSelector model
+        , button
+            [ onClick (SetGlobalFilteredAccidents filtered "with time") ]
+            [ text "globally filter accidents with time" ]
         , h3 []
             [ text ("Aspect Ratio: " ++ String.fromFloat aspectRatio)
             ]
