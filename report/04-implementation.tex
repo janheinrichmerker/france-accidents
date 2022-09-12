@@ -5,7 +5,7 @@
     \caption{Example of wrapping the \lstinline{update} function from \lstinline{Visualization1} inside the \lstinline{Main} module's \lstinline{update} function. Commands sent from \lstinline{Visualization1} are then mapped to the \lstinline{Main} modules types.}
     \label{listing-map-model}
 \end{listing}
-Our demo application is developed in the Elm programming language\footnote{\url{https://elm-lang.org/}} following the functional proramming paradigm. We implement each visualization as a sub-application in a separate Elm module~(\lstinline{Visualization1}, \lstinline{Visualization2}, \lstinline{Visualization3}) that only exposes the functions required in the Elm application architecture~(i.e., \lstinline{Model}, \lstinline{Msg}, \lstinline{init}, \lstinline{update}, \lstinline{view}) as well as a visualization name~(i.e., \lstinline{label}). The \lstinline{Main} module is then responsible for switching visualizations and any bundling messages sent from either of the sub-applications, by mapping and wrapping each visuzlization's model, messages, and view as illustrated in Listing~\ref{listing-map-model}. In addition to the modules used for displaying the application, additional modules are implemented for defining the accident model~(\lstinline{Model}), parsing accidents from the JSONL~files described in Section~\ref{data}~(\lstinline{Data}), and for utility functions and data structures~(\lstinline{Utils}, \lstinline{TimeUtils}, \lstinline{TreeUtils}, \lstinline{Partition}).
+Our demo application is developed in the Elm programming language\footnote{\url{https://elm-lang.org/}} following the functional programming paradigm. We implement each visualization as a sub-application in a separate Elm module~(\lstinline{Visualization1}, \lstinline{Visualization2}, \lstinline{Visualization3}) that only exposes the functions required in the Elm application architecture~(i.e., \lstinline{Model}, \lstinline{Msg}, \lstinline{init}, \lstinline{update}, \lstinline{view}) as well as a visualization name~(i.e., \lstinline{label}). The \lstinline{Main} module is then responsible for switching visualizations and any bundling messages sent from either of the sub-applications, by mapping and wrapping each visualization's model, messages, and view as illustrated in Listing~\ref{listing-map-model}. In addition to the modules used for displaying the application, additional modules are implemented for defining the accident model~(\lstinline{Model}), parsing accidents from the JSONL~files described in Section~\ref{data}~(\lstinline{Data}), and for utility functions and data structures~(\lstinline{Utils}, \lstinline{TimeUtils}, \lstinline{TreeUtils}, \lstinline{Partition}).
 
 \paragraph{Model}
 \begin{listing}
@@ -13,7 +13,7 @@ Our demo application is developed in the Elm programming language\footnote{\url{
     \caption{The accident record as Elm data structure.}
     \label{listing-accident-model}
 \end{listing}
-We implement the accident data model by creating record types for the \lstinline[breaklines=false]{Accident}, \lstinline{Vehicle}, and \lstinline{Person} as shwon in Listing~\ref{listing-accident-model}. To type-safely model the various categorical data dimensions~(e.g., \lstinline{Intersection} or \lstinline{TravelReason}) we implement Elm set types. The Elm datastructures in the \lstinline{Model} module follow the same type definitions as the Python types from the data preprocessing code~(cf. Section~\ref{data}).
+We implement the accident data model by creating record types for the \lstinline[breaklines=false]{Accident}, \lstinline{Vehicle}, and \lstinline{Person} as shown in Listing~\ref{listing-accident-model}. To type-safely model the various categorical data dimensions~(e.g., \lstinline{Intersection} or \lstinline{TravelReason}) we implement Elm set types. The Elm datastructures in the \lstinline{Model} module follow the same type definitions as the Python types from the data preprocessing code~(cf. Section~\ref{data}).
 
 \paragraph{Data}
 \begin{listing}
@@ -21,7 +21,7 @@ We implement the accident data model by creating record types for the \lstinline
     \caption{Decoder function for parsing the person category from the JSON field.}
     \label{listing-parse-person-category}
 \end{listing}
-We then load the static JSONL dataset file~(cf. Section~\ref{data}) via HTTP requests and parse the response line-by-line into a list of type-safe data structures. Parsers are implemented in the \lstinline{Json.Decode} framework by creating deoders for each categorical dimension, the \lstinline{Accident} structure, the \lstinline{Vehicle} structure, and the \lstinline{Person} stucture like illustrated in Listing~\ref{listing-parse-person-category}.
+We then load the static JSONL dataset file~(cf. Section~\ref{data}) via HTTP requests and parse the response line-by-line into a list of type-safe data structures. Parsers are implemented in the \lstinline{Json.Decode} framework by creating decoders for each categorical dimension, the \lstinline{Accident} structure, the \lstinline{Vehicle} structure, and the \lstinline{Person} structure like illustrated in Listing~\ref{listing-parse-person-category}.
 Parsing the categorical dimensions requires a substantial amount of boilerplate code. For future work it might make sense to automatically generate the decoder functions given that they follow the exact same structure regardless of individual values.
 
 \paragraph{Utilities and Additional Data Structures}
@@ -33,7 +33,7 @@ Parsing the categorical dimensions requires a substantial amount of boilerplate 
 In utility modules we uncouple code that is used in multiple modules or would otherwise clutter the individual visualization modules source files.
 In brief, the \lstinline{Partition} module is used to partition lists of items into labelled subsets. Multiple partitioning functions can be used to create partition trees where partitioned lists are subsequently split further until no partitioning function is left.
 Using the \lstinline{Time} module, we can manipulate \lstinline{Posix} timestamps as illustrated in Listing~\ref{listing-util-remove-year}.
-The \lstinline{TreeUtils} module consists of a function to convert a \lstinline{Tree} sructure into a graph tree.
+The \lstinline{TreeUtils} module consists of a function to convert a \lstinline{Tree} structure into a graph tree.
 And the \lstinline{Utils} module contains various functions that simplify working with \lstinline{List} values and tuples.
 
 \paragraph{Severity Time Series}
@@ -62,7 +62,7 @@ To implement key-based grouping of accidents into buckets, we implement utilitie
     \label{listing-vis2-stick-figure}
 \end{listing}
 Implementing the map of stick figures was more difficult as we had to integrate icon-based markers into a scatterplot. We also needed to ensure that the plot's bounds match the map background's geographical bounds.
-Hence, accidents are \Ni filtered by bounds and \Nii grouped by the user-selected grouping method~(as specified by group key, cf. Listing~\ref{listing-vis2-group-key}). Each group is then plotted onto the map background by drawing either one average stick figure or multiple overlayed stick figures as illustrated in Listing~\ref{listing-vis2-stick-figure}. Because a majority of the grouping utility functions could be re-used from the first visualization, we were able to focus on the geo-coding and stick figure markers for this visualization. Similar to the time series visualization, we implement selectors for the grouping and display style by sending messages on click events and storing the typed options to the visualization's \lstinline{Model}.
+Hence, accidents are \Ni filtered by bounds and \Nii grouped by the user-selected grouping method~(as specified by group key, cf. Listing~\ref{listing-vis2-group-key}). Each group is then plotted onto the map background by drawing either one average stick figure or multiple overlayed stick figures as illustrated in Listing~\ref{listing-vis2-stick-figure}. Because a majority of the grouping utility functions could be re-used from the first visualization, we were able to focus on the geocoding and stick figure markers for this visualization. Similar to the time series visualization, we implement selectors for the grouping and display style by sending messages on click events and storing the typed options to the visualization's \lstinline{Model}.
 
 \paragraph{Accident Type Treemap}
 \begin{listing}
@@ -81,8 +81,8 @@ By sending messages on click events we either modify the active dimensions' orde
 The second challenge in implementing the accident type tree was to hierarchically partition the global list of accidents into increasingly smaller subsets while also keeping track of a label describing each subset's filters.
 Using an Elm package, we implement this tree partitioning in the \lstinline{Partition} module~(cf. Listing~\ref{listing-partition-tree})
 
-The interaction between the three visualizations introduced in Section~\ref{interaction} is implemented by sending a special \lstinline{SetGlobalFilteredAccidents} message with the desired subset of accidents and a descriptive filter name. This special message is ignored in the individual visualization's \lstinline{update} function but instead catched in the \lstinline{Main} module in order to re-distribute the updated accident list to each of the three visualizations.
+The interaction between the three visualizations introduced in Section~\ref{interaction} is implemented by sending a special \lstinline{SetGlobalFilteredAccidents} message with the desired subset of accidents and a descriptive filter name. This special message is ignored in the individual visualization's \lstinline{update} function but instead caught in the \lstinline{Main} module in order to re-distribute the updated accident list to each of the three visualizations.
 Once the accidents are partitioned into a tree, we display the tree either using the \lstinline{treemap}, \lstinline{treeGraph}, or \lstinline{treeList} function which all recursively restructure the tree into HTML and SVG nodes.
 
-Together with the static data files~(cf. Section~\ref{data}), we compile and bundle the Elm source code in a WebPack\footnote{\url{https://webpack.js.org/}} module. To improve the code quality, a continuous integration pipeline enforcea the default Elm source code formatting and reviewa our code against a set of common mistakes as specified in the \lstinline{ReviewConfig} module.
+Together with the static data files~(cf. Section~\ref{data}), we compile and bundle the Elm source code in a WebPack\footnote{\url{https://webpack.js.org/}} module. To improve the code quality, a continuous integration pipeline enforces the default Elm source code formatting and reviews our code against a set of common mistakes as specified in the \lstinline{ReviewConfig} module.
 The reviewed bundle is then deployed to GitHub Pages.\footnote{\url{https://heinrichreimer.github.io/france-accidents/}}
