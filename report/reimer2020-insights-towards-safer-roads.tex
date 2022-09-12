@@ -86,11 +86,7 @@
 \newcommand{\Ne}{(e)~}
 
 % Git:
-\newcommand{\lastcommit}{\CatchFileDef{\gitfull}{git-log.txt}{}\StrBetween{\gitfull}{* }{ (HEAD -> main)}}
-
-% Editing:
-\newcommand{\todocite}{{\smaller\color{red}[CITE]}\xspace}
-\newcommand{\todo}[1]{{\smaller\color{red}[#1]}}
+\newcommand{\lastcommit}{\CatchFileDef{\gitfull}{git-log.txt}{}\StrBetween{\gitfull}{* }{ (HEAD}}
 
 \begin{document}
 
