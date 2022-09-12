@@ -1,0 +1,107 @@
+\documentclass[english]{mlutalk}
+% \documentclass[english,handout]{mlutalk}
+
+\title{Insights Towards Safer Roads}
+\subtitle{Visualizing Accidents in France from~2005 to~2020}
+\author{Jan Heinrich Reimer}
+\institute{Martin Luther University Halle-Wittenberg\\Information Retrieval und Visualisierung}
+\date{September~14, 2022}
+\titlegraphic{\includegraphics[width=3cm]{figures/mlu-halle}}
+
+
+\usepackage{tikz}
+\usepackage{listings}
+\usepackage{xspace}
+\usepackage{biblatex}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{fontawesome5}
+\addbibresource{../report/literature.bib}
+
+% Listings
+\definecolor{mediumgray}{gray}{0.60}
+\definecolor{webiscodebasic}{rgb}{0.2,0.2,0.2}
+\definecolor{webiscodekeyword}{rgb}{0.0,0.5,0.0}
+\definecolor{webiscodekeywordself}{rgb}{0.7,0.4,0.6}
+\definecolor{webiscodeidentifier}{rgb}{0.0,0.0,0.0}
+\definecolor{webiscodecomment}{rgb}{0.25,0.5,0.5}
+\definecolor{webiscodestring}{rgb}{0.75,0.12,0.12}
+\definecolor{webiscodedecorator}{rgb}{0.6,0.3,0.0}
+\lstdefinestyle{webisstyle}{
+  basicstyle=\ttfamily\footnotesize\color{webiscodebasic},
+  keywordstyle=\color{webiscodekeyword},
+  identifierstyle=\color{webiscodeidentifier},
+  commentstyle=\color{webiscodecomment},
+  stringstyle=\color{webiscodestring},
+  showstringspaces=false,
+  frame=lines,
+  framesep=0.7em,
+  rulesep=0.5em,
+  framerule=0.1em,
+  keepspaces=true,
+  tabsize=2,
+  showtabs=false,
+  breakatwhitespace=false,
+  breaklines=true,
+  prebreak={\mbox{\(\hookleftarrow\)}},
+  numbers=none,
+  literate=
+    {->}{{\textrightarrow}}{2}
+    {>=}{{\(\geq\)}}{2}
+    {<=}{{\(\leq\)}}{2}
+    {!=}{{\(\neq\)}}{2}
+    {|>}{{\(\triangleright\)}}{2},
+  emptylines=0,
+}
+\lstloadlanguages{Haskell}
+\lstset{
+  style=webisstyle,
+  language=Haskell,
+}
+
+% Editing:
+\newcommand{\todocite}{{\smaller\color{red}[CITE]}\xspace}
+\newcommand{\todo}[1]{{\smaller\color{red}[#1]}}
+
+% Lists:
+\setlength{\itemsep}{2ex}
+
+\begin{document}
+
+\titleframe
+
+\begin{frame}{Motivation}
+  \begin{itemize}
+    \item high global number of accidents~\cite{Who2015}
+    \item foo
+    \item bar
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Conclusion}
+  \begin{itemize}
+    \item[\faIcon{github}] \href{https://github.com/heinrichreimer/france-accidents}{\texttt{heinrichreimer/france-accidents}}
+    \item foo
+    \item bar
+  \end{itemize}
+  \vspace{2ex}
+  \begin{block}{Future Work}
+    \begin{itemize}
+      \item foo
+      \item bar
+    \end{itemize}
+  \end{block}
+  \only<1>{\color{white}}\only<2->{}%
+  \thankyou
+\end{frame}
+
+\appendix
+\section{\appendixname}
+
+\bibliographyframe
+
+\end{document}
