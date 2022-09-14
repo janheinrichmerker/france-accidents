@@ -423,6 +423,7 @@ treemapNode axis w h node =
                         , TypedSvg.Attributes.transform
                             [ Translate (w * 0.5) (h * 0.5)
                             ]
+                        , TypedSvg.Events.onClick (SetGlobalFilteredAccidents parentAccidents parentName)
                         ]
                         [ TypedSvg.Core.text (parentName ++ ": " ++ String.fromInt parentWeight) ]
                     ]
@@ -432,7 +433,6 @@ treemapNode axis w h node =
     in
     TypedSvg.g
         [ TypedSvg.Attributes.class [ "node" ]
-        , TypedSvg.Events.onClick (SetGlobalFilteredAccidents parentAccidents parentName)
         ]
         (TypedSvg.rect
             [ TypedSvg.Attributes.x (Px 0)
