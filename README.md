@@ -1,4 +1,4 @@
-[![CI](https://img.shields.io/github/workflow/status/heinrichreimer/france-accidents/CI?style=flat-square)](https://github.com/heinrichreimer/france-accidents/actions?query=workflow%3A"CI")
+[![CI](https://img.shields.io/github/actions/workflow/status/heinrichreimer/france-accidents/ci.yml?branch=main&style=flat-square)](https://github.com/heinrichreimer/france-accidents/actions/workflows/ci.yml)
 [![Code coverage](https://img.shields.io/codecov/c/github/heinrichreimer/france-accidents?style=flat-square)](https://codecov.io/github/heinrichreimer/france-accidents/)
 [![Issues](https://img.shields.io/github/issues/heinrichreimer/france-accidents?style=flat-square)](https://github.com/heinrichreimer/france-accidents/issues)
 [![Commit activity](https://img.shields.io/github/commit-activity/m/heinrichreimer/france-accidents?style=flat-square)](https://github.com/heinrichreimer/france-accidents/commits)
