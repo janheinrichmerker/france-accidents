@@ -7,7 +7,7 @@ on:
 jobs:
   build:
     name: "🏗️ Build"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         node:
@@ -32,7 +32,7 @@ jobs:
         run: yarn build
   test:
     name: "🧪 Test"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         node:
