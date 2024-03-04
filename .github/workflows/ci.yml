@@ -60,7 +60,7 @@ jobs:
       - name: "🧪 Report test coverage"
         run: yarn coverage
       - name: "📤 Upload test coverage"
-        uses: actions/upload-artifact@v2.2.2
+        uses: actions/upload-artifact@v4.3.1
         with:
           path: .coverage/
           name: Test coverage
