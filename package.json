@@ -24,7 +24,7 @@
     "elm-hot-webpack-loader": "^1.1.8",
     "elm-json": "^0.2.13",
     "elm-review": "^2.5.3",
-    "elm-test": "^0.19.1-revision7",
+    "elm-test": "^0.19.1-revision12",
     "elm-webpack-loader": "^7.0.1",
     "html-webpack-plugin": "^5.3.2",
     "rimraf": "^5.0.5",
