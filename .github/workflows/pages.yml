@@ -29,7 +29,7 @@ jobs:
       - name: "🧰 Setup Pages"
         uses: actions/configure-pages@v2
       - name: "🧰 Install Node.js"
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: 14
       - name: "♻️ Cache dependencies"
