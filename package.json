@@ -27,7 +27,7 @@
     "elm-test": "^0.19.1-revision7",
     "elm-webpack-loader": "^7.0.1",
     "html-webpack-plugin": "^5.3.2",
-    "rimraf": "^5.0.5",
+    "rimraf": "^5.0.7",
     "webpack": "^5.90.3",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^3.11.2",
