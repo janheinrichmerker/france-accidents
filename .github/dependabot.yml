@@ -7,7 +7,7 @@ updates:
   - package-ecosystem: pip
     directory: /preprocessing/
     schedule:
-      interval: weekly
+      interval: monthly
   - package-ecosystem: github-actions
     directory: /
     schedule:
