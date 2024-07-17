@@ -2,67 +2,99 @@ name: CI
 
 on:
   push:
-  pull_request:
+
+concurrency:
+  group: ${{ github.actor }}-${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build:
-    name: "🏗️ Build"
+  node-build:
+    name: 🏗️ Build Node app
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node:
-          #- 12
-          - 14
     steps:
-      - name: "📥 Check-out"
+      - name: 📥 Check-out
         uses: actions/checkout@v4
-      - name: "🧰 Install Node.js"
-        uses: actions/setup-node@v2
+      - name: 🧰 Install Node
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node }}
-      - name: "♻️ Cache dependencies"
-        uses: actions/cache@v4
-        with:
-          path: |
-            node_modules
-          key: ${{ runner.os }}-node-${{ matrix.node }}-${{ hashFiles('**/yarn.lock') }}
-      - name: "🧰 Install dependencies"
-        run: yarn install --frozen-lockfile
-      - name: "🏗️ Build package"
+          node-version: "22.2"
+          cache: yarn
+          cache-dependency-path: yarn.lock
+      - name: 🧰 Install Node dependencies
+        run: yarn
+      - name: 🏗️ Build Node app
         run: yarn build
-  test:
-    name: "🧪 Test"
+      - name: 📤 Upload app for GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/
+  node-check:
+    name: 🔍 Check Node app code
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node:
-          #- 12
-          - 14
     steps:
-      - name: "📥 Check-out"
+      - name: 📥 Check-out
         uses: actions/checkout@v4
-      - name: "🧰 Install Node.js"
-        uses: actions/setup-node@v2
+      - name: 🧰 Install Node
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node }}
-      - name: "♻️ Cache dependencies"
-        uses: actions/cache@v4
-        with:
-          path: |
-            node_modules
-          key: ${{ runner.os }}-node-${{ matrix.node }}-${{ hashFiles('**/yarn.lock') }}
-      - name: "🧰 Install dependencies"
-        run: yarn install --frozen-lockfile
-      - name: "🧪 Review code"
+          node-version: "22.2"
+          cache: yarn
+          cache-dependency-path: yarn.lock
+      - name: 🧰 Install Node dependencies
+        run: yarn --dev
+      - name: 🔍 Check Node app code
         run: yarn lint
-      - name: "🧪 Run tests"
-        run: yarn test
-      - name: "🧪 Report test coverage"
-        run: yarn coverage
-      - name: "📤 Upload test coverage"
-        uses: actions/upload-artifact@v4
+  node-test:
+    name: 🧪 Test Node app
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Check-out
+        uses: actions/checkout@v4
+      - name: 🧰 Install Node
+        uses: actions/setup-node@v4
         with:
-          path: .coverage/
-          name: Test coverage
-      - name: "📤 Publish test coverage"
-        uses: codecov/codecov-action@v1
+          node-version: "22.2"
+          cache: yarn
+          cache-dependency-path: yarn.lock
+      - name: 🧰 Install Node dependencies
+        run: yarn --dev
+      - name: 🧪 Test Node app
+        run: yarn test
+  github-pages-deploy:
+    name: 🚀 Deploy to GitHub Pages
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    needs:
+      - node-build
+      - node-check
+      - node-test
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: GitHub Pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🚀 Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+  github-release:
+    name: 🚀 Create GitHub release
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    needs:
+      - node-build
+      - node-check
+      - node-test
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Check-out
+        uses: actions/checkout@v4
+      - name: 🚀 Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
