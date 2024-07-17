@@ -842,10 +842,6 @@ timeSeriesLinePlot aspectRatio group model =
         ]
 
 
-type alias Point =
-    ( Float, Float )
-
-
 type alias TimePoint =
     ( Posix, Float )
 
