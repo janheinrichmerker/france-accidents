@@ -1,8 +1,8 @@
-[![CI](https://img.shields.io/github/actions/workflow/status/heinrichreimer/france-accidents/ci.yml?branch=main&style=flat-square)](https://github.com/heinrichreimer/france-accidents/actions/workflows/ci.yml)
-[![Code coverage](https://img.shields.io/codecov/c/github/heinrichreimer/france-accidents?style=flat-square)](https://codecov.io/github/heinrichreimer/france-accidents/)
-[![Issues](https://img.shields.io/github/issues/heinrichreimer/france-accidents?style=flat-square)](https://github.com/heinrichreimer/france-accidents/issues)
-[![Commit activity](https://img.shields.io/github/commit-activity/m/heinrichreimer/france-accidents?style=flat-square)](https://github.com/heinrichreimer/france-accidents/commits)
-[![License](https://img.shields.io/github/license/heinrichreimer/france-accidents?style=flat-square)](LICENSE)
+[![CI](https://img.shields.io/github/actions/workflow/status/janheinrichmerker/france-accidents/ci.yml?branch=main&style=flat-square)](https://github.com/janheinrichmerker/france-accidents/actions/workflows/ci.yml)
+[![Code coverage](https://img.shields.io/codecov/c/github/janheinrichmerker/france-accidents?style=flat-square)](https://codecov.io/github/janheinrichmerker/france-accidents/)
+[![Issues](https://img.shields.io/github/issues/janheinrichmerker/france-accidents?style=flat-square)](https://github.com/janheinrichmerker/france-accidents/issues)
+[![Commit activity](https://img.shields.io/github/commit-activity/m/janheinrichmerker/france-accidents?style=flat-square)](https://github.com/janheinrichmerker/france-accidents/commits)
+[![License](https://img.shields.io/github/license/janheinrichmerker/france-accidents?style=flat-square)](LICENSE)
 
 # 🚨 france-accidents
 

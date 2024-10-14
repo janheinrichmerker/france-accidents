@@ -2,7 +2,7 @@
   "name": "france-accidents",
   "version": "1.0.0",
   "description": "Visualizing accidents in France from 2005 to 2016.",
-  "repository": "https://github.com/heinrichreimer/france-accidents",
+  "repository": "https://github.com/janheinrichmerker/france-accidents",
   "author": "Jan Heinrich Reimer <jan.reimer@student.uni-halle.de>",
   "license": "MIT",
   "private": true,
