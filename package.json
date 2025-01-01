@@ -29,7 +29,7 @@
     "html-webpack-plugin": "^5.3.2",
     "rimraf": "^6.0.1",
     "webpack": "^5.90.3",
-    "webpack-cli": "^5.1.4",
+    "webpack-cli": "^6.0.1",
     "webpack-dev-server": "^3.11.2",
     "yarn-or-npm": "^3.0.1"
   }
