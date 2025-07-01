@@ -20,7 +20,7 @@
     "copy-webpack-plugin": "^9.0.1",
     "elm": "^0.19.1-6",
     "elm-coverage": "^0.4.1",
-    "elm-format": "^0.8.7",
+    "elm-format": "^0.8.8",
     "elm-hot-webpack-loader": "^1.1.8",
     "elm-json": "^0.2.13",
     "elm-review": "^2.12.0",
